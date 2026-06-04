@@ -2,6 +2,7 @@ package io.github.s52.preslib.generator
 
 import io.github.s52.preslib.source.PresLibSourceNormalizer
 import io.github.s52.preslib.source.PresLibSourcePack
+import io.github.s52.preslib.source.SourceAttributeFilter
 import io.github.s52.preslib.source.SourceVectorCommand
 import java.util.Locale
 
@@ -23,6 +24,7 @@ object PresLibKotlinGenerator {
             appendLine("package $packageName")
             appendLine()
             appendLine("import io.github.s52.catalog.PrimitiveType")
+            appendLine("import io.github.s52.catalog.S57Attribute")
             appendLine("import io.github.s52.catalog.S57ObjectClass")
             appendLine("import io.github.s52.core.settings.DisplayCategory")
             appendLine("import io.github.s52.core.settings.S52Palette")
@@ -31,6 +33,7 @@ object PresLibKotlinGenerator {
             appendLine("import io.github.s52.preslib.source.SourceColor")
             appendLine("import io.github.s52.preslib.source.SourceColorTable")
             appendLine("import io.github.s52.preslib.source.SourceLineStyle")
+            appendLine("import io.github.s52.preslib.source.SourceAttributeFilter")
             appendLine("import io.github.s52.preslib.source.SourceLookupRecord")
             appendLine("import io.github.s52.preslib.source.SourcePattern")
             appendLine("import io.github.s52.preslib.source.SourceSymbol")
@@ -97,7 +100,12 @@ object PresLibKotlinGenerator {
                 appendLine("                displayCategory = DisplayCategory.${record.displayCategory.name},")
                 appendLine("                viewingGroup = ${record.viewingGroup},")
                 appendLine("                displayPriority = ${record.displayPriority},")
-                appendLine("                overRadar = ${record.overRadar}")
+                val minimumDisplayScale = record.minimumDisplayScale?.d() ?: "null"
+                val maximumDisplayScale = record.maximumDisplayScale?.d() ?: "null"
+                appendLine("                overRadar = ${record.overRadar},")
+                appendLine("                attributeFilter = ${record.attributeFilter.kt()},")
+                appendLine("                minimumDisplayScale = $minimumDisplayScale,")
+                appendLine("                maximumDisplayScale = $maximumDisplayScale")
                 append("            )")
                 appendLine(if (index == normalized.lookupRecords.lastIndex) "" else ",")
             }
@@ -123,6 +131,25 @@ object PresLibKotlinGenerator {
     }
 
     private fun Double.d(): String = String.format(Locale.US, "%.6f", this).trimEnd('0').trimEnd('.') + ".0".takeIf { this % 1.0 == 0.0 }.orEmpty()
+
+    private fun SourceAttributeFilter.kt(): String = when (this) {
+        SourceAttributeFilter.Any -> "SourceAttributeFilter.Any"
+        is SourceAttributeFilter.Exists -> "SourceAttributeFilter.Exists(S57Attribute.${attribute.name})"
+        is SourceAttributeFilter.Missing -> "SourceAttributeFilter.Missing(S57Attribute.${attribute.name})"
+        is SourceAttributeFilter.EqualsInt -> "SourceAttributeFilter.EqualsInt(S57Attribute.${attribute.name}, $expected)"
+        is SourceAttributeFilter.IntIn -> "SourceAttributeFilter.IntIn(S57Attribute.${attribute.name}, setOf(${expected.sorted().joinToString()}))"
+        is SourceAttributeFilter.EqualsDecimal -> "SourceAttributeFilter.EqualsDecimal(S57Attribute.${attribute.name}, ${expected.d()}, ${tolerance.d()})"
+        is SourceAttributeFilter.DecimalRange -> {
+            val min = minInclusive?.d() ?: "null"
+            val max = maxInclusive?.d() ?: "null"
+            "SourceAttributeFilter.DecimalRange(S57Attribute.${attribute.name}, $min, $max)"
+        }
+        is SourceAttributeFilter.TextEquals -> "SourceAttributeFilter.TextEquals(S57Attribute.${attribute.name}, ${expected.kt()}, $ignoreCase)"
+        is SourceAttributeFilter.TextIn -> "SourceAttributeFilter.TextIn(S57Attribute.${attribute.name}, setOf(${expected.sorted().joinToString { it.kt() }}), $ignoreCase)"
+        is SourceAttributeFilter.All -> "SourceAttributeFilter.All(listOf(${filters.joinToString { it.kt() }}))"
+        is SourceAttributeFilter.AnyOf -> "SourceAttributeFilter.AnyOf(listOf(${filters.joinToString { it.kt() }}))"
+        is SourceAttributeFilter.Not -> "SourceAttributeFilter.Not(${filter.kt()})"
+    }
 
     private fun SourceVectorCommand.kt(): String = when (this) {
         is SourceVectorCommand.MoveTo -> "SourceVectorCommand.MoveTo(${x.d()}, ${y.d()})"

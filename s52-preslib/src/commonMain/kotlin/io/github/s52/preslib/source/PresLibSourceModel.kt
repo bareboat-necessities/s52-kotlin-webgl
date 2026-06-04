@@ -1,17 +1,18 @@
 package io.github.s52.preslib.source
 
 import io.github.s52.catalog.PrimitiveType
+import io.github.s52.catalog.S57Attribute
 import io.github.s52.catalog.S57ObjectClass
+import io.github.s52.core.lookup.AttributeFilter
 import io.github.s52.core.settings.DisplayCategory
 import io.github.s52.core.settings.S52Palette
 
 /**
  * Source-side Presentation Library interchange model.
  *
- * Phase 2 intentionally keeps this independent from the runtime registries so
- * an importer/generator can validate and normalize names before creating a
- * [io.github.s52.preslib.PresLibPack]. It is not the official IHO source
- * format; it is a compact internal handoff format for generated data.
+ * It is not the official IHO source format; it is a compact internal handoff
+ * format for generated data after an importer has decoded the official/local
+ * Presentation Library package.
  */
 data class PresLibSourcePack(
     val metadata: PresLibMetadata,
@@ -73,5 +74,77 @@ data class SourceLookupRecord(
     val displayCategory: DisplayCategory,
     val viewingGroup: Int,
     val displayPriority: Int,
-    val overRadar: Boolean = false
+    val overRadar: Boolean = false,
+    val attributeFilter: SourceAttributeFilter = SourceAttributeFilter.Any,
+    val minimumDisplayScale: Double? = null,
+    val maximumDisplayScale: Double? = null
 )
+
+/** Structural, generator-friendly lookup filter model. */
+sealed interface SourceAttributeFilter {
+    fun toRuntime(): AttributeFilter
+
+    data object Any : SourceAttributeFilter {
+        override fun toRuntime(): AttributeFilter = AttributeFilter.Any
+    }
+
+    data class Exists(val attribute: S57Attribute) : SourceAttributeFilter {
+        override fun toRuntime(): AttributeFilter = AttributeFilter.Exists(attribute)
+    }
+
+    data class Missing(val attribute: S57Attribute) : SourceAttributeFilter {
+        override fun toRuntime(): AttributeFilter = AttributeFilter.Missing(attribute)
+    }
+
+    data class EqualsInt(val attribute: S57Attribute, val expected: Int) : SourceAttributeFilter {
+        override fun toRuntime(): AttributeFilter = AttributeFilter.EqualsInt(attribute, expected)
+    }
+
+    data class IntIn(val attribute: S57Attribute, val expected: Set<Int>) : SourceAttributeFilter {
+        override fun toRuntime(): AttributeFilter = AttributeFilter.IntIn(attribute, expected)
+    }
+
+    data class EqualsDecimal(
+        val attribute: S57Attribute,
+        val expected: Double,
+        val tolerance: Double = 1.0e-9
+    ) : SourceAttributeFilter {
+        override fun toRuntime(): AttributeFilter = AttributeFilter.EqualsDecimal(attribute, expected, tolerance)
+    }
+
+    data class DecimalRange(
+        val attribute: S57Attribute,
+        val minInclusive: Double? = null,
+        val maxInclusive: Double? = null
+    ) : SourceAttributeFilter {
+        override fun toRuntime(): AttributeFilter = AttributeFilter.DecimalRange(attribute, minInclusive, maxInclusive)
+    }
+
+    data class TextEquals(
+        val attribute: S57Attribute,
+        val expected: String,
+        val ignoreCase: Boolean = false
+    ) : SourceAttributeFilter {
+        override fun toRuntime(): AttributeFilter = AttributeFilter.TextEquals(attribute, expected, ignoreCase)
+    }
+
+    data class TextIn(
+        val attribute: S57Attribute,
+        val expected: Set<String>,
+        val ignoreCase: Boolean = false
+    ) : SourceAttributeFilter {
+        override fun toRuntime(): AttributeFilter = AttributeFilter.TextIn(attribute, expected, ignoreCase)
+    }
+
+    data class All(val filters: List<SourceAttributeFilter>) : SourceAttributeFilter {
+        override fun toRuntime(): AttributeFilter = AttributeFilter.All(filters.map { it.toRuntime() })
+    }
+
+    data class AnyOf(val filters: List<SourceAttributeFilter>) : SourceAttributeFilter {
+        override fun toRuntime(): AttributeFilter = AttributeFilter.AnyOf(filters.map { it.toRuntime() })
+    }
+
+    data class Not(val filter: SourceAttributeFilter) : SourceAttributeFilter {
+        override fun toRuntime(): AttributeFilter = AttributeFilter.Not(filter.toRuntime())
+    }
+}

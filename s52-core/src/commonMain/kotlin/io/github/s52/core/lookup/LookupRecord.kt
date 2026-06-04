@@ -13,5 +13,18 @@ data class LookupRecord(
     val displayCategory: DisplayCategory,
     val viewingGroup: Int,
     val displayPriority: Int,
-    val overRadar: Boolean = false
-)
+    val overRadar: Boolean = false,
+    val minimumDisplayScale: Double? = null,
+    val maximumDisplayScale: Double? = null,
+    val sourceIndex: Int = 0
+) {
+    init {
+        require(viewingGroup >= 0) { "Viewing group must be non-negative: $viewingGroup" }
+        require(displayPriority >= 0) { "Display priority must be non-negative: $displayPriority" }
+        require(minimumDisplayScale == null || minimumDisplayScale > 0.0) { "minimumDisplayScale must be positive" }
+        require(maximumDisplayScale == null || maximumDisplayScale > 0.0) { "maximumDisplayScale must be positive" }
+        require(
+            minimumDisplayScale == null || maximumDisplayScale == null || minimumDisplayScale <= maximumDisplayScale
+        ) { "minimumDisplayScale must be <= maximumDisplayScale" }
+    }
+}

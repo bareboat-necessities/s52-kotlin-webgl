@@ -38,3 +38,10 @@ tasks.register("phase3Check") {
     description = "Runs Phase 3 S-52 instruction parser checks and all previous phase checks."
     dependsOn("phase2Check")
 }
+
+
+tasks.register("phase4Check") {
+    group = "verification"
+    description = "Runs Phase 4 lookup matching, display filtering, and ordering checks plus all previous phase checks."
+    dependsOn("phase3Check")
+}

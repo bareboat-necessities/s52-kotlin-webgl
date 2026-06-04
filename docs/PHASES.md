@@ -109,18 +109,34 @@ Notes:
 
 ## Phase 4 — Lookup matching and display ordering
 
-Goal: turn typed feature + primitive + attributes into ordered portrayal instructions.
+**Status:** complete in this increment.
 
-Deliverables:
+Goal: turn typed feature + primitive + attributes into ordered portrayal instructions and draw commands.
 
-- Object class matching
-- Primitive matching
-- Attribute filter matching
-- Display category filtering
-- Viewing group filtering
-- Display priority ordering
-- Scale-dependent filtering
-- Radar flag preservation
+Deliverables completed:
+
+- Indexed lookup table by object class + primitive
+- Detailed lookup matches with source row index and attribute-filter specificity
+- Lookup explanation diagnostics for scale and attribute-filter rejections
+- Structural `AttributeFilter` tree for generated/runtime lookup rows
+- Source/generator-side `SourceAttributeFilter` model
+- Optional lookup-row scale constraints
+- Display category filtering extracted to `DisplayCategoryFilter`
+- Viewing group allow/deny filtering extracted to `ViewingGroupFilter`
+- Deterministic display-priority sorter with stable command-kind tie-breakers
+- Mariner settings for enabled/disabled viewing groups
+- Phase 4 tests and CI target `phase4Check`
+
+Definition of done:
+
+- Object class matching works
+- Primitive matching works
+- Attribute filter matching works
+- Display category filtering works
+- Viewing group filtering works
+- Display priority ordering is deterministic
+- Scale-dependent filtering supports feature and lookup-row constraints
+- Radar flag remains preserved on all draw commands
 
 ## Phase 5 — Critical CSP batch
 

@@ -41,11 +41,14 @@ object PresLibPackBuilder {
     private fun SourceLookupRecord.toLookupRecord(): LookupRecord = LookupRecord(
         objectClass = objectClass,
         primitive = primitive,
+        attributeFilter = attributeFilter.toRuntime(),
         instructions = InstructionParser.parseSequence(instruction),
         displayCategory = displayCategory,
         viewingGroup = viewingGroup,
         displayPriority = displayPriority,
-        overRadar = overRadar
+        overRadar = overRadar,
+        minimumDisplayScale = minimumDisplayScale,
+        maximumDisplayScale = maximumDisplayScale
     )
 
     private fun SourceSymbol.toSymbolDefinition(): SymbolDefinition = SymbolDefinition(
