@@ -375,3 +375,26 @@ Completed deliverables:
 Phase 17 remains additive. It does not add S-57 parsing, S-63, navigation, AIS, GPS, route management, or ECDIS certification scope.
 
 See [`DIAGNOSTICS_PHASE17.md`](DIAGNOSTICS_PHASE17.md).
+
+## Phase 18 — Built-in portrayal profiles
+
+Status: **complete**.
+
+Goal: make downstream demos, tests, issue reports, and consumer integrations reproducible by giving them stable named portrayal settings instead of ad-hoc `MarinerSettings` construction.
+
+Completed deliverables:
+
+- Added `S52PortrayalProfile`, `S52ProfileSummary`, `S52ProfilePreset`, and `S52ProfileCatalog` to the public `s52-api` module.
+- Added built-in profile presets: `safety-day`, `planning-day`, `night-minimal`, and `diagnostics-all`.
+- Added profile summary Markdown and simple properties-style output.
+- Added profile-to-request and profile-to-context helpers.
+- Added `S52PortrayalSession.portray(features, profile)` convenience API.
+- Added `S52PortrayalSession.diagnosticBundle(features, profile, ...)` convenience API.
+- Added profile API tests and Phase 18 release-readiness tests.
+- Added profile integration sample under `samples/integration/profiles/`.
+- Added `phase18ProfilesAudit`, `phase18SourceArchive`, and `phase18Check`.
+- Updated CI and release workflow to run `phase18Check`.
+
+Phase 18 remains additive. It does not add S-57 parsing, S-63, navigation, AIS, GPS, route management, or ECDIS certification scope.
+
+See [`PROFILES_PHASE18.md`](PROFILES_PHASE18.md).

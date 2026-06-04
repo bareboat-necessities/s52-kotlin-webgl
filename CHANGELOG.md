@@ -18,6 +18,7 @@
 - Phase 15 release-readiness checks, release workflow, and source archive task.
 - Phase 16 `s52-api` consumer facade, runtime manifest, diagnostics result, and facade integration sample.
 - Phase 17 diagnostic bundle, Markdown/properties diagnostics, transcript preview, and diagnostics integration sample.
+- Phase 18 built-in portrayal profiles, profile summaries, profile-based facade convenience calls, and profile integration sample.
 
 ### Safety
 

@@ -224,3 +224,45 @@ tasks.register("phase17Check") {
     description = "Runs Phase 17 diagnostic bundle checks and all previous phase checks."
     dependsOn("phase16Check", "phase17DiagnosticsAudit", ":s52-api:build", ":s52-tests:jvmTest")
 }
+
+tasks.register("phase18ProfilesAudit") {
+    group = "verification"
+    description = "Checks Phase 18 built-in portrayal profile API and integration documentation."
+
+    doLast {
+        val requiredFiles = listOf(
+            "s52-api/src/commonMain/kotlin/io/github/s52/api/S52Profile.kt",
+            "s52-api/src/jvmTest/kotlin/io/github/s52/api/S52ProfileTest.kt",
+            "docs/PROFILES_PHASE18.md",
+            "samples/integration/profiles/README.md"
+        )
+        val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
+        check(missing.isEmpty()) { "Missing Phase 18 profile files: $missing" }
+
+        val readme = layout.projectDirectory.file("README.md").asFile.readText()
+        check("S52ProfileCatalog" in readme) { "README.md must document the Phase 18 profile API." }
+        check("phase18Check" in readme) { "README.md must document the Phase 18 check task." }
+        check("Not for navigation" in readme) { "README.md must keep the not-for-navigation boundary." }
+    }
+}
+
+tasks.register<org.gradle.api.tasks.bundling.Zip>("phase18SourceArchive") {
+    group = "distribution"
+    description = "Builds a source archive for Phase 18 release handoff."
+    archiveBaseName.set("s52-kotlin-webgl")
+    archiveClassifier.set("phase18-source")
+    archiveVersion.set(project.version.toString())
+
+    from(layout.projectDirectory) {
+        exclude(".git/**")
+        exclude(".gradle/**")
+        exclude("**/build/**")
+        exclude("build/**")
+    }
+}
+
+tasks.register("phase18Check") {
+    group = "verification"
+    description = "Runs Phase 18 portrayal profile checks and all previous phase checks."
+    dependsOn("phase17Check", "phase18ProfilesAudit", ":s52-api:build", ":s52-api:jvmTest", ":s52-tests:jvmTest")
+}

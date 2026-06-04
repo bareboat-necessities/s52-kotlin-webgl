@@ -25,5 +25,5 @@ jobs:
         with:
           gradle-version: 8.14.5
 
-      - name: Build and test Phase 17
-        run: gradle --no-daemon phase17Check
+      - name: Build and test Phase 18
+        run: gradle --no-daemon phase18Check
