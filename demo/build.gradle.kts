@@ -11,6 +11,7 @@ kotlin {
     sourceSets {
         jsMain {
             dependencies {
+                implementation(libs.kotlinx.browser)
                 implementation(project(":s52-catalog"))
                 implementation(project(":s52-core"))
                 implementation(project(":s52-preslib"))

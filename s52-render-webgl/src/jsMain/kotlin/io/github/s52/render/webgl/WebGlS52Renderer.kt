@@ -13,7 +13,7 @@ import io.github.s52.render.webgl.internal.LineRenderer
 import io.github.s52.render.webgl.internal.SolidColorProgram
 import io.github.s52.render.webgl.internal.SymbolRenderer
 import io.github.s52.render.webgl.internal.TextRenderer
-import org.khronos.webgl.WebGL2RenderingContext
+import org.khronos.webgl.WebGLRenderingContext
 import org.w3c.dom.HTMLCanvasElement
 
 /**
@@ -28,8 +28,8 @@ class WebGlS52Renderer(
     private val canvas: HTMLCanvasElement,
     private val presLib: PresLibPack
 ) {
-    private val gl: WebGL2RenderingContext =
-        canvas.getContext("webgl2") as? WebGL2RenderingContext
+    private val gl: WebGLRenderingContext =
+        canvas.getContext("webgl2") as? WebGLRenderingContext
             ?: error("WebGL2 is not available in this browser")
 
     private val solidProgram = SolidColorProgram(gl)
@@ -46,9 +46,9 @@ class WebGlS52Renderer(
     ): RenderStats {
         resizeToDisplaySize()
         gl.viewport(0, 0, canvas.width, canvas.height)
-        gl.disable(WebGL2RenderingContext.DEPTH_TEST)
-        gl.enable(WebGL2RenderingContext.BLEND)
-        gl.blendFunc(WebGL2RenderingContext.SRC_ALPHA, WebGL2RenderingContext.ONE_MINUS_SRC_ALPHA)
+        gl.disable(WebGLRenderingContext.DEPTH_TEST)
+        gl.enable(WebGLRenderingContext.BLEND)
+        gl.blendFunc(WebGLRenderingContext.SRC_ALPHA, WebGLRenderingContext.ONE_MINUS_SRC_ALPHA)
 
         val colors = ColorResolver(presLib, settings.palette)
         val background = presLib.colors.color(settings.palette, "DEPDW")
@@ -57,7 +57,7 @@ class WebGlS52Renderer(
         } else {
             gl.clearColor(0.9f, 0.95f, 1.0f, 1.0f)
         }
-        gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT)
+        gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT)
 
         val projector = GeometryProjector(viewport, canvas.width, canvas.height)
         val batchReport = DrawCommandBatcher.report(commands)

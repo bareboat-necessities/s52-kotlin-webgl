@@ -45,6 +45,6 @@ class S52DocumentationPhase14Test {
 
         assertTrue(result.isValid)
         assertTrue(result.commands.isNotEmpty())
-        assertTrue(runtime.transcript(listOf(feature), settings, S52.defaultContext(settings)).contains("AreaFill"))
+        assertTrue(runtime.transcript(listOf(feature), settings, S52.defaultContext(settings)).contains("area-fill"))
     }
 }

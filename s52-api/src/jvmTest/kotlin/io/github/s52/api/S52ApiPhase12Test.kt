@@ -34,8 +34,8 @@ class S52ApiPhase12Test {
         val second = runtime.transcript(listOf(depthArea(), sounding()), settings, context)
 
         assertEquals(first, second)
-        assertTrue(first.contains("AreaFill"))
-        assertTrue(first.contains("Sounding"))
+        assertTrue(first.contains("area-fill"))
+        assertTrue(first.contains("sounding"))
     }
 
     @Test

@@ -125,7 +125,7 @@ class Phase5CriticalCspTest {
             context
         )
 
-        assertTrue(commands.any { it is S52DrawCommand.Text && it.textExpression == "3" })
+        assertTrue(commands.any { it is S52DrawCommand.Sounding && it.depthLabel == "3" })
         assertTrue(commands.any { it is S52DrawCommand.PointSymbol && it.symbolName == "TOPMAR_CONE_UP01" })
     }
 

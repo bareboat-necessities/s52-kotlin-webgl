@@ -5,13 +5,13 @@ import io.github.s52.core.geometry.EncGeometry
 import io.github.s52.preslib.PresLibPack
 import io.github.s52.preslib.SymbolDefinition
 import io.github.s52.preslib.VectorCommand
-import org.khronos.webgl.WebGL2RenderingContext
+import org.khronos.webgl.WebGLRenderingContext
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
 internal class SymbolRenderer(
-    private val gl: WebGL2RenderingContext,
+    private val gl: WebGLRenderingContext,
     private val program: SolidColorProgram,
     private val presLib: PresLibPack
 ) {
@@ -27,7 +27,7 @@ internal class SymbolRenderer(
         )
         if (vertices.isEmpty()) return 0
         gl.lineWidth(1.5f)
-        return program.draw(WebGL2RenderingContext.LINES, vertices, colors.resolve(null, fallback = "CHBLK"))
+        return program.draw(WebGLRenderingContext.LINES, vertices, colors.resolve(null, fallback = "CHBLK"))
     }
 
     private fun symbolLineSegments(

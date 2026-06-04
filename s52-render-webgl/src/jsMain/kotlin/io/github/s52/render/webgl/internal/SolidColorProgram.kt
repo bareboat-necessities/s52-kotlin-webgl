@@ -1,13 +1,13 @@
 package io.github.s52.render.webgl.internal
 
-import org.khronos.webgl.WebGL2RenderingContext
+import org.khronos.webgl.WebGLRenderingContext
 import org.khronos.webgl.WebGLBuffer
 import org.khronos.webgl.WebGLProgram
 import org.khronos.webgl.WebGLShader
 import org.khronos.webgl.WebGLUniformLocation
 
 internal class SolidColorProgram(
-    private val gl: WebGL2RenderingContext
+    private val gl: WebGLRenderingContext
 ) {
     private val program: WebGLProgram = linkProgram(VERTEX_SHADER, FRAGMENT_SHADER)
     private val positionLocation: Int = gl.getAttribLocation(program, "a_position")
@@ -21,10 +21,10 @@ internal class SolidColorProgram(
         val vertexCount = vertices.size / 2
 
         gl.useProgram(program)
-        gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, buffer)
-        gl.bufferData(WebGL2RenderingContext.ARRAY_BUFFER, vertices.toFloat32Array(), WebGL2RenderingContext.STREAM_DRAW)
+        gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, buffer)
+        gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, vertices.toFloat32Array(), WebGLRenderingContext.STREAM_DRAW)
         gl.enableVertexAttribArray(positionLocation)
-        gl.vertexAttribPointer(positionLocation, 2, WebGL2RenderingContext.FLOAT, false, 0, 0)
+        gl.vertexAttribPointer(positionLocation, 2, WebGLRenderingContext.FLOAT, false, 0, 0)
         gl.uniform4f(colorLocation, color.r, color.g, color.b, color.a)
         gl.drawArrays(mode, 0, vertexCount)
         return 1
@@ -34,7 +34,7 @@ internal class SolidColorProgram(
         val shader = gl.createShader(type) ?: error("Could not create shader")
         gl.shaderSource(shader, source)
         gl.compileShader(shader)
-        val ok = gl.getShaderParameter(shader, WebGL2RenderingContext.COMPILE_STATUS) as Boolean
+        val ok = gl.getShaderParameter(shader, WebGLRenderingContext.COMPILE_STATUS) as Boolean
         if (!ok) {
             val log = gl.getShaderInfoLog(shader) ?: "unknown error"
             gl.deleteShader(shader)
@@ -44,13 +44,13 @@ internal class SolidColorProgram(
     }
 
     private fun linkProgram(vertexSource: String, fragmentSource: String): WebGLProgram {
-        val vertexShader = compileShader(WebGL2RenderingContext.VERTEX_SHADER, vertexSource)
-        val fragmentShader = compileShader(WebGL2RenderingContext.FRAGMENT_SHADER, fragmentSource)
+        val vertexShader = compileShader(WebGLRenderingContext.VERTEX_SHADER, vertexSource)
+        val fragmentShader = compileShader(WebGLRenderingContext.FRAGMENT_SHADER, fragmentSource)
         val program = gl.createProgram() ?: error("Could not create WebGL program")
         gl.attachShader(program, vertexShader)
         gl.attachShader(program, fragmentShader)
         gl.linkProgram(program)
-        val ok = gl.getProgramParameter(program, WebGL2RenderingContext.LINK_STATUS) as Boolean
+        val ok = gl.getProgramParameter(program, WebGLRenderingContext.LINK_STATUS) as Boolean
         gl.deleteShader(vertexShader)
         gl.deleteShader(fragmentShader)
         if (!ok) {

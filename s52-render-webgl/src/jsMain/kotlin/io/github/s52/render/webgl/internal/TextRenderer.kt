@@ -2,10 +2,10 @@ package io.github.s52.render.webgl.internal
 
 import io.github.s52.core.draw.S52DrawCommand
 import io.github.s52.core.geometry.EncGeometry
-import org.khronos.webgl.WebGL2RenderingContext
+import org.khronos.webgl.WebGLRenderingContext
 
 internal class TextRenderer(
-    private val gl: WebGL2RenderingContext,
+    private val gl: WebGLRenderingContext,
     private val program: SolidColorProgram
 ) {
     fun renderText(command: S52DrawCommand.Text, projector: GeometryProjector, colors: ColorResolver): Int {
@@ -14,7 +14,7 @@ internal class TextRenderer(
         val vertices = LineGlyphFont.lineVertices(text, anchor, projector, pixelSize = 10.0)
         if (vertices.isEmpty()) return 0
         gl.lineWidth(1.0f)
-        return program.draw(WebGL2RenderingContext.LINES, vertices, colors.resolve(command.colorToken, fallback = "CHBLK"))
+        return program.draw(WebGLRenderingContext.LINES, vertices, colors.resolve(command.colorToken, fallback = "CHBLK"))
     }
 
     fun renderSounding(command: S52DrawCommand.Sounding, projector: GeometryProjector, colors: ColorResolver): Int {
@@ -22,7 +22,7 @@ internal class TextRenderer(
         val vertices = LineGlyphFont.lineVertices(command.depthLabel, anchor, projector, pixelSize = 12.0)
         if (vertices.isEmpty()) return 0
         gl.lineWidth(1.0f)
-        return program.draw(WebGL2RenderingContext.LINES, vertices, colors.resolve(command.colorToken, fallback = "SNDG1"))
+        return program.draw(WebGLRenderingContext.LINES, vertices, colors.resolve(command.colorToken, fallback = "SNDG1"))
     }
 
     private fun anchor(geometry: EncGeometry, projector: GeometryProjector): ClipPoint? = when (geometry) {
