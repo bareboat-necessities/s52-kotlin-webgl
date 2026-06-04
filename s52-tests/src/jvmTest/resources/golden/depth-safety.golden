@@ -1,0 +1,3 @@
+{"kind":"area-fill","featureId":"1001","priority":"2","viewingGroup":"21010","category":"Standard","overRadar":"false","geometry":"POLYGON(-74,40;-73.99,40;-73.99,40.01;-74,40)","color":"DEPVS"}
+{"kind":"line-simple","featureId":"1002","priority":"3","viewingGroup":"21020","category":"Standard","overRadar":"false","geometry":"LINESTRING(-74,40;-73.99,40.01)","style":"SOLD","width":"2","color":"DEPSC"}
+{"kind":"sounding","featureId":"1003","priority":"9","viewingGroup":"33010","category":"Standard","overRadar":"true","geometry":"POINT(-73.995,40.005)","depth":"3.2","color":"SNDG2"}

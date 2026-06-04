@@ -243,20 +243,21 @@ See [`STATIC_COMPLETENESS_PHASE9.md`](STATIC_COMPLETENESS_PHASE9.md).
 
 ## Phase 10 — Golden portrayal tests
 
-Goal: protect behavior from regressions.
+Status: **complete**.
 
-Start with command-level tests for:
+Goal: protect behavior from regressions using deterministic command-level transcripts.
 
-- DEPARE depth-color transitions
-- DEPCNT safety contour
-- SOUNDG safety depth
-- WRECKS dangerous/non-dangerous cases
-- OBSTRN dangerous/non-dangerous cases
-- LIGHTS sector/description handling
-- TOPMAR with buoy/beacon classes
-- RESARE category combinations
-- M_QUAL / CATZOC quality display
-- DATCVR coverage boundaries
+Completed deliverables:
+
+- Added dedicated `s52-tests` module.
+- Added reusable golden helpers: `GoldenPortrayalCase`, `GoldenPortrayalRunner`, and `GoldenTranscriptComparison`.
+- Added checked-in golden resources for depth/safety behavior, danger symbols, other-category overlays, and visibility settings.
+- Tests run through the public `EncFeature -> S52PortrayalEngine -> S52DrawCommand` boundary.
+- Draw commands are validated before transcript comparison.
+- Negative comparator test proves mismatch messages identify the first differing line.
+- CI target `phase10Check` runs all previous checks plus `:s52-tests:jvmTest`.
+
+See [`GOLDEN_TESTS_PHASE10.md`](GOLDEN_TESTS_PHASE10.md).
 
 ## Phase 11 — S-64 / Chart 1 validation harness
 

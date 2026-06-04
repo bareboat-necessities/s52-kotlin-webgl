@@ -18,15 +18,15 @@ Optional WebGL2 renderer
 
 Experimental. Not type-approved ECDIS. Not for navigation.
 
-## Phase 9 status
+## Phase 10 status
 
-Phase 9 is complete in this increment:
+Phase 10 is complete in this increment:
 
-- Added static completeness validation for source and runtime Presentation Library packs.
-- Added structured diagnostics and Markdown reports for missing symbols, line styles, patterns, colors, palettes, CSPs, invalid primitives, parse failures, duplicate source names, invalid RGB values, and incompatible source attribute filters.
-- Added positive tests proving the synthetic generated pack is complete when checked against the Phase 6 CSP registry.
-- Added negative tests proving actionable diagnostics are emitted for broken packs.
-- CI now runs `phase9Check`.
+- Added a dedicated `s52-tests` module for command-level golden portrayal regression tests.
+- Added reusable golden test helpers: `GoldenPortrayalCase`, `GoldenPortrayalRunner`, and `GoldenTranscriptComparison`.
+- Added checked-in golden transcript resources for depth/safety behavior, dangerous symbols, other-category overlays, and visibility settings.
+- Golden tests run through the public `EncFeature -> S52PortrayalEngine -> S52DrawCommand` boundary and validate draw commands before comparing transcripts.
+- CI now runs `phase10Check`.
 
 The project still uses a synthetic Presentation Library pack. Official IHO Presentation Library source assets are not bundled.
 
@@ -35,7 +35,7 @@ The project still uses a synthetic Presentation Library pack. Official IHO Prese
 This project is configured for Gradle 8.14.5 and Kotlin 2.3.21.
 
 ```bash
-gradle phase9Check
+gradle phase10Check
 ```
 
 The CI workflow installs Gradle and Java 21, then runs the same task.
@@ -48,6 +48,7 @@ s52-core          core model, instructions, lookup, CSP interface, portrayal eng
 s52-preslib       Presentation Library source model, builder, validation, generator, registries
 s52-csp           CSP implementations and coverage validation
 s52-render-webgl  JS/WebGL2 renderer for S52DrawCommand
+s52-tests         command-level golden portrayal tests
 demo              Kotlin/JS browser demo
 ```
 
@@ -57,4 +58,4 @@ Official IHO Presentation Library assets should be treated as external input unl
 
 ## Next step
 
-Begin Phase 10: command-level golden portrayal tests for depth areas, contours, soundings, dangers, lights, topmarks, restricted areas, quality areas, and data coverage.
+Begin Phase 11: external S-64 / Chart 1 style validation harness on top of the command-level golden transcript infrastructure.

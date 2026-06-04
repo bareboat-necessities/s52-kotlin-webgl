@@ -81,3 +81,10 @@ tasks.register("phase9Check") {
     description = "Runs Phase 9 static Presentation Library completeness checks and all previous phase checks."
     dependsOn("phase8Check", ":s52-preslib:jvmTest", ":s52-csp:jvmTest")
 }
+
+
+tasks.register("phase10Check") {
+    group = "verification"
+    description = "Runs Phase 10 command-level golden portrayal tests and all previous phase checks."
+    dependsOn("phase9Check", ":s52-tests:jvmTest")
+}

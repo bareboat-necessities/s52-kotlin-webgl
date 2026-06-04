@@ -1,0 +1,2 @@
+{"kind":"point-symbol","featureId":"2001","priority":"8","viewingGroup":"34050","category":"Standard","overRadar":"true","geometry":"POINT(-73.99,40)","symbol":"WRECKS_DANGER01","parameters":"[]"}
+{"kind":"point-symbol","featureId":"2002","priority":"8","viewingGroup":"34060","category":"Standard","overRadar":"true","geometry":"POINT(-73.98,40)","symbol":"OBSTRN_DANGER01","parameters":"[]"}

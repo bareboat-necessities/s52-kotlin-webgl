@@ -1,0 +1,2 @@
+{"kind":"line-complex","featureId":"4001","priority":"9","viewingGroup":"28010","category":"Standard","overRadar":"true","geometry":"POINT(-73.99,40.01)","lineStyle":"LIGHTSECTOR01","parameters":"[]"}
+{"kind":"point-symbol","featureId":"4001","priority":"9","viewingGroup":"28010","category":"Standard","overRadar":"true","geometry":"POINT(-73.99,40.01)","symbol":"LIGHTS11","parameters":"[]"}
