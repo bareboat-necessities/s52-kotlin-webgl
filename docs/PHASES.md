@@ -167,13 +167,20 @@ See [`CSP_PHASE5.md`](CSP_PHASE5.md).
 
 ## Phase 6 — Complete CSP coverage
 
+**Status:** complete in this increment for the generated synthetic Presentation Library fixture.
+
 Goal: every `CS(...)` referenced by imported lookup tables has an implementation.
 
-Definition of done:
+Completed deliverables:
 
-- Zero missing CSP references
-- Every CSP has command-level golden tests
-- CSPs use typed attributes only
+- `DefaultCspRegistry.phase6Complete()` registers every `CspId`.
+- The generated synthetic Presentation Library fixture references the full Phase 6 CSP set.
+- `CspCoverageValidator` reports zero missing CSP references for the generated fixture.
+- Added starter CSP behavior for `ACHARE`, `RESARE`, `PRCARE`, `TESARE`, `FAIRWY`, `DRGARE`, `SBDARE`, `M_QUAL`, and `DATCVR`.
+- Added command-level golden transcript tests for every CSP.
+- CI target `phase6Check` runs all previous checks plus Phase 6 tests.
+
+See [`CSP_PHASE6.md`](CSP_PHASE6.md).
 
 ## Phase 7 — Draw-command model hardening
 

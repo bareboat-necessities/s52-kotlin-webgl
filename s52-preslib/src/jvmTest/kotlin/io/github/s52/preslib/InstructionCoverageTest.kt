@@ -30,9 +30,16 @@ class InstructionCoverageTest {
 
         assertEquals(setOf("BOYLAT01", "BOYCAR01"), refs.symbols)
         assertEquals(setOf("COALNE01"), refs.lineStyles)
-        assertEquals(setOf("APACHR01"), refs.patterns)
+        assertEquals(emptySet(), refs.patterns)
         assertTrue(setOf("LANDA").all { it in refs.colorTokens })
-        assertEquals(setOf("DEPARE", "DEPCNT", "LIGHTS", "WRECKS", "OBSTRN", "SOUNDG", "TOPMAR"), refs.csps)
+        assertEquals(
+            setOf(
+                "ACHARE", "DATCVR", "DEPCNT", "DEPARE", "DRGARE", "FAIRWY", "LIGHTS",
+                "M_QUAL", "OBSTRN", "PRCARE", "RESARE", "SBDARE", "SOUNDG", "TESARE",
+                "TOPMAR", "WRECKS"
+            ),
+            refs.csps
+        )
         assertEquals(
             instructions,
             InstructionParser.parseSequence(InstructionFormatter.formatSequence(instructions))

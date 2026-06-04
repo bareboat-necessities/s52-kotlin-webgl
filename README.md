@@ -18,16 +18,16 @@ Optional WebGL2 renderer
 
 Experimental. Not type-approved ECDIS. Not for navigation.
 
-## Phase 5 status
+## Phase 6 status
 
-Phase 5 is complete in this increment:
+Phase 6 is complete in this increment:
 
-- Added a critical CSP registry through `CspId` and `DefaultCspRegistry.phase5Critical()`.
-- Added starter implementations for `DEPARE`, `DEPCNT`, `SOUNDG`, `WRECKS`, `OBSTRN`, `LIGHTS`, and `TOPMAR`.
-- Added static CSP coverage validation for `CS(...)` lookup references.
-- Expanded the synthetic Presentation Library fixture so all critical Phase 5 CSPs are referenced.
-- Added tests for direct CSP behavior and engine expansion from `CS(...)` to draw commands.
-- CI now runs `phase5Check`.
+- Added `DefaultCspRegistry.phase6Complete()` for all CSPs referenced by the generated synthetic Presentation Library fixture.
+- Expanded `CspId` beyond the Phase 5 critical batch.
+- Added starter CSPs for restricted/caution areas, dredged areas, seabed areas, data coverage, and quality-of-data.
+- Expanded the synthetic Presentation Library fixture to reference every Phase 6 CSP through `CS(...)`.
+- Added command-level golden transcript tests for every `CspId`.
+- CI now runs `phase6Check`.
 
 The project still uses a synthetic Presentation Library pack. Official IHO Presentation Library source assets are not bundled.
 
@@ -36,7 +36,7 @@ The project still uses a synthetic Presentation Library pack. Official IHO Prese
 This project is configured for Gradle 8.14.5 and Kotlin 2.3.21.
 
 ```bash
-gradle phase5Check
+gradle phase6Check
 ```
 
 The CI workflow installs Gradle and Java 21, then runs the same task.
@@ -58,4 +58,4 @@ Official IHO Presentation Library assets should be treated as external input unl
 
 ## Next step
 
-Begin Phase 6: expand CSP coverage from the Phase 5 critical starter set toward every CSP referenced by an imported Presentation Library pack.
+Begin Phase 7: harden the renderer-independent draw-command model and deterministic serialization.

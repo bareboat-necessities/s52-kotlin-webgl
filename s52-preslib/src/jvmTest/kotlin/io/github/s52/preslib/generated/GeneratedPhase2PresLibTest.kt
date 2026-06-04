@@ -19,8 +19,8 @@ class GeneratedPhase2PresLibTest {
         assertTrue(report.lookupRecordCount >= 8)
         assertTrue(report.referencedSymbols.contains("BOYLAT01"))
         assertTrue(report.referencedLineStyles.contains("COALNE01"))
-        assertTrue(report.referencedPatterns.contains("APACHR01"))
         assertTrue(report.referencedCsps.containsAll(setOf("DEPARE", "DEPCNT", "SOUNDG", "WRECKS", "OBSTRN", "LIGHTS", "TOPMAR")))
+        assertTrue(report.referencedCsps.containsAll(setOf("ACHARE", "RESARE", "PRCARE", "TESARE", "FAIRWY", "DRGARE", "SBDARE", "M_QUAL", "DATCVR")))
     }
 
     @Test
@@ -39,6 +39,7 @@ class GeneratedPhase2PresLibTest {
         val records = pack.lookupTable.records()
 
         assertTrue(records.any { it.objectClass == S57ObjectClass.DEPARE && it.instructions.single() is S52Instruction.Conditional })
-        assertTrue(records.any { it.objectClass == S57ObjectClass.LIGHTS && it.instructions.any { ins -> ins is S52Instruction.Text } })
+        assertTrue(records.any { it.objectClass == S57ObjectClass.LIGHTS && it.instructions.single() is S52Instruction.Conditional })
+        assertTrue(records.any { it.objectClass == S57ObjectClass.M_QUAL && it.instructions.single() is S52Instruction.Conditional })
     }
 }

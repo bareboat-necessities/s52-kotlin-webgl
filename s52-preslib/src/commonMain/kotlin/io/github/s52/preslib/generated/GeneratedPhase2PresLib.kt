@@ -52,13 +52,22 @@ object GeneratedPhase2PresLib {
             SourceLineStyle("SOLD", "solid line"),
             SourceLineStyle("DASH", "dashed line"),
             SourceLineStyle("COALNE01", "synthetic coastline complex line"),
-            SourceLineStyle("LIGHTSECTOR01", "synthetic light sector line")
+            SourceLineStyle("LIGHTSECTOR01", "synthetic light sector line"),
+            SourceLineStyle("DATCVR01", "synthetic data-coverage boundary line")
         ),
         patterns = listOf(
             SourcePattern("APACHR01", "synthetic anchorage area pattern"),
             SourcePattern("DANGER01", "synthetic danger highlight pattern"),
             SourcePattern("WRECKS_AREA01", "synthetic wreck area pattern"),
-            SourcePattern("OBSTRN_AREA01", "synthetic obstruction area pattern")
+            SourcePattern("OBSTRN_AREA01", "synthetic obstruction area pattern"),
+            SourcePattern("RESTRN01", "synthetic restricted-area pattern"),
+            SourcePattern("CAUTION01", "synthetic caution-area pattern"),
+            SourcePattern("FAIRWY01", "synthetic fairway pattern"),
+            SourcePattern("DRGARE01", "synthetic dredged-area pattern"),
+            SourcePattern("SBDARE01", "synthetic seabed-area pattern"),
+            SourcePattern("MQUAL_LOW01", "synthetic low-quality-data pattern"),
+            SourcePattern("MQUAL_GOOD01", "synthetic good-quality-data pattern"),
+            SourcePattern("NODATA01", "synthetic no-data pattern")
         ),
         lookupRecords = listOf(
             SourceLookupRecord(
@@ -96,7 +105,7 @@ object GeneratedPhase2PresLib {
             SourceLookupRecord(
                 objectClass = S57ObjectClass.ACHARE,
                 primitive = PrimitiveType.Area,
-                instruction = "AP(APACHR01)",
+                instruction = "CS(ACHARE)",
                 displayCategory = DisplayCategory.Standard,
                 viewingGroup = 24010,
                 displayPriority = 5
@@ -181,6 +190,70 @@ object GeneratedPhase2PresLib {
                 viewingGroup = 27030,
                 displayPriority = 9,
                 overRadar = true
+            ),
+            SourceLookupRecord(
+                objectClass = S57ObjectClass.RESARE,
+                primitive = PrimitiveType.Area,
+                instruction = "CS(RESARE)",
+                displayCategory = DisplayCategory.Standard,
+                viewingGroup = 24020,
+                displayPriority = 5
+            ),
+            SourceLookupRecord(
+                objectClass = S57ObjectClass.PRCARE,
+                primitive = PrimitiveType.Area,
+                instruction = "CS(PRCARE)",
+                displayCategory = DisplayCategory.Standard,
+                viewingGroup = 24030,
+                displayPriority = 5
+            ),
+            SourceLookupRecord(
+                objectClass = S57ObjectClass.TESARE,
+                primitive = PrimitiveType.Area,
+                instruction = "CS(TESARE)",
+                displayCategory = DisplayCategory.Standard,
+                viewingGroup = 24040,
+                displayPriority = 5
+            ),
+            SourceLookupRecord(
+                objectClass = S57ObjectClass.FAIRWY,
+                primitive = PrimitiveType.Area,
+                instruction = "CS(FAIRWY)",
+                displayCategory = DisplayCategory.Standard,
+                viewingGroup = 24050,
+                displayPriority = 5
+            ),
+            SourceLookupRecord(
+                objectClass = S57ObjectClass.DRGARE,
+                primitive = PrimitiveType.Area,
+                instruction = "CS(DRGARE)",
+                displayCategory = DisplayCategory.Standard,
+                viewingGroup = 21030,
+                displayPriority = 3
+            ),
+            SourceLookupRecord(
+                objectClass = S57ObjectClass.SBDARE,
+                primitive = PrimitiveType.Area,
+                instruction = "CS(SBDARE)",
+                displayCategory = DisplayCategory.Other,
+                viewingGroup = 31010,
+                displayPriority = 4
+            ),
+            SourceLookupRecord(
+                objectClass = S57ObjectClass.M_QUAL,
+                primitive = PrimitiveType.Area,
+                instruction = "CS(M_QUAL)",
+                displayCategory = DisplayCategory.Other,
+                viewingGroup = 52010,
+                displayPriority = 6
+            ),
+            SourceLookupRecord(
+                objectClass = S57ObjectClass.M_COVR,
+                primitive = PrimitiveType.Area,
+                instruction = "CS(DATCVR)",
+                displayCategory = DisplayCategory.DisplayBase,
+                viewingGroup = 11010,
+                displayPriority = 0
             )
         )
     )
@@ -216,7 +289,12 @@ object GeneratedPhase2PresLib {
             c("SNDG1", 0, 0, 0),
             c("SNDG2", 30, 30, 30),
             c("LITRD", 255, 80, 80),
-            c("LITYW", 255, 220, 70)
+            c("LITYW", 255, 220, 70),
+            c("CHMGD", 160, 60, 160),
+            c("NODTA", 120, 120, 120),
+            c("QUAPOS", 80, 140, 80),
+            c("QUASR", 200, 90, 90),
+            c("DRGHL", 80, 100, 170)
         )
     }
 

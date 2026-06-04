@@ -30,9 +30,9 @@ class Phase5CriticalCspTest {
     }
 
     @Test
-    fun generatedPackHasNoMissingCriticalCspReferences() {
+    fun generatedPackReferencesAllCriticalPhase5Procedures() {
         val pack = PresLibPack.phase2Synthetic()
-        val report = CspCoverageValidator.validate(pack.lookupTable, DefaultCspRegistry.phase5Critical())
+        val report = CspCoverageValidator.validate(pack.lookupTable, DefaultCspRegistry.phase6Complete())
         assertFalse(report.hasErrors, report.toMarkdown())
         assertTrue(report.referenced.containsAll(CspId.criticalPhase5Names()))
     }
