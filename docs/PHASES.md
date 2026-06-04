@@ -38,24 +38,33 @@ Notes:
 
 ## Phase 2 — Presentation Library importer / generator
 
+**Status:** complete in this increment.
+
 Goal: avoid hand-maintaining S-52 lookup rows and Presentation Library resources.
 
-Deliverables:
+Deliverables completed:
 
-- External Presentation Library source loader
-- Deterministic generated Kotlin/JSON tables
-- Generated lookup rows
-- Generated color tables
-- Generated symbol, line-style, and pattern registries
-- Generated CSP reference report
-- Build-time report for missing symbols, colors, line styles, patterns, and CSPs
+- `PresLibSourcePack` source/interchange model for generated or imported Presentation Library data
+- `PresLibPackBuilder` that converts source packs to runtime registries
+- Generated-style synthetic Phase 2 source pack in `GeneratedPhase2PresLib`
+- Deterministic JVM Kotlin source generator API in `PresLibKotlinGenerator`
+- Static validation report in `PresLibValidator`
+- Missing-reference diagnostics for symbols, line styles, patterns, color tokens, and palettes
+- Source-pack diagnostics for duplicate names and invalid RGB values
+- Phase 2 tests for generation determinism, pack construction, and validation
+- CI target `phase2Check`
 
 Definition of done:
 
 - Generator output is deterministic
 - Runtime tables load without browser dependencies
-- Missing reference report is machine-readable
+- Missing reference report is machine-readable as a Kotlin data model and Markdown summary
 - CI fails when generated references are internally inconsistent
+
+Notes:
+
+- The included Phase 2 Presentation Library pack is synthetic. It proves the generator/builder/validator architecture without bundling official IHO assets.
+- `PresLibPack.phase0Minimal()` remains as a compatibility alias, but now delegates to the generated-style Phase 2 pack.
 
 ## Phase 3 — Complete S-52 instruction parser
 

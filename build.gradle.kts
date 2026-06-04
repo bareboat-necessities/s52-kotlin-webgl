@@ -25,3 +25,10 @@ tasks.register("phase1Check") {
     description = "Runs Phase 1 typed-catalogue validation and all Phase 0 checks."
     dependsOn("phase0Check")
 }
+
+
+tasks.register("phase2Check") {
+    group = "verification"
+    description = "Runs Phase 2 Presentation Library generation/validation checks and all previous phase checks."
+    dependsOn("phase1Check")
+}
