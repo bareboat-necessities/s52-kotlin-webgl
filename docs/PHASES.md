@@ -354,3 +354,24 @@ Phase 16 remains additive. It still uses the synthetic Presentation Library fixt
 
 See [`API_FACADE_PHASE16.md`](API_FACADE_PHASE16.md).
 
+
+## Phase 17 — Diagnostic bundle and support handoff
+
+Status: **complete**.
+
+Goal: give downstream consumers a stable, renderer-independent diagnostic artifact for issue reports, CI summaries, validation handoff, and support workflows.
+
+Completed deliverables:
+
+- Added `S52DiagnosticBundle` and `S52Diagnostics` to the public `s52-api` module.
+- Added `S52PortrayalSession.diagnosticBundle(...)` extension for one-call bundle generation.
+- Diagnostic bundles include runtime manifest data, feature counts, command counts, command counts by `DrawCommandKind`, diagnostic counts, full transcript, and bounded transcript preview.
+- Added Markdown and simple properties outputs without adding JSON dependencies.
+- Added Phase 17 API tests and release-readiness tests.
+- Added diagnostics integration sample under `samples/integration/diagnostics/`.
+- Added `phase17DiagnosticsAudit`, `phase17SourceArchive`, and `phase17Check`.
+- Updated CI and release workflow to run `phase17Check`.
+
+Phase 17 remains additive. It does not add S-57 parsing, S-63, navigation, AIS, GPS, route management, or ECDIS certification scope.
+
+See [`DIAGNOSTICS_PHASE17.md`](DIAGNOSTICS_PHASE17.md).

@@ -18,15 +18,15 @@ Optional WebGL2 renderer
 
 Experimental. Not type-approved ECDIS. Not for navigation.
 
-## Phase 16 status
+## Phase 17 status
 
-Phase 16 is complete in this increment:
+Phase 17 is complete in this increment:
 
-- Added `s52-api`, a small consumer-facing facade over the existing portrayal modules.
-- Added `S52PortrayalSession`, `S52PortrayalRequest`, `S52PortrayalResult`, and `S52RuntimeManifest`.
-- The facade returns draw commands, validation reports, static-completeness reports, and deterministic transcripts.
-- Added a facade integration sample.
-- CI now runs `phase16Check`.
+- Phase 16 `s52-api` remains the stable consumer-facing facade.
+- Added `S52DiagnosticBundle`, `S52Diagnostics`, and `S52PortrayalSession.diagnosticBundle(...)`.
+- Diagnostic bundles summarize manifests, command counts by kind, validation counts, and deterministic transcript previews.
+- Added a diagnostics integration sample.
+- CI now runs `phase17Check`.
 
 The project still uses a synthetic Presentation Library pack. Official IHO Presentation Library source assets are not bundled.
 
@@ -35,7 +35,7 @@ The project still uses a synthetic Presentation Library pack. Official IHO Prese
 This project is configured for Gradle 8.14.5 and Kotlin 2.3.21.
 
 ```bash
-gradle phase16Check
+gradle phase17Check
 ```
 
 The CI workflow installs Gradle and Java 21, then runs the same task.
@@ -43,7 +43,7 @@ The CI workflow installs Gradle and Java 21, then runs the same task.
 To build the release handoff archive:
 
 ```bash
-gradle phase16SourceArchive
+gradle phase17SourceArchive
 ```
 
 ## Modules
@@ -65,4 +65,4 @@ Official IHO Presentation Library assets should be treated as external input unl
 
 ## Next step
 
-Use the Phase 16 facade as the stable integration entry point, then continue with broader public API stabilization, performance work, and official Presentation Library import tooling when ready.
+Use the Phase 16 facade and Phase 17 diagnostic bundle as the stable downstream integration and support boundary, then continue with broader performance work and official Presentation Library import tooling when ready.

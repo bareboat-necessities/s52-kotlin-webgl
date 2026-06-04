@@ -183,3 +183,44 @@ tasks.register("phase16Check") {
     dependsOn("phase15Check", "phase16ApiAudit", ":s52-api:build", ":s52-tests:jvmTest")
 }
 
+
+tasks.register("phase17DiagnosticsAudit") {
+    group = "verification"
+    description = "Checks Phase 17 diagnostic bundle API and integration documentation."
+
+    doLast {
+        val requiredFiles = listOf(
+            "s52-api/src/commonMain/kotlin/io/github/s52/api/S52DiagnosticBundle.kt",
+            "s52-api/src/jvmTest/kotlin/io/github/s52/api/S52DiagnosticBundleTest.kt",
+            "docs/DIAGNOSTICS_PHASE17.md",
+            "samples/integration/diagnostics/README.md"
+        )
+        val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
+        check(missing.isEmpty()) { "Missing Phase 17 diagnostic files: $missing" }
+
+        val readme = layout.projectDirectory.file("README.md").asFile.readText()
+        check("S52DiagnosticBundle" in readme) { "README.md must document the Phase 17 diagnostic bundle." }
+        check("phase17Check" in readme) { "README.md must document the Phase 17 check task." }
+    }
+}
+
+tasks.register<org.gradle.api.tasks.bundling.Zip>("phase17SourceArchive") {
+    group = "distribution"
+    description = "Builds a source archive for Phase 17 release handoff."
+    archiveBaseName.set("s52-kotlin-webgl")
+    archiveClassifier.set("phase17-source")
+    archiveVersion.set(project.version.toString())
+
+    from(layout.projectDirectory) {
+        exclude(".git/**")
+        exclude(".gradle/**")
+        exclude("**/build/**")
+        exclude("build/**")
+    }
+}
+
+tasks.register("phase17Check") {
+    group = "verification"
+    description = "Runs Phase 17 diagnostic bundle checks and all previous phase checks."
+    dependsOn("phase16Check", "phase17DiagnosticsAudit", ":s52-api:build", ":s52-tests:jvmTest")
+}

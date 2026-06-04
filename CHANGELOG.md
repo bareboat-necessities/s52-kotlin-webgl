@@ -17,6 +17,7 @@
 - S-64 / Chart-1-style command validation harness.
 - Phase 15 release-readiness checks, release workflow, and source archive task.
 - Phase 16 `s52-api` consumer facade, runtime manifest, diagnostics result, and facade integration sample.
+- Phase 17 diagnostic bundle, Markdown/properties diagnostics, transcript preview, and diagnostics integration sample.
 
 ### Safety
 
