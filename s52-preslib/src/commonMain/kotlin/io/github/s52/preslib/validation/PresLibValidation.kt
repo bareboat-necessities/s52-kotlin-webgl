@@ -1,6 +1,6 @@
 package io.github.s52.preslib.validation
 
-import io.github.s52.core.instruction.S52Instruction
+import io.github.s52.core.instruction.InstructionReferenceCollector
 import io.github.s52.core.settings.S52Palette
 import io.github.s52.preslib.PresLibPack
 import io.github.s52.preslib.source.PresLibSourcePack
@@ -163,20 +163,14 @@ internal data class PresLibReferences(
             val colors = mutableSetOf<String>()
             val csps = mutableSetOf<String>()
 
-            pack.lookupTable.records().flatMap { it.instructions }.forEach { instruction ->
-                when (instruction) {
-                    is S52Instruction.Symbol -> symbols += instruction.name.s52Token()
-                    is S52Instruction.SimpleLine -> {
-                        lineStyles += instruction.style.s52Token()
-                        colors += instruction.colorToken.s52Token()
-                    }
-                    is S52Instruction.ComplexLine -> lineStyles += instruction.name.s52Token()
-                    is S52Instruction.AreaColor -> colors += instruction.colorToken.s52Token()
-                    is S52Instruction.AreaPattern -> patterns += instruction.name.s52Token()
-                    is S52Instruction.Text -> Unit
-                    is S52Instruction.Conditional -> csps += instruction.cspName.s52Token()
-                }
-            }
+            val references = InstructionReferenceCollector.collect(
+                pack.lookupTable.records().flatMap { it.instructions }
+            )
+            symbols += references.symbols.map { it.s52Token() }
+            lineStyles += references.lineStyles.map { it.s52Token() }
+            patterns += references.patterns.map { it.s52Token() }
+            colors += references.colorTokens.map { it.s52Token() }
+            csps += references.csps.map { it.s52Token() }
             return PresLibReferences(symbols, lineStyles, patterns, colors, csps)
         }
     }

@@ -18,28 +18,28 @@ Optional WebGL2 renderer
 
 Experimental. Not type-approved ECDIS. Not for navigation.
 
-## Phase 2 status
+## Phase 3 status
 
-Phase 2 is complete in this increment:
+Phase 3 is complete in this increment:
 
-- Added a Presentation Library source-pack model for generated/imported data
-- Added `PresLibPackBuilder` to build runtime registries from source packs
-- Added a generated-style synthetic Phase 2 Presentation Library pack
-- Added deterministic JVM Kotlin source generator API
-- Added static Presentation Library validation reports
-- Added validation for missing symbols, line styles, patterns, colors, and palettes
-- Updated the default/Phase 0 pack to flow through the Phase 2 source pipeline
-- Added Phase 2 JVM tests for generation, runtime pack construction, and validation
-- CI now runs `phase2Check`
+- Replaced the minimal instruction parser with a quote-aware S-52 instruction parser
+- Kept the compatibility API: `InstructionParser.parseOne` and `parseSequence` still return AST nodes
+- Added detailed parsing API with source ranges, raw instruction text, token ranges, and argument ranges
+- Added canonical instruction formatting for round-trip/golden tests
+- Added `InstructionReferenceCollector` for symbol, line-style, pattern, color-token, and CSP references
+- Added typed `TextSpec` for `TX(...)` and `TE(...)` instructions
+- Added early validation of malformed input, unsupported instruction kinds, and invalid simple-line widths
+- Added parser coverage tests for the generated Phase 2 synthetic Presentation Library pack
+- CI now runs `phase3Check`
 
-The project still does **not** bundle official IHO Presentation Library source assets. The Phase 2 pack is synthetic and exists to prove the architecture.
+The project still uses a synthetic Presentation Library pack. Official IHO Presentation Library source assets are not bundled.
 
 ## Build
 
 This project is configured for Gradle 8.14.5 and Kotlin 2.3.21.
 
 ```bash
-gradle phase2Check
+gradle phase3Check
 ```
 
 The CI workflow installs Gradle and Java 21, then runs the same task.
@@ -61,4 +61,4 @@ Official IHO Presentation Library assets should be treated as external input unl
 
 ## Next step
 
-Begin Phase 3: harden the S-52 instruction parser with source-location diagnostics, command serialization, and stricter support for the full Presentation Library instruction grammar.
+Begin Phase 4: implement indexed lookup matching, attribute-filter compilation, viewing-group filtering, and final display ordering hardening.

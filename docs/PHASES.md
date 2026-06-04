@@ -68,9 +68,11 @@ Notes:
 
 ## Phase 3 — Complete S-52 instruction parser
 
-Goal: parse Presentation Library instruction strings into typed AST nodes.
+**Status:** complete in this increment.
 
-Instruction families:
+Goal: parse Presentation Library instruction strings into typed AST nodes while preserving enough metadata for generator diagnostics and future golden tests.
+
+Instruction families supported:
 
 - `SY(...)`
 - `LS(...)`
@@ -81,11 +83,29 @@ Instruction families:
 - `TE(...)`
 - `CS(...)`
 
+Deliverables completed:
+
+- Quote-aware, parenthesis-aware top-level splitter for instruction sequences and arguments
+- Backward-compatible AST API through `InstructionParser.parseOne` and `parseSequence`
+- Detailed parser API through `parseOneDetailed` and `parseSequenceDetailed`
+- Source ranges for whole instruction, token, argument list, and individual arguments
+- Raw argument preservation plus normalized argument values
+- `TextSpec` for `TX` and `TE` instructions
+- Canonical `InstructionFormatter` for round-trip and golden-test fixtures
+- `InstructionReferenceCollector` for Presentation Library dependency scans
+- Parser tests for source-location diagnostics, quoted delimiters, canonical formatting, and dependency extraction
+- Generated Phase 2 Presentation Library pack coverage test
+- CI target `phase3Check`
+
 Definition of done:
 
-- Every imported lookup instruction parses
+- Every synthetic imported lookup instruction parses
 - Parser reports source location and offending token
-- Parser output can be serialized for golden tests
+- Parser output can be serialized canonically for golden tests
+
+Notes:
+
+- Phase 3 does not yet claim official Presentation Library completeness. It proves the parser architecture against the synthetic pack and gives the generator/validator enough metadata for Phase 4 and Phase 9.
 
 ## Phase 4 — Lookup matching and display ordering
 
