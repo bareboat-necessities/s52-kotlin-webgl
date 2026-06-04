@@ -19,3 +19,9 @@ tasks.register("phase0Check") {
         ":demo:build"
     )
 }
+
+tasks.register("phase1Check") {
+    group = "verification"
+    description = "Runs Phase 1 typed-catalogue validation and all Phase 0 checks."
+    dependsOn("phase0Check")
+}

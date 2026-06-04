@@ -1,6 +1,7 @@
 package io.github.s52.core.model
 
 import io.github.s52.catalog.S57Attribute
+import io.github.s52.catalog.S57EnumeratedValue
 
 class S57Attributes(
     private val values: Map<S57Attribute, S57Value> = emptyMap()
@@ -25,8 +26,28 @@ class S57Attributes(
         is S57Value.Text -> value.value
         is S57Value.Integer -> value.value.toString()
         is S57Value.Decimal -> value.value.toString()
+        S57Value.Empty -> ""
         else -> null
     }
+
+    fun ints(attribute: S57Attribute): List<Int> = when (val value = values[attribute]) {
+        is S57Value.ListValue -> value.values.mapNotNull { item ->
+            when (item) {
+                is S57Value.Integer -> item.value
+                is S57Value.Decimal -> item.value.toInt()
+                is S57Value.Text -> item.value.toIntOrNull()
+                else -> null
+            }
+        }
+        null -> emptyList()
+        else -> int(attribute)?.let(::listOf).orEmpty()
+    }
+
+    fun enum(attribute: S57Attribute): S57EnumeratedValue? =
+        int(attribute)?.let { code -> S57EnumeratedValue.fromCode(attribute, code) }
+
+    fun enumList(attribute: S57Attribute): List<S57EnumeratedValue> =
+        ints(attribute).mapNotNull { code -> S57EnumeratedValue.fromCode(attribute, code) }
 
     fun list(attribute: S57Attribute): List<S57Value> = when (val value = values[attribute]) {
         is S57Value.ListValue -> value.values

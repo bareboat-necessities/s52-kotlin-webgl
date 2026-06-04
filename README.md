@@ -18,29 +18,26 @@ Optional WebGL2 renderer
 
 Experimental. Not type-approved ECDIS. Not for navigation.
 
-## Phase 0 status
+## Phase 1 status
 
-Phase 0 is complete in this scaffold:
+Phase 1 is complete in this increment:
 
-- Multi-module Gradle project
-- GitHub Actions workflow
-- Typed S-57 object and attribute enum subset
-- Renderer-independent `EncFeature`, `S52Instruction`, and `S52DrawCommand` APIs
-- Minimal S-52 instruction parser for smoke tests
-- Minimal lookup-driven portrayal engine
-- Empty CSP registry plus example CSP module
-- Minimal Presentation Library registry model
-- WebGL2 renderer placeholder
-- Browser demo placeholder
-- JVM smoke tests for core modules
-- Full phase roadmap in `docs/PHASES.md`
+- Expanded generated-style `S57ObjectClass` enum with common S-57/S-52 portrayal classes
+- Expanded generated-style `S57Attribute` enum with coarse value-kind metadata
+- Added `S57EnumeratedValue` for common enumerated values used by early CSPs
+- Added `S57CatalogValidator` to detect duplicate acronyms/codes/enumerated values
+- Added strict raw-to-typed feature conversion through `RawEncFeatureConverter`
+- Added detailed conversion diagnostics for unknown object classes, unknown attributes, and unsupported primitives
+- Added typed helpers for scalar, list, and enumerated attribute access
+- Added Phase 1 JVM tests for catalog validation and raw feature conversion
+- CI now runs `phase1Check`
 
 ## Build
 
 This project is configured for Gradle 8.14.5 and Kotlin 2.3.21.
 
 ```bash
-gradle phase0Check
+gradle phase1Check
 ```
 
 The CI workflow installs Gradle and Java 21, then runs the same task.
@@ -62,4 +59,4 @@ Official IHO Presentation Library assets should be treated as external input unl
 
 ## Next step
 
-Begin Phase 1: replace the hand-written catalogue subset with generated `S57ObjectClass`, `S57Attribute`, and enumerated attribute value tables.
+Begin Phase 2: add the Presentation Library importer/generator so lookup rows, symbols, line styles, patterns, colors, and CSP references are generated rather than hand-maintained.

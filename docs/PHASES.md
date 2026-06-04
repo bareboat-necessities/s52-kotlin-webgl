@@ -1,72 +1,65 @@
-# Project phases
+# Project Phases
 
-The goal is a complete S-52 portrayal library in Kotlin, with renderer-independent output and an optional WebGL2 backend.
+This project is a standalone S-52 portrayal library. It accepts normalized, typed ENC-like features and produces renderer-independent S-52 draw commands. WebGL is an optional backend, not the core architecture.
 
-## Phase 0 — Scaffold and architecture baseline
+## Phase 0 — Repository scaffold and architectural boundary
 
-Status: complete in this repository.
-
-Deliverables:
-
-- Multi-module Gradle project
-- GitHub Actions CI
-- Typed feature model
-- Typed object class and attribute enum subset
-- S-52 instruction AST and parser smoke implementation
-- Minimal lookup and portrayal engine
-- CSP registry interfaces
-- Presentation Library runtime model
-- WebGL2 renderer placeholder
-- Browser demo placeholder
-- JVM smoke tests
-
-Definition of done:
-
-- `gradle phase0Check` is the canonical validation command.
-- Core modules compile without browser dependencies.
-- WebGL renderer does not know S-57 feature semantics.
-- README contains safety and scope boundaries.
-
-## Phase 1 — Generated S-57 catalogue
-
-Replace the Phase 0 hand-written enum subset with generated tables.
+**Status:** complete.
 
 Deliverables:
 
-- Generator for `S57ObjectClass`
-- Generator for `S57Attribute`
-- Generator for enumerated attribute values
-- Raw-to-typed feature conversion diagnostics
-- Tests for acronym/code lookup
+- Multi-module Kotlin Multiplatform repository
+- GitHub Actions build
+- Core feature, instruction, lookup, CSP, and draw-command APIs
+- Minimal smoke-test lookup engine
+- Minimal WebGL/demo placeholders
+- Clear safety and legal boundary text
 
-Definition of done:
+## Phase 1 — Typed S-57 / S-52 domain model
 
-- No hand-maintained S-57 object/attribute catalogue except generator inputs.
-- Unknown object classes and attributes produce clear diagnostics.
-- Typed features use enums, not strings.
-
-## Phase 2 — Presentation Library importer/generator
-
-Do not hand-maintain lookup rows and artwork metadata.
+**Status:** complete in this increment.
 
 Deliverables:
 
-- Importer for external Presentation Library source package
-- Generated lookup tables
+- Generated-style `S57ObjectClass` enum
+- Generated-style `S57Attribute` enum
+- Coarse `S57AttributeValueKind` metadata
+- Starter `S57EnumeratedValue` table for common CSP/lookup values
+- `S57CatalogValidator` for duplicate acronym/code/value checks
+- `RawEncFeatureConverter` with structured diagnostics
+- Strict primitive validation at the raw-to-typed boundary
+- Typed scalar, list, and enum attribute helpers
+- Tests proving the catalogue and conversion boundary are working
+
+Notes:
+
+- The catalogue files are deliberately data-only. No S-52 drawing or CSP behavior is stored in `S57ObjectClass` or `S57Attribute`.
+- Some catalogue codes are still nullable in this phase. Phase 2 introduces the external generator/importer that can replace the curated starter catalogue with full official tables.
+
+## Phase 2 — Presentation Library importer / generator
+
+Goal: avoid hand-maintaining S-52 lookup rows and Presentation Library resources.
+
+Deliverables:
+
+- External Presentation Library source loader
+- Deterministic generated Kotlin/JSON tables
+- Generated lookup rows
 - Generated color tables
-- Generated symbol, line, pattern, and text registries
-- Deterministic generated output
-- Missing reference report
+- Generated symbol, line-style, and pattern registries
+- Generated CSP reference report
+- Build-time report for missing symbols, colors, line styles, patterns, and CSPs
 
 Definition of done:
 
-- Every lookup row imports.
-- Every generated instruction string is preserved for parser validation.
-- Official assets remain external unless redistribution rights are explicitly clear.
+- Generator output is deterministic
+- Runtime tables load without browser dependencies
+- Missing reference report is machine-readable
+- CI fails when generated references are internally inconsistent
 
-## Phase 3 — Complete instruction parser
+## Phase 3 — Complete S-52 instruction parser
 
-Parse S-52 instruction strings into typed AST.
+Goal: parse Presentation Library instruction strings into typed AST nodes.
 
 Instruction families:
 
@@ -81,32 +74,28 @@ Instruction families:
 
 Definition of done:
 
-- Every imported lookup instruction parses.
-- Parser diagnostics include source lookup row context.
-- Unknown or malformed instructions fail tests, not runtime rendering.
+- Every imported lookup instruction parses
+- Parser reports source location and offending token
+- Parser output can be serialized for golden tests
 
 ## Phase 4 — Lookup matching and display ordering
 
-Implement matching from object class, primitive, and attributes to instructions.
+Goal: turn typed feature + primitive + attributes into ordered portrayal instructions.
 
 Deliverables:
 
-- Object/primitive lookup indexing
-- Attribute filter matcher
-- Display category filter
-- Viewing group filter
-- Display priority sorter
-- Scale filtering
-- Over/under radar flag preservation
+- Object class matching
+- Primitive matching
+- Attribute filter matching
+- Display category filtering
+- Viewing group filtering
+- Display priority ordering
+- Scale-dependent filtering
+- Radar flag preservation
 
-Definition of done:
+## Phase 5 — Critical CSP batch
 
-- Lookup records produce stable, sorted, renderer-independent output.
-- All ordering metadata is retained in `S52DrawCommand`.
-
-## Phase 5 — Critical CSPs
-
-Implement the first high-value conditional symbology procedures.
+Goal: implement the first safety-critical conditional symbology procedures.
 
 Initial CSPs:
 
@@ -120,150 +109,116 @@ Initial CSPs:
 
 Definition of done:
 
-- Depth/safety portrayal works from typed attributes and mariner settings.
-- Synthetic golden tests cover common shallow/deep/danger cases.
+- Critical depth and danger portrayal works
+- CSP output remains renderer-independent
+- Synthetic golden tests cover safety-depth/safety-contour settings
 
 ## Phase 6 — Complete CSP coverage
 
-Implement every CSP referenced by the imported Presentation Library.
+Goal: every `CS(...)` referenced by imported lookup tables has an implementation.
 
 Definition of done:
 
-- Static test: every `CS(name)` in lookup tables is present in `CspRegistry`.
-- Every CSP has command-level tests.
-- No CSP reads attributes by raw string.
+- Zero missing CSP references
+- Every CSP has command-level golden tests
+- CSPs use typed attributes only
 
-## Phase 7 — Draw-command completeness
+## Phase 7 — Draw-command model hardening
 
-Make renderer-independent command output complete enough for all S-52 instructions.
-
-Commands:
-
-- Area fill
-- Area pattern
-- Simple line
-- Complex line
-- Point symbol
-- Text
-- Sounding
+Goal: stabilize renderer-independent draw commands.
 
 Definition of done:
 
-- Commands serialize for golden tests.
-- Commands use S-52 color tokens, not CSS colors.
-- Commands preserve feature id, priority, viewing group, and display category.
+- Commands preserve feature id, display priority, viewing group, category, and radar flag
+- Commands use S-52 color tokens, not CSS colors
+- Commands serialize deterministically for tests
 
 ## Phase 8 — WebGL2 renderer
 
-Render `S52DrawCommand` only.
+Goal: render `S52DrawCommand`, not ENC semantics.
 
 Deliverables:
 
 - Area fill renderer
-- Pattern atlas renderer
-- Simple and complex line renderers
+- Area pattern renderer
+- Simple line renderer
+- Complex line renderer
 - Point symbol renderer
-- SDF text renderer
+- Text renderer
 - Sounding renderer
-- Day/dusk/night palette switching
-
-Definition of done:
-
-- WebGL layer contains no S-57 object-class logic.
-- Renderer can draw synthetic Chart-1-like scenes.
+- Symbol, pattern, and SDF text atlases
 
 ## Phase 9 — Static completeness tests
 
-Automatically verify internal Presentation Library consistency.
+Goal: prove the imported Presentation Library is internally satisfied.
 
 Checks:
 
 - Every instruction parses
-- Every symbol exists
-- Every line style exists
-- Every pattern exists
-- Every color token exists in required palettes
-- Every CSP exists
-- Every object class maps to `S57ObjectClass`
-- Every attribute maps to `S57Attribute`
-
-Definition of done:
-
-- Missing references fail CI.
-- CI publishes or prints a completeness report.
+- Every symbol reference resolves
+- Every line-style reference resolves
+- Every pattern reference resolves
+- Every color token resolves in required palettes
+- Every CSP reference resolves
+- Every object/attribute acronym resolves to a typed enum
 
 ## Phase 10 — Golden portrayal tests
 
-Compare command-level output for synthetic fixtures.
+Goal: protect behavior from regressions.
 
-Fixture families:
+Start with command-level tests for:
 
-- Depth areas and contours
-- Soundings
-- Wrecks and obstructions
-- Lights and sectors
-- Buoys, beacons, and topmarks
-- Restricted areas
-- Quality and coverage features
+- DEPARE depth-color transitions
+- DEPCNT safety contour
+- SOUNDG safety depth
+- WRECKS dangerous/non-dangerous cases
+- OBSTRN dangerous/non-dangerous cases
+- LIGHTS sector/description handling
+- TOPMAR with buoy/beacon classes
+- RESARE category combinations
+- M_QUAL / CATZOC quality display
+- DATCVR coverage boundaries
 
-Definition of done:
+## Phase 11 — S-64 / Chart 1 validation harness
 
-- Stable JSON golden outputs.
-- Settings changes produce expected output changes.
+Goal: compare portrayal output against serious external validation material.
 
-## Phase 11 — S-64 / external validation harness
-
-Add a validation harness for external test data.
-
-Definition of done:
-
-- Can run command-level validation against external fixtures.
-- Can optionally produce PNG screenshots.
-- Pixel-level tests are optional and tolerance-based.
+Start with command-level transcripts. Pixel-level regression can follow later because anti-aliasing, fonts, and GPU differences make screenshots fragile.
 
 ## Phase 12 — Public API stabilization
 
-Prepare the library for downstream use.
+Goal: make the library consumable by other Kotlin/JS applications.
 
-Definition of done:
+Deliverables:
 
-- KDoc on public APIs
-- SemVer versioning
-- Usage examples
-- Minimal integration guide
-- Clear binary/source compatibility policy
+- SemVer
+- KDoc for public APIs
+- Minimal integration example
+- Stable module names and package structure
 
 ## Phase 13 — Performance pass
 
-Optimize portrayal and rendering.
+Goal: make portrayal and rendering viable for large real scenes.
 
-Targets:
+Optimize:
 
 - Lookup indexing
-- Attribute filter precompilation
-- CSP allocation reduction
+- Attribute-filter precompilation
+- CSP allocations
+- Draw-command batching
 - Viewport culling
-- Symbol/pattern atlas caching
-- Line/text batching
+- Symbol/pattern/text atlas caching
 
-Definition of done:
+## Phase 14 — Documentation and examples
 
-- Benchmarks exist.
-- Large synthetic scenes remain interactive.
+Goal: make the project maintainable by contributors.
 
-## Phase 14 — Documentation and contributor guide
-
-Complete maintainability docs.
-
-Documents:
+Docs:
 
 - Architecture
+- Public API
 - Presentation Library import
-- CSP implementation guide
-- WebGL renderer design
+- Conditional symbology
+- WebGL renderer
 - Testing and validation
-- Safety / not-for-navigation policy
-
-Definition of done:
-
-- New contributor can add a CSP and tests without reverse-engineering the codebase.
+- Safety/legal boundary
