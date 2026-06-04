@@ -19,6 +19,7 @@ kotlin {
         jvmTest {
             dependencies {
                 implementation(kotlin("test"))
+                implementation(project(":s52-preslib"))
             }
         }
     }

@@ -73,3 +73,11 @@ tasks.register("phase8Check") {
     description = "Runs Phase 8 WebGL2 renderer checks and all previous phase checks."
     dependsOn("phase7Check", ":s52-render-webgl:build", ":demo:build")
 }
+
+
+
+tasks.register("phase9Check") {
+    group = "verification"
+    description = "Runs Phase 9 static Presentation Library completeness checks and all previous phase checks."
+    dependsOn("phase8Check", ":s52-preslib:jvmTest", ":s52-csp:jvmTest")
+}

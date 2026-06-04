@@ -226,17 +226,20 @@ See [`WEBGL_PHASE8.md`](WEBGL_PHASE8.md).
 
 ## Phase 9 — Static completeness tests
 
-Goal: prove the imported Presentation Library is internally satisfied.
+Status: **complete**.
 
-Checks:
+Goal: prove that a generated/imported Presentation Library pack is internally satisfied before rendering.
 
-- Every instruction parses
-- Every symbol reference resolves
-- Every line-style reference resolves
-- Every pattern reference resolves
-- Every color token resolves in required palettes
-- Every CSP reference resolves
-- Every object/attribute acronym resolves to a typed enum
+Completed deliverables:
+
+- Added `StaticCompletenessValidator` for source and runtime Presentation Library packs
+- Added structured `StaticCompletenessDiagnostic` and `StaticCompletenessReport`
+- Validates instruction parsing, referenced symbols, line styles, patterns, colors, palettes, CSPs, lookup primitives, duplicate source names, RGB ranges, and source attribute-filter kind compatibility
+- Added Phase 9 tests proving the synthetic generated pack has zero static-completeness diagnostics with the Phase 6 CSP registry
+- Added negative tests for missing assets, missing palettes, missing CSPs, invalid primitives, parse failures, and incompatible attribute-filter kinds
+- CI target `phase9Check` runs all previous checks plus the static-completeness tests
+
+See [`STATIC_COMPLETENESS_PHASE9.md`](STATIC_COMPLETENESS_PHASE9.md).
 
 ## Phase 10 — Golden portrayal tests
 

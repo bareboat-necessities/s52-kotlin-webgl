@@ -18,17 +18,15 @@ Optional WebGL2 renderer
 
 Experimental. Not type-approved ECDIS. Not for navigation.
 
-## Phase 8 status
+## Phase 9 status
 
-Phase 8 is complete in this increment:
+Phase 9 is complete in this increment:
 
-- Replaced the placeholder WebGL module with a real command-only WebGL2 backend.
-- Added `RenderViewport` and clip-space projection.
-- Added shared shader/program support.
-- Added renderers for area fills, area patterns, simple lines, complex lines, point symbols, text, and soundings.
-- Kept the WebGL renderer independent from S-57 object classes, attributes, lookup rows, and CSP names.
-- Updated the browser demo to exercise the Phase 8 renderer.
-- CI now runs `phase8Check`.
+- Added static completeness validation for source and runtime Presentation Library packs.
+- Added structured diagnostics and Markdown reports for missing symbols, line styles, patterns, colors, palettes, CSPs, invalid primitives, parse failures, duplicate source names, invalid RGB values, and incompatible source attribute filters.
+- Added positive tests proving the synthetic generated pack is complete when checked against the Phase 6 CSP registry.
+- Added negative tests proving actionable diagnostics are emitted for broken packs.
+- CI now runs `phase9Check`.
 
 The project still uses a synthetic Presentation Library pack. Official IHO Presentation Library source assets are not bundled.
 
@@ -37,7 +35,7 @@ The project still uses a synthetic Presentation Library pack. Official IHO Prese
 This project is configured for Gradle 8.14.5 and Kotlin 2.3.21.
 
 ```bash
-gradle phase8Check
+gradle phase9Check
 ```
 
 The CI workflow installs Gradle and Java 21, then runs the same task.
@@ -59,4 +57,4 @@ Official IHO Presentation Library assets should be treated as external input unl
 
 ## Next step
 
-Begin Phase 9: static completeness tests that fail the build if imported Presentation Library references are unresolved.
+Begin Phase 10: command-level golden portrayal tests for depth areas, contours, soundings, dangers, lights, topmarks, restricted areas, quality areas, and data coverage.
