@@ -7,8 +7,28 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  phase-checks:
+    name: Phase ${{ matrix.phase }} checks
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        phase:
+          - 0
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+          - 7
+          - 8
+          - 9
+          - 10
+          - 11
+          - 12
+          - 13
+          - 14
 
     steps:
       - name: Check out repository
@@ -23,5 +43,5 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build and test Phase 14
-        run: gradle --no-daemon phase14Check
+      - name: Build and test Phase ${{ matrix.phase }}
+        run: gradle --no-daemon phase${{ matrix.phase }}Check
