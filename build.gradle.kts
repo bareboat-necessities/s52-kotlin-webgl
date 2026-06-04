@@ -4,7 +4,7 @@ plugins {
 
 allprojects {
     group = "io.github.s52"
-    version = "0.1.0-SNAPSHOT"
+    version = "0.14.0-SNAPSHOT"
 }
 
 tasks.register("phase0Check") {
@@ -107,4 +107,11 @@ tasks.register("phase13Check") {
     group = "verification"
     description = "Runs Phase 13 performance/cache/batching checks and all previous phase checks."
     dependsOn("phase12Check", ":s52-core:jvmTest", ":s52-api:jvmTest", ":s52-render-webgl:build", ":demo:build")
+}
+
+
+tasks.register("phase14Check") {
+    group = "verification"
+    description = "Runs Phase 14 documentation/example checks and all previous phase checks."
+    dependsOn("phase13Check", ":s52-api:jvmTest", ":s52-tests:jvmTest")
 }

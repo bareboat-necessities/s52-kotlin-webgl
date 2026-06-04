@@ -21,7 +21,7 @@ class S52ApiPhase12Test {
 
         assertTrue(result.isValid)
         assertEquals(1, result.commands.size)
-        assertEquals("0.13.0-SNAPSHOT", S52.version.toString())
+        assertEquals("0.14.0-SNAPSHOT", S52.version.toString())
     }
 
     @Test

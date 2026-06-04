@@ -319,15 +319,22 @@ See [`PERFORMANCE_PHASE13.md`](PERFORMANCE_PHASE13.md).
 
 ## Phase 14 — Documentation and examples
 
-Goal: make the project maintainable by contributors.
+Status: **complete**.
 
-Docs:
+Goal: make the project maintainable by contributors and downstream integrators.
 
-- Architecture
-- Public API
-- Presentation Library import
-- Conditional symbology
-- WebGL renderer
-- Testing and validation
-- Safety/legal boundary
+Completed deliverables:
+
+- Added architecture documentation with strict module boundaries.
+- Added safety/legal boundary documentation.
+- Added contributor guide.
+- Added CSP extension guide.
+- Added testing and validation guide.
+- Added example integration guide.
+- Added sample code for minimal API usage, deterministic transcripts, custom Presentation Library wiring, and browser/WebGL integration.
+- Added documentation/example smoke tests.
+- Bumped public API version metadata to `0.14.0-SNAPSHOT`.
+- CI target `phase14Check` runs all previous checks plus Phase 14 documentation/example checks.
+
+See [`DOCUMENTATION_PHASE14.md`](DOCUMENTATION_PHASE14.md).
 
