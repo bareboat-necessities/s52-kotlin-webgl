@@ -1,0 +1,22 @@
+# Synthetic S-64-style validation fixture for overlay and quality objects.
+id=s64-overlay-quality
+source=SyntheticS64
+description=Data coverage, restricted area, and quality overlays in Other display category.
+settings.displayCategory=Other
+settings.showText=true
+context.compilationScale=50000.0
+context.displayScale=50000.0
+context.viewportId=phase11-s64-overlay-quality
+feature=3001|M_COVR|Area|CATCOV=I:2|POLYGON(-74,40;-73.99,40;-73.99,40.01;-74,40)
+feature=3002|RESARE|Area|RESTRN=L:I:1,I:7|POLYGON(-74,40;-73.99,40;-73.99,40.01;-74,40)
+feature=3003|M_QUAL|Area|CATZOC=I:5|POLYGON(-74,40;-73.99,40;-73.99,40.01;-74,40)
+expect:
+{"kind":"area-fill","featureId":"3001","priority":"0","viewingGroup":"11010","category":"DisplayBase","overRadar":"false","geometry":"POLYGON(-74,40;-73.99,40;-73.99,40.01;-74,40)","color":"NODTA"}
+{"kind":"area-pattern","featureId":"3001","priority":"0","viewingGroup":"11010","category":"DisplayBase","overRadar":"false","geometry":"POLYGON(-74,40;-73.99,40;-73.99,40.01;-74,40)","pattern":"NODATA01","parameters":"[]"}
+{"kind":"line-complex","featureId":"3001","priority":"0","viewingGroup":"11010","category":"DisplayBase","overRadar":"false","geometry":"POLYGON(-74,40;-73.99,40;-73.99,40.01;-74,40)","lineStyle":"DATCVR01","parameters":"[]"}
+{"kind":"area-pattern","featureId":"3002","priority":"5","viewingGroup":"24020","category":"Standard","overRadar":"false","geometry":"POLYGON(-74,40;-73.99,40;-73.99,40.01;-74,40)","pattern":"RESTRN01","parameters":"[]"}
+{"kind":"line-simple","featureId":"3002","priority":"5","viewingGroup":"24020","category":"Standard","overRadar":"false","geometry":"POLYGON(-74,40;-73.99,40;-73.99,40.01;-74,40)","style":"DASH","width":"1","color":"CHMGD"}
+{"kind":"text","featureId":"3002","priority":"5","viewingGroup":"24020","category":"Standard","overRadar":"false","geometry":"POLYGON(-74,40;-73.99,40;-73.99,40.01;-74,40)","textKind":"TX","text":"RESTRN=1, 7","args":"[RESTRN=1, 7,CHMGD]","color":"CHMGD"}
+{"kind":"area-pattern","featureId":"3003","priority":"6","viewingGroup":"52010","category":"Other","overRadar":"false","geometry":"POLYGON(-74,40;-73.99,40;-73.99,40.01;-74,40)","pattern":"MQUAL_LOW01","parameters":"[]"}
+{"kind":"line-simple","featureId":"3003","priority":"6","viewingGroup":"52010","category":"Other","overRadar":"false","geometry":"POLYGON(-74,40;-73.99,40;-73.99,40.01;-74,40)","style":"DASH","width":"1","color":"QUASR"}
+{"kind":"text","featureId":"3003","priority":"6","viewingGroup":"52010","category":"Other","overRadar":"false","geometry":"POLYGON(-74,40;-73.99,40;-73.99,40.01;-74,40)","textKind":"TX","text":"CATZOC=5","args":"[CATZOC=5,QUASR]","color":"QUASR"}

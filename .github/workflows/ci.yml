@@ -23,5 +23,5 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build and test Phase 10
-        run: gradle --no-daemon phase10Check
+      - name: Build and test Phase 11
+        run: gradle --no-daemon phase11Check

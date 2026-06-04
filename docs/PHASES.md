@@ -261,9 +261,21 @@ See [`GOLDEN_TESTS_PHASE10.md`](GOLDEN_TESTS_PHASE10.md).
 
 ## Phase 11 — S-64 / Chart 1 validation harness
 
-Goal: compare portrayal output against serious external validation material.
+Status: **complete**.
 
-Start with command-level transcripts. Pixel-level regression can follow later because anti-aliasing, fonts, and GPU differences make screenshots fragile.
+Goal: compare portrayal output against serious external validation material while still avoiding fragile pixel tests.
+
+Completed deliverables:
+
+- Added `CommandValidationFixture` for external command-level validation inputs.
+- Added `ValidationFixtureParser` for small checked-in or externally supplied normalized-feature fixtures.
+- Added `S64CommandValidationRunner`, `CommandValidationResult`, and `S64ValidationReport`.
+- Added synthetic Chart-1 / S-64-style fixture resources for depth/danger, display-settings, and overlay/quality cases.
+- Validation runs through `EncFeature -> S52PortrayalEngine -> S52DrawCommand -> transcript`.
+- Negative test proves mismatch diagnostics identify the fixture id and first differing transcript line.
+- CI target `phase11Check` runs all previous checks plus the validation harness tests.
+
+See [`S64_VALIDATION_PHASE11.md`](S64_VALIDATION_PHASE11.md).
 
 ## Phase 12 — Public API stabilization
 

@@ -88,3 +88,9 @@ tasks.register("phase10Check") {
     description = "Runs Phase 10 command-level golden portrayal tests and all previous phase checks."
     dependsOn("phase9Check", ":s52-tests:jvmTest")
 }
+
+tasks.register("phase11Check") {
+    group = "verification"
+    description = "Runs Phase 11 S-64 / Chart-1 command validation harness checks and all previous phase checks."
+    dependsOn("phase10Check", ":s52-tests:jvmTest")
+}

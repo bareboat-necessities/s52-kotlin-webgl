@@ -1,0 +1,15 @@
+# Synthetic S-64-style validation fixture for mariner display settings.
+id=s64-display-settings
+source=SyntheticS64
+description=Text, light-description, and sounding settings suppress only text/sounding commands.
+settings.showText=false
+settings.showSoundings=false
+settings.showLightDescriptions=false
+context.compilationScale=50000.0
+context.displayScale=50000.0
+context.viewportId=phase11-s64-display-settings
+feature=4001|LIGHTS|Point|OBJNAM=T:Main;SECTR1=D:20.0;SECTR2=D:110.0|POINT(-73.99,40.01)
+feature=4002|SOUNDG|Point|VALSOU=D:3.2|POINT(-73.98,40.01)
+expect:
+{"kind":"line-complex","featureId":"4001","priority":"9","viewingGroup":"28010","category":"Standard","overRadar":"true","geometry":"POINT(-73.99,40.01)","lineStyle":"LIGHTSECTOR01","parameters":"[]"}
+{"kind":"point-symbol","featureId":"4001","priority":"9","viewingGroup":"28010","category":"Standard","overRadar":"true","geometry":"POINT(-73.99,40.01)","symbol":"LIGHTS11","parameters":"[]"}

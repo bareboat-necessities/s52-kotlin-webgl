@@ -1,0 +1,23 @@
+# Synthetic Chart-1-style validation fixture for depth and danger portrayal.
+id=chart1-depth-danger
+source=SyntheticChart1
+description=Depth safety, dangerous wreck, and dangerous obstruction command validation.
+settings.safetyDepthMeters=5.0
+settings.safetyContourMeters=10.0
+settings.shallowContourMeters=2.0
+settings.deepContourMeters=30.0
+settings.showSoundings=true
+context.compilationScale=50000.0
+context.displayScale=50000.0
+context.viewportId=phase11-chart1-depth-danger
+feature=1001|DEPARE|Area|DRVAL1=D:0.0;DRVAL2=D:4.0|POLYGON(-74,40;-73.99,40;-73.99,40.01;-74,40)
+feature=1002|DEPCNT|Line|VALDCO=D:10.0|LINESTRING(-74,40;-73.99,40.01)
+feature=1003|SOUNDG|Point|VALSOU=D:3.2|POINT(-73.995,40.005)
+feature=2001|WRECKS|Point|CATWRK=I:2|POINT(-73.99,40)
+feature=2002|OBSTRN|Point|VALSOU=D:2.0|POINT(-73.98,40)
+expect:
+{"kind":"area-fill","featureId":"1001","priority":"2","viewingGroup":"21010","category":"Standard","overRadar":"false","geometry":"POLYGON(-74,40;-73.99,40;-73.99,40.01;-74,40)","color":"DEPVS"}
+{"kind":"line-simple","featureId":"1002","priority":"3","viewingGroup":"21020","category":"Standard","overRadar":"false","geometry":"LINESTRING(-74,40;-73.99,40.01)","style":"SOLD","width":"2","color":"DEPSC"}
+{"kind":"point-symbol","featureId":"2001","priority":"8","viewingGroup":"34050","category":"Standard","overRadar":"true","geometry":"POINT(-73.99,40)","symbol":"WRECKS_DANGER01","parameters":"[]"}
+{"kind":"point-symbol","featureId":"2002","priority":"8","viewingGroup":"34060","category":"Standard","overRadar":"true","geometry":"POINT(-73.98,40)","symbol":"OBSTRN_DANGER01","parameters":"[]"}
+{"kind":"sounding","featureId":"1003","priority":"9","viewingGroup":"33010","category":"Standard","overRadar":"true","geometry":"POINT(-73.995,40.005)","depth":"3.2","color":"SNDG2"}
