@@ -2,10 +2,10 @@ package io.github.s52.render.webgl.internal
 
 import io.github.s52.core.draw.S52DrawCommand
 import io.github.s52.core.geometry.EncGeometry
-import org.khronos.webgl.WebGL2RenderingContext
+import org.khronos.webgl.WebGLRenderingContext
 
 internal class LineRenderer(
-    private val gl: WebGL2RenderingContext,
+    private val gl: WebGLRenderingContext,
     private val program: SolidColorProgram
 ) {
     fun renderSimple(command: S52DrawCommand.LineSimple, projector: GeometryProjector, colors: ColorResolver): Int {
@@ -24,7 +24,7 @@ internal class LineRenderer(
         }
         if (vertices.isEmpty()) return 0
         gl.lineWidth(lineWidth.toFloat().coerceAtLeast(1.0f))
-        return program.draw(WebGL2RenderingContext.LINE_STRIP, vertices, color)
+        return program.draw(WebGLRenderingContext.LINE_STRIP, vertices, color)
     }
 
     private fun List<io.github.s52.core.geometry.Coordinate>.toVertices(projector: GeometryProjector): FloatArray {

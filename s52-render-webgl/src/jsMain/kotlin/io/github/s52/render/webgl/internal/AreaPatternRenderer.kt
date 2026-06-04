@@ -4,10 +4,10 @@ import io.github.s52.core.draw.S52DrawCommand
 import io.github.s52.core.geometry.Coordinate
 import io.github.s52.core.geometry.EncGeometry
 import io.github.s52.render.webgl.coordinates
-import org.khronos.webgl.WebGL2RenderingContext
+import org.khronos.webgl.WebGLRenderingContext
 
 internal class AreaPatternRenderer(
-    private val gl: WebGL2RenderingContext,
+    private val gl: WebGLRenderingContext,
     private val program: SolidColorProgram
 ) {
     fun render(command: S52DrawCommand.AreaPattern, projector: GeometryProjector, colors: ColorResolver): Int {
@@ -16,7 +16,7 @@ internal class AreaPatternRenderer(
 
         val vertices = hatchLines(geometryCoordinates, projector)
         if (vertices.isEmpty()) return 0
-        return program.draw(WebGL2RenderingContext.LINES, vertices, colors.resolve(command.backgroundColorToken, fallback = "CHMGD"))
+        return program.draw(WebGLRenderingContext.LINES, vertices, colors.resolve(command.backgroundColorToken, fallback = "CHMGD"))
     }
 
     private fun hatchLines(coordinates: List<Coordinate>, projector: GeometryProjector): FloatArray {

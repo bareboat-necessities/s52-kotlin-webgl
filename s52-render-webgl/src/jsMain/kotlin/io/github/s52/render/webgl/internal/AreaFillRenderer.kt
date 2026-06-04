@@ -2,16 +2,16 @@ package io.github.s52.render.webgl.internal
 
 import io.github.s52.core.draw.S52DrawCommand
 import io.github.s52.core.geometry.EncGeometry
-import org.khronos.webgl.WebGL2RenderingContext
+import org.khronos.webgl.WebGLRenderingContext
 
 internal class AreaFillRenderer(
-    private val gl: WebGL2RenderingContext,
+    private val gl: WebGLRenderingContext,
     private val program: SolidColorProgram
 ) {
     fun render(command: S52DrawCommand.AreaFill, projector: GeometryProjector, colors: ColorResolver): Int {
         val triangles = triangulate(command.geometry, projector)
         if (triangles.isEmpty()) return 0
-        return program.draw(WebGL2RenderingContext.TRIANGLES, triangles, colors.resolve(command.colorToken, fallback = "DEPDW"))
+        return program.draw(WebGLRenderingContext.TRIANGLES, triangles, colors.resolve(command.colorToken, fallback = "DEPDW"))
     }
 
     private fun triangulate(geometry: EncGeometry, projector: GeometryProjector): FloatArray {
