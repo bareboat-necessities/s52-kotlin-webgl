@@ -18,18 +18,17 @@ Optional WebGL2 renderer
 
 Experimental. Not type-approved ECDIS. Not for navigation.
 
-## Phase 7 status
+## Phase 8 status
 
-Phase 7 is complete in this increment:
+Phase 8 is complete in this increment:
 
-- Hardened the renderer-independent `S52DrawCommand` boundary.
-- Added stable `DrawCommandKind` metadata.
-- Added dedicated `S52DrawCommand.Sounding`.
-- Added deterministic command transcripts through `S52DrawCommandTranscript`.
-- Added `DrawCommandValidator` for pre-render command diagnostics.
-- Preserved S-52 symbol, line, pattern, color, text, and sounding tokens without converting them to renderer-specific values.
-- Updated placeholder WebGL stats to count soundings separately.
-- CI now runs `phase7Check`.
+- Replaced the placeholder WebGL module with a real command-only WebGL2 backend.
+- Added `RenderViewport` and clip-space projection.
+- Added shared shader/program support.
+- Added renderers for area fills, area patterns, simple lines, complex lines, point symbols, text, and soundings.
+- Kept the WebGL renderer independent from S-57 object classes, attributes, lookup rows, and CSP names.
+- Updated the browser demo to exercise the Phase 8 renderer.
+- CI now runs `phase8Check`.
 
 The project still uses a synthetic Presentation Library pack. Official IHO Presentation Library source assets are not bundled.
 
@@ -38,7 +37,7 @@ The project still uses a synthetic Presentation Library pack. Official IHO Prese
 This project is configured for Gradle 8.14.5 and Kotlin 2.3.21.
 
 ```bash
-gradle phase7Check
+gradle phase8Check
 ```
 
 The CI workflow installs Gradle and Java 21, then runs the same task.
@@ -60,4 +59,4 @@ Official IHO Presentation Library assets should be treated as external input unl
 
 ## Next step
 
-Begin Phase 8: implement the real WebGL2 renderer for the hardened draw-command model.
+Begin Phase 9: static completeness tests that fail the build if imported Presentation Library references are unresolved.

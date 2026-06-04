@@ -207,16 +207,22 @@ See [`DRAW_COMMAND_PHASE7.md`](DRAW_COMMAND_PHASE7.md).
 
 Goal: render `S52DrawCommand`, not ENC semantics.
 
-Deliverables:
+Completed deliverables:
 
-- Area fill renderer
-- Area pattern renderer
-- Simple line renderer
-- Complex line renderer
-- Point symbol renderer
-- Text renderer
-- Sounding renderer
-- Symbol, pattern, and SDF text atlases
+- Added `RenderViewport` with automatic command-bounds fitting.
+- Added `GeometryProjector` for lon/lat to WebGL clip-space projection.
+- Added shared `SolidColorProgram` shader support.
+- Added S-52 palette color resolution in the renderer layer.
+- Implemented area fill rendering with simple fan triangulation.
+- Implemented area pattern rendering with synthetic hatch overlays.
+- Implemented simple-line and complex-line rendering.
+- Implemented point-symbol rendering from Presentation Library vector commands.
+- Implemented text rendering through a built-in line-glyph font.
+- Implemented dedicated sounding rendering.
+- Updated the browser demo to exercise all Phase 8 command families.
+- CI target `phase8Check` runs all previous checks plus renderer/demo builds.
+
+See [`WEBGL_PHASE8.md`](WEBGL_PHASE8.md).
 
 ## Phase 9 — Static completeness tests
 
