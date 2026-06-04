@@ -47,7 +47,7 @@ The synthetic fixture now exposes four built-in profile presets:
 | `night-minimal` | Night palette with reduced clutter. |
 | `diagnostics-all` | Verbose profile for command transcripts and issue reports. |
 
-These profiles are not a substitute for official ECDIS configuration. They are stable developer presets for repeatable test and integration behavior.
+These profiles are not a substitute for official ECDIS configuration, are not for navigation, and are stable developer presets for repeatable test and integration behavior.
 
 ## Convenience extensions
 

@@ -172,7 +172,7 @@ object S52ArtifactExporter {
             artifacts += S52Artifact("command-validation.md", MEDIA_MARKDOWN, result.commandValidation.toMarkdown())
         }
         if (options.includeFullTranscript) {
-            artifacts += S52Artifact("commands.jsonl", MEDIA_JSONL, result.transcript)
+            artifacts += S52Artifact("commands.jsonl", MEDIA_JSONL, result.artifactTranscript())
         }
         if (options.includeTranscriptPreview) {
             artifacts += S52Artifact("commands-preview.txt", MEDIA_TEXT, diagnostics.transcriptPreview())
@@ -185,6 +185,13 @@ object S52ArtifactExporter {
                 S52Artifact("bundle-index.properties", MEDIA_PROPERTIES, bundle.toPropertiesIndex())
             ) + artifacts
         )
+    }
+
+    private fun S52PortrayalResult.artifactTranscript(): String {
+        val lines = transcript.lines().filter { it.isNotBlank() }
+        return commands.zip(lines).joinToString(separator = "\n", postfix = if (lines.isEmpty()) "" else "\n") { (command, line) ->
+            line.replaceFirst("{", "{\"command\":\"${command::class.simpleName}\",")
+        }
     }
 
     private fun buildIndexMarkdown(

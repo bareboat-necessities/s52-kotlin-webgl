@@ -1,10 +1,7 @@
 package io.github.s52.api
 
 import io.github.s52.core.csp.CspRegistry
-import io.github.s52.core.draw.DrawCommandValidationReport
 import io.github.s52.core.draw.DrawCommandValidator
-import io.github.s52.core.draw.S52DrawCommand
-import io.github.s52.core.draw.S52DrawCommandTranscript
 import io.github.s52.core.engine.S52PortrayalEngine
 import io.github.s52.core.model.EncFeature
 import io.github.s52.core.settings.MarinerSettings
@@ -51,9 +48,8 @@ class S52PortrayalSession(
 
         return S52PortrayalResult(
             commands = commands,
-            commandValidation = commandValidation,
-            staticCompleteness = completeness,
-            transcript = S52DrawCommandTranscript.serialize(commands)
+            validation = commandValidation,
+            staticCompleteness = completeness
         )
     }
 
@@ -104,22 +100,6 @@ data class S52PortrayalRequest(
     )
 )
 
-/** Stable result object suitable for renderers, golden tests, and diagnostics. */
-data class S52PortrayalResult(
-    val commands: List<S52DrawCommand>,
-    val commandValidation: DrawCommandValidationReport,
-    val staticCompleteness: StaticCompletenessReport,
-    val transcript: String
-) {
-    val hasErrors: Boolean get() = commandValidation.hasErrors || staticCompleteness.hasErrors
-
-    fun diagnosticsMarkdown(): String = buildString {
-        appendLine(staticCompleteness.toMarkdown())
-        appendLine()
-        appendLine(commandValidation.toMarkdown())
-    }
-}
-
 /** Machine-readable runtime summary for release audits and downstream apps. */
 data class S52RuntimeManifest(
     val name: String,
@@ -150,10 +130,4 @@ data class S52RuntimeManifest(
         appendLine("- Statically complete: $staticallyComplete")
         appendLine("- Safety status: $safetyStatus")
     }
-}
-
-/** Convenience entry point for consumers that want the default bundled synthetic fixture. */
-object S52 {
-    fun synthetic(): S52PortrayalSession = S52PortrayalSession.syntheticPhase16()
-    fun s52LibCompat(): S52PortrayalSession = S52PortrayalSession.s52LibCompat()
 }

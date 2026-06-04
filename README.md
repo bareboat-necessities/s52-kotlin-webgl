@@ -23,12 +23,13 @@ Experimental. Not type-approved ECDIS. Not for navigation.
 Phase 20 is complete in this increment:
 
 - Phase 16 `s52-api` remains the stable consumer-facing facade.
-- Phase 17 diagnostic bundles remain the support and CI handoff format.
-- Phase 18 built-in portrayal profiles remain the reproducible settings layer.
+- Phase 17 diagnostic bundles (`S52DiagnosticBundle`) remain the support and CI handoff format.
+- Phase 18 built-in portrayal profiles (`S52ProfileCatalog`) remain the reproducible settings layer.
 - Added Phase 19 portable text artifact bundles through `S52ArtifactBundle`, `S52ArtifactExporter`, and `S52PortrayalSession.artifactBundle(...)`.
 - Artifact bundles can include manifest, diagnostics, profile summary, static-completeness report, command-validation report, and command transcript files.
 - Added an artifact-bundle integration sample.
-- Added Phase 20 s52lib-compatible pack and browser gallery routes.
+- Added Phase 20 s52lib-compatible pack, `S52GalleryBuilder`, and browser gallery routes.
+- Phase checks remain available for downstream CI gates: `phase16Check`, `phase17Check`, `phase18Check`, `phase19Check`, and `phase20Check`.
 - CI now runs `phase20Check`.
 
 The default browser demo now uses the s52lib-compatible pack. Official IHO Presentation Library source assets are still not bundled; the compatibility pack renders all assets present in the loaded pack.

@@ -22,6 +22,12 @@ object S52 {
     /** Build the default Phase 14 runtime using the synthetic pack and complete CSP registry. */
     fun defaultRuntime(): S52Runtime = S52Runtime.synthetic()
 
+    /** Build the Phase 16+ session facade using the synthetic pack and complete CSP registry. */
+    fun synthetic(): S52PortrayalSession = S52PortrayalSession.syntheticPhase16()
+
+    /** Build the Phase 20 session facade using the s52lib-compatible synthetic pack. */
+    fun s52LibCompat(): S52PortrayalSession = S52PortrayalSession.s52LibCompat()
+
     /** Stable default mariner settings used by examples and tests. */
     fun defaultSettings(
         displayCategory: DisplayCategory = DisplayCategory.Standard,
