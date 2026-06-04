@@ -13,18 +13,9 @@ object DisplayPrioritySorter : Comparator<S52DrawCommand> {
             a,
             b,
             S52DrawCommand::priority,
-            { it.commandKindOrder() },
+            { it.kind.order },
             S52DrawCommand::viewingGroup,
             S52DrawCommand::featureId,
             { if (it.overRadar) 1 else 0 }
         )
-
-    private fun S52DrawCommand.commandKindOrder(): Int = when (this) {
-        is S52DrawCommand.AreaFill -> 0
-        is S52DrawCommand.AreaPattern -> 1
-        is S52DrawCommand.LineSimple -> 2
-        is S52DrawCommand.LineComplex -> 3
-        is S52DrawCommand.PointSymbol -> 4
-        is S52DrawCommand.Text -> 5
-    }
 }

@@ -37,7 +37,8 @@ class WebGlS52Renderer(
             areaPatternCount = commands.count { it is S52DrawCommand.AreaPattern },
             lineCount = commands.count { it is S52DrawCommand.LineSimple || it is S52DrawCommand.LineComplex },
             symbolCount = commands.count { it is S52DrawCommand.PointSymbol },
-            textCount = commands.count { it is S52DrawCommand.Text }
+            textCount = commands.count { it is S52DrawCommand.Text },
+            soundingCount = commands.count { it is S52DrawCommand.Sounding }
         )
     }
 
@@ -56,5 +57,6 @@ data class RenderStats(
     val areaPatternCount: Int,
     val lineCount: Int,
     val symbolCount: Int,
-    val textCount: Int
+    val textCount: Int,
+    val soundingCount: Int = 0
 )

@@ -18,16 +18,18 @@ Optional WebGL2 renderer
 
 Experimental. Not type-approved ECDIS. Not for navigation.
 
-## Phase 6 status
+## Phase 7 status
 
-Phase 6 is complete in this increment:
+Phase 7 is complete in this increment:
 
-- Added `DefaultCspRegistry.phase6Complete()` for all CSPs referenced by the generated synthetic Presentation Library fixture.
-- Expanded `CspId` beyond the Phase 5 critical batch.
-- Added starter CSPs for restricted/caution areas, dredged areas, seabed areas, data coverage, and quality-of-data.
-- Expanded the synthetic Presentation Library fixture to reference every Phase 6 CSP through `CS(...)`.
-- Added command-level golden transcript tests for every `CspId`.
-- CI now runs `phase6Check`.
+- Hardened the renderer-independent `S52DrawCommand` boundary.
+- Added stable `DrawCommandKind` metadata.
+- Added dedicated `S52DrawCommand.Sounding`.
+- Added deterministic command transcripts through `S52DrawCommandTranscript`.
+- Added `DrawCommandValidator` for pre-render command diagnostics.
+- Preserved S-52 symbol, line, pattern, color, text, and sounding tokens without converting them to renderer-specific values.
+- Updated placeholder WebGL stats to count soundings separately.
+- CI now runs `phase7Check`.
 
 The project still uses a synthetic Presentation Library pack. Official IHO Presentation Library source assets are not bundled.
 
@@ -36,7 +38,7 @@ The project still uses a synthetic Presentation Library pack. Official IHO Prese
 This project is configured for Gradle 8.14.5 and Kotlin 2.3.21.
 
 ```bash
-gradle phase6Check
+gradle phase7Check
 ```
 
 The CI workflow installs Gradle and Java 21, then runs the same task.
@@ -58,4 +60,4 @@ Official IHO Presentation Library assets should be treated as external input unl
 
 ## Next step
 
-Begin Phase 7: harden the renderer-independent draw-command model and deterministic serialization.
+Begin Phase 8: implement the real WebGL2 renderer for the hardened draw-command model.

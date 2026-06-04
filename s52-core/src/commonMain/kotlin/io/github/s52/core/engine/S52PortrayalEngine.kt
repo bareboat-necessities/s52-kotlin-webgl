@@ -6,6 +6,7 @@ import io.github.s52.core.draw.DisplayCategoryFilter
 import io.github.s52.core.draw.DisplayPrioritySorter
 import io.github.s52.core.draw.S52DrawCommand
 import io.github.s52.core.draw.ViewingGroupFilter
+import io.github.s52.catalog.S57ObjectClass
 import io.github.s52.core.instruction.S52Instruction
 import io.github.s52.core.lookup.LookupMatch
 import io.github.s52.core.lookup.LookupRecord
@@ -85,6 +86,7 @@ class S52PortrayalEngine(
                 featureId = feature.id,
                 geometry = feature.geometry,
                 patternName = name,
+                parameters = parameters,
                 priority = record.displayPriority,
                 viewingGroup = record.viewingGroup,
                 category = record.displayCategory,
@@ -105,6 +107,7 @@ class S52PortrayalEngine(
                 featureId = feature.id,
                 geometry = feature.geometry,
                 lineStyleName = name,
+                parameters = parameters,
                 priority = record.displayPriority,
                 viewingGroup = record.viewingGroup,
                 category = record.displayCategory,
@@ -114,22 +117,52 @@ class S52PortrayalEngine(
                 featureId = feature.id,
                 geometry = feature.geometry,
                 symbolName = name,
+                parameters = parameters,
+                rotationDegrees = parameters.firstNotNullOfOrNull { it.toDoubleOrNull() },
                 priority = record.displayPriority,
                 viewingGroup = record.viewingGroup,
                 category = record.displayCategory,
                 overRadar = record.overRadar
             )
-            is S52Instruction.Text -> if (!settings.showText) null else S52DrawCommand.Text(
-                featureId = feature.id,
-                geometry = feature.geometry,
-                textExpression = textExpression,
-                rawArgs = rawArgs,
-                priority = record.displayPriority,
-                viewingGroup = record.viewingGroup,
-                category = record.displayCategory,
-                overRadar = record.overRadar
-            )
+            is S52Instruction.Text -> textInstructionToDrawCommand(feature, record, settings)
             is S52Instruction.Conditional -> null
         }
     }
+    private fun S52Instruction.Text.textInstructionToDrawCommand(
+        feature: EncFeature,
+        record: LookupRecord,
+        settings: MarinerSettings
+    ): S52DrawCommand? {
+        if (feature.objectClass == S57ObjectClass.SOUNDG) {
+            if (!settings.showSoundings) return null
+            return S52DrawCommand.Sounding(
+                featureId = feature.id,
+                geometry = feature.geometry,
+                depthLabel = textExpression,
+                colorToken = rawArgs.lastOrNull()?.takeIf { it.isNotBlank() } ?: "SNDG1",
+                priority = record.displayPriority,
+                viewingGroup = record.viewingGroup,
+                category = record.displayCategory,
+                overRadar = record.overRadar
+            )
+        }
+
+        if (!settings.showText) return null
+        return S52DrawCommand.Text(
+            featureId = feature.id,
+            geometry = feature.geometry,
+            textExpression = textExpression,
+            rawArgs = rawArgs,
+            textKind = kind,
+            colorToken = rawArgs.lastOrNull()?.takeIf { it.isStableToken() },
+            priority = record.displayPriority,
+            viewingGroup = record.viewingGroup,
+            category = record.displayCategory,
+            overRadar = record.overRadar
+        )
+    }
+
+    private fun String.isStableToken(): Boolean =
+        isNotBlank() && all { it.isUpperCase() || it.isDigit() || it == '_' }
+
 }

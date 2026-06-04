@@ -59,3 +59,10 @@ tasks.register("phase6Check") {
     description = "Runs Phase 6 complete CSP coverage checks and all previous phase checks."
     dependsOn("phase5Check")
 }
+
+
+tasks.register("phase7Check") {
+    group = "verification"
+    description = "Runs Phase 7 draw-command model checks and all previous phase checks."
+    dependsOn("phase6Check")
+}

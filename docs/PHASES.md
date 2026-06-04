@@ -184,13 +184,24 @@ See [`CSP_PHASE6.md`](CSP_PHASE6.md).
 
 ## Phase 7 — Draw-command model hardening
 
-Goal: stabilize renderer-independent draw commands.
+**Status:** complete in this increment.
 
-Definition of done:
+Goal: stabilize renderer-independent draw commands before the WebGL backend becomes real.
 
-- Commands preserve feature id, display priority, viewing group, category, and radar flag
-- Commands use S-52 color tokens, not CSS colors
-- Commands serialize deterministically for tests
+Completed deliverables:
+
+- `DrawCommandKind` stable discriminator for every command family.
+- `S52DrawCommand` now exposes `geometry` and `kind` through the shared interface.
+- Added dedicated `S52DrawCommand.Sounding` instead of treating soundings as ordinary text.
+- Preserved symbol, complex-line, and pattern parameters on draw commands.
+- Added optional point-symbol rotation metadata.
+- Added text-kind and optional text color metadata on text commands.
+- Added `S52DrawCommandTranscript` for deterministic command-level golden fixtures.
+- Added `DrawCommandValidator` for pre-render diagnostics.
+- Updated placeholder WebGL stats to count soundings separately.
+- CI target `phase7Check` runs all previous checks plus Phase 7 tests.
+
+See [`DRAW_COMMAND_PHASE7.md`](DRAW_COMMAND_PHASE7.md).
 
 ## Phase 8 — WebGL2 renderer
 
