@@ -73,6 +73,14 @@ enum class S57EnumeratedValue(
     CATLIT_HORIZONTAL(S57Attribute.CATLIT, 21, "horizontally disposed light"),
     CATLIT_VERTICAL(S57Attribute.CATLIT, 22, "vertically disposed light"),
 
+    TOPSHP_CONE_POINT_UP(S57Attribute.TOPSHP, 1, "cone point up"),
+    TOPSHP_CONE_POINT_DOWN(S57Attribute.TOPSHP, 2, "cone point down"),
+    TOPSHP_SPHERE(S57Attribute.TOPSHP, 3, "sphere"),
+    TOPSHP_TWO_SPHERES(S57Attribute.TOPSHP, 4, "two spheres"),
+    TOPSHP_CYLINDER(S57Attribute.TOPSHP, 5, "cylinder"),
+    TOPSHP_X_SHAPE(S57Attribute.TOPSHP, 6, "x-shape"),
+    TOPSHP_UPRIGHT_CROSS(S57Attribute.TOPSHP, 7, "upright cross"),
+
     CATZOC_A1(S57Attribute.CATZOC, 1, "zone of confidence A1"),
     CATZOC_A2(S57Attribute.CATZOC, 2, "zone of confidence A2"),
     CATZOC_B(S57Attribute.CATZOC, 3, "zone of confidence B"),

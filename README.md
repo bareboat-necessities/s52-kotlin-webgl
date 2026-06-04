@@ -18,19 +18,16 @@ Optional WebGL2 renderer
 
 Experimental. Not type-approved ECDIS. Not for navigation.
 
-## Phase 4 status
+## Phase 5 status
 
-Phase 4 is complete in this increment:
+Phase 5 is complete in this increment:
 
-- Added indexed lookup matching by `S57ObjectClass + PrimitiveType`
-- Added detailed lookup-match diagnostics through `LookupMatch` and `LookupExplanation`
-- Expanded `AttributeFilter` into a typed structural filter tree
-- Added source/generator-side `SourceAttributeFilter`
-- Added optional lookup-row scale constraints
-- Moved display category filtering into `DisplayCategoryFilter`
-- Added mariner viewing-group allow/deny filtering through `ViewingGroupFilter`
-- Hardened deterministic display ordering through `DisplayPrioritySorter`
-- CI now runs `phase4Check`
+- Added a critical CSP registry through `CspId` and `DefaultCspRegistry.phase5Critical()`.
+- Added starter implementations for `DEPARE`, `DEPCNT`, `SOUNDG`, `WRECKS`, `OBSTRN`, `LIGHTS`, and `TOPMAR`.
+- Added static CSP coverage validation for `CS(...)` lookup references.
+- Expanded the synthetic Presentation Library fixture so all critical Phase 5 CSPs are referenced.
+- Added tests for direct CSP behavior and engine expansion from `CS(...)` to draw commands.
+- CI now runs `phase5Check`.
 
 The project still uses a synthetic Presentation Library pack. Official IHO Presentation Library source assets are not bundled.
 
@@ -39,7 +36,7 @@ The project still uses a synthetic Presentation Library pack. Official IHO Prese
 This project is configured for Gradle 8.14.5 and Kotlin 2.3.21.
 
 ```bash
-gradle phase4Check
+gradle phase5Check
 ```
 
 The CI workflow installs Gradle and Java 21, then runs the same task.
@@ -50,7 +47,7 @@ The CI workflow installs Gradle and Java 21, then runs the same task.
 s52-catalog       typed S-57 object/attribute catalogue subset; generated later
 s52-core          core model, instructions, lookup, CSP interface, portrayal engine
 s52-preslib       Presentation Library source model, builder, validation, generator, registries
-s52-csp           CSP implementations; early examples/placeholders
+s52-csp           CSP implementations and coverage validation
 s52-render-webgl  JS/WebGL2 renderer for S52DrawCommand
 demo              Kotlin/JS browser demo
 ```
@@ -61,4 +58,4 @@ Official IHO Presentation Library assets should be treated as external input unl
 
 ## Next step
 
-Begin Phase 5: implement the first safety-critical CSP batch: DEPARE, DEPCNT, SOUNDG, WRECKS, OBSTRN, LIGHTS, and TOPMAR.
+Begin Phase 6: expand CSP coverage from the Phase 5 critical starter set toward every CSP referenced by an imported Presentation Library pack.

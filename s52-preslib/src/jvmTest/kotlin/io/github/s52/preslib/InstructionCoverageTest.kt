@@ -28,11 +28,11 @@ class InstructionCoverageTest {
         val instructions = pack.lookupTable.records().flatMap { it.instructions }
         val refs = InstructionReferenceCollector.collect(instructions)
 
-        assertEquals(setOf("BOYLAT01", "BOYCAR01", "LIGHTS11", "WRECKS01"), refs.symbols)
-        assertEquals(setOf("SOLD", "COALNE01"), refs.lineStyles)
+        assertEquals(setOf("BOYLAT01", "BOYCAR01"), refs.symbols)
+        assertEquals(setOf("COALNE01"), refs.lineStyles)
         assertEquals(setOf("APACHR01"), refs.patterns)
-        assertTrue(setOf("LANDA", "CHGRD").all { it in refs.colorTokens })
-        assertEquals(setOf("DEPARE"), refs.csps)
+        assertTrue(setOf("LANDA").all { it in refs.colorTokens })
+        assertEquals(setOf("DEPARE", "DEPCNT", "LIGHTS", "WRECKS", "OBSTRN", "SOUNDG", "TOPMAR"), refs.csps)
         assertEquals(
             instructions,
             InstructionParser.parseSequence(InstructionFormatter.formatSequence(instructions))

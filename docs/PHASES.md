@@ -140,9 +140,11 @@ Definition of done:
 
 ## Phase 5 — Critical CSP batch
 
-Goal: implement the first safety-critical conditional symbology procedures.
+Status: **complete**.
 
-Initial CSPs:
+Goal: implement the first safety-critical conditional symbology procedures as behavior objects separate from S-57 object-class enums.
+
+Completed CSPs:
 
 - `DEPARE`
 - `DEPCNT`
@@ -152,11 +154,16 @@ Initial CSPs:
 - `LIGHTS`
 - `TOPMAR`
 
-Definition of done:
+Completed deliverables:
 
-- Critical depth and danger portrayal works
-- CSP output remains renderer-independent
-- Synthetic golden tests cover safety-depth/safety-contour settings
+- `CspId` stores the critical Phase 5 procedure implementations.
+- `DefaultCspRegistry.phase5Critical()` exposes the registry used by tests and demos.
+- `CspCoverageValidator` reports missing `CS(...)` implementations from a lookup table.
+- The synthetic Presentation Library fixture references all seven critical CSPs.
+- Direct tests cover safety contour, unsafe soundings, dangerous wrecks, dangerous obstructions, light descriptions/sectors, and topmark symbol selection.
+- Engine tests prove `CS(...)` instructions expand into renderer-independent draw commands.
+
+See [`CSP_PHASE5.md`](CSP_PHASE5.md).
 
 ## Phase 6 — Complete CSP coverage
 
@@ -267,3 +274,4 @@ Docs:
 - WebGL renderer
 - Testing and validation
 - Safety/legal boundary
+

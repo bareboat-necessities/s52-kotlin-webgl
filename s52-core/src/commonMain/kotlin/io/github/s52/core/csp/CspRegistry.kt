@@ -6,6 +6,9 @@ import io.github.s52.core.settings.MarinerSettings
 import io.github.s52.core.settings.PortrayalContext
 
 interface CspRegistry {
+    /** Upper-case S-52 CSP names implemented by this registry. */
+    fun names(): Set<String> = emptySet()
+
     fun has(name: String): Boolean
 
     fun evaluate(
@@ -20,6 +23,8 @@ class MapCspRegistry(
     procedures: Iterable<ConditionalSymbologyProcedure>
 ) : CspRegistry {
     private val byName = procedures.associateBy { it.name.uppercase() }
+
+    override fun names(): Set<String> = byName.keys
 
     override fun has(name: String): Boolean = name.uppercase() in byName
 
@@ -36,6 +41,8 @@ class MapCspRegistry(
 }
 
 object EmptyCspRegistry : CspRegistry {
+    override fun names(): Set<String> = emptySet()
+
     override fun has(name: String): Boolean = false
 
     override fun evaluate(

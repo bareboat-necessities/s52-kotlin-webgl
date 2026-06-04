@@ -45,3 +45,10 @@ tasks.register("phase4Check") {
     description = "Runs Phase 4 lookup matching, display filtering, and ordering checks plus all previous phase checks."
     dependsOn("phase3Check")
 }
+
+
+tasks.register("phase5Check") {
+    group = "verification"
+    description = "Runs Phase 5 critical CSP framework checks and all previous phase checks."
+    dependsOn("phase4Check")
+}

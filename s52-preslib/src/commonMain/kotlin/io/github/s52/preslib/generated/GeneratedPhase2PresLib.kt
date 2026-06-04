@@ -35,15 +35,30 @@ object GeneratedPhase2PresLib {
             triangleSymbol("BOYLAT01"),
             diamondSymbol("BOYCAR01"),
             crossSymbol("LIGHTS11"),
-            wreckSymbol("WRECKS01")
+            wreckSymbol("WRECKS01"),
+            dangerWreckSymbol("WRECKS_DANGER01"),
+            obstructionSymbol("OBSTRN01"),
+            dangerObstructionSymbol("OBSTRN_DANGER01"),
+            triangleSymbol("TOPMAR_CONE_UP01"),
+            triangleDownSymbol("TOPMAR_CONE_DOWN01"),
+            circleSymbol("TOPMAR_SPHERE01"),
+            twoCircleSymbol("TOPMAR_TWO_SPHERES01"),
+            rectangleSymbol("TOPMAR_CYLINDER01"),
+            crossSymbol("TOPMAR_X01"),
+            uprightCrossSymbol("TOPMAR_CROSS01"),
+            diamondSymbol("TOPMAR_UNKNOWN01")
         ),
         lineStyles = listOf(
             SourceLineStyle("SOLD", "solid line"),
             SourceLineStyle("DASH", "dashed line"),
-            SourceLineStyle("COALNE01", "synthetic coastline complex line")
+            SourceLineStyle("COALNE01", "synthetic coastline complex line"),
+            SourceLineStyle("LIGHTSECTOR01", "synthetic light sector line")
         ),
         patterns = listOf(
-            SourcePattern("APACHR01", "synthetic anchorage area pattern")
+            SourcePattern("APACHR01", "synthetic anchorage area pattern"),
+            SourcePattern("DANGER01", "synthetic danger highlight pattern"),
+            SourcePattern("WRECKS_AREA01", "synthetic wreck area pattern"),
+            SourcePattern("OBSTRN_AREA01", "synthetic obstruction area pattern")
         ),
         lookupRecords = listOf(
             SourceLookupRecord(
@@ -65,7 +80,7 @@ object GeneratedPhase2PresLib {
             SourceLookupRecord(
                 objectClass = S57ObjectClass.DEPCNT,
                 primitive = PrimitiveType.Line,
-                instruction = "LS(SOLD,1,CHGRD)",
+                instruction = "CS(DEPCNT)",
                 displayCategory = DisplayCategory.Standard,
                 viewingGroup = 21020,
                 displayPriority = 3
@@ -107,7 +122,7 @@ object GeneratedPhase2PresLib {
             SourceLookupRecord(
                 objectClass = S57ObjectClass.LIGHTS,
                 primitive = PrimitiveType.Point,
-                instruction = "SY(LIGHTS11);TX(OBJNAM)",
+                instruction = "CS(LIGHTS)",
                 displayCategory = DisplayCategory.Standard,
                 viewingGroup = 28010,
                 displayPriority = 9,
@@ -116,10 +131,55 @@ object GeneratedPhase2PresLib {
             SourceLookupRecord(
                 objectClass = S57ObjectClass.WRECKS,
                 primitive = PrimitiveType.Point,
-                instruction = "SY(WRECKS01)",
+                instruction = "CS(WRECKS)",
                 displayCategory = DisplayCategory.Standard,
                 viewingGroup = 34050,
                 displayPriority = 8,
+                overRadar = true
+            ),
+            SourceLookupRecord(
+                objectClass = S57ObjectClass.WRECKS,
+                primitive = PrimitiveType.Area,
+                instruction = "CS(WRECKS)",
+                displayCategory = DisplayCategory.Standard,
+                viewingGroup = 34050,
+                displayPriority = 8,
+                overRadar = true
+            ),
+            SourceLookupRecord(
+                objectClass = S57ObjectClass.OBSTRN,
+                primitive = PrimitiveType.Point,
+                instruction = "CS(OBSTRN)",
+                displayCategory = DisplayCategory.Standard,
+                viewingGroup = 34060,
+                displayPriority = 8,
+                overRadar = true
+            ),
+            SourceLookupRecord(
+                objectClass = S57ObjectClass.OBSTRN,
+                primitive = PrimitiveType.Area,
+                instruction = "CS(OBSTRN)",
+                displayCategory = DisplayCategory.Standard,
+                viewingGroup = 34060,
+                displayPriority = 8,
+                overRadar = true
+            ),
+            SourceLookupRecord(
+                objectClass = S57ObjectClass.SOUNDG,
+                primitive = PrimitiveType.Point,
+                instruction = "CS(SOUNDG)",
+                displayCategory = DisplayCategory.Standard,
+                viewingGroup = 33010,
+                displayPriority = 9,
+                overRadar = true
+            ),
+            SourceLookupRecord(
+                objectClass = S57ObjectClass.TOPMAR,
+                primitive = PrimitiveType.Point,
+                instruction = "CS(TOPMAR)",
+                displayCategory = DisplayCategory.Standard,
+                viewingGroup = 27030,
+                displayPriority = 9,
                 overRadar = true
             )
         )
@@ -151,6 +211,8 @@ object GeneratedPhase2PresLib {
             c("LANDA", 201, 179, 123),
             c("CHBLK", 0, 0, 0),
             c("CHGRD", 110, 110, 110),
+            c("DEPSC", 0, 95, 170),
+            c("DNGHL", 190, 40, 40),
             c("SNDG1", 0, 0, 0),
             c("SNDG2", 30, 30, 30),
             c("LITRD", 255, 80, 80),
@@ -214,4 +276,84 @@ object GeneratedPhase2PresLib {
             SourceVectorCommand.LineTo(2.0, 14.0)
         )
     )
+
+
+    private fun dangerWreckSymbol(name: String): SourceSymbol = wreckSymbol(name).copy(width = 18.0, height = 18.0)
+
+    private fun obstructionSymbol(name: String): SourceSymbol = diamondSymbol(name)
+
+    private fun dangerObstructionSymbol(name: String): SourceSymbol = crossSymbol(name)
+
+    private fun triangleDownSymbol(name: String): SourceSymbol = SourceSymbol(
+        name = name,
+        pivotX = 8.0,
+        pivotY = 8.0,
+        width = 16.0,
+        height = 16.0,
+        commands = listOf(
+            SourceVectorCommand.MoveTo(0.0, 0.0),
+            SourceVectorCommand.LineTo(16.0, 0.0),
+            SourceVectorCommand.LineTo(8.0, 16.0),
+            SourceVectorCommand.ClosePath
+        )
+    )
+
+    private fun circleSymbol(name: String): SourceSymbol = SourceSymbol(
+        name = name,
+        pivotX = 8.0,
+        pivotY = 8.0,
+        width = 16.0,
+        height = 16.0,
+        commands = listOf(
+            SourceVectorCommand.MoveTo(8.0, 0.0),
+            SourceVectorCommand.LineTo(14.0, 4.0),
+            SourceVectorCommand.LineTo(14.0, 12.0),
+            SourceVectorCommand.LineTo(8.0, 16.0),
+            SourceVectorCommand.LineTo(2.0, 12.0),
+            SourceVectorCommand.LineTo(2.0, 4.0),
+            SourceVectorCommand.ClosePath
+        )
+    )
+
+    private fun twoCircleSymbol(name: String): SourceSymbol = SourceSymbol(
+        name = name,
+        pivotX = 8.0,
+        pivotY = 8.0,
+        width = 16.0,
+        height = 16.0,
+        commands = circleSymbol(name).commands + listOf(
+            SourceVectorCommand.MoveTo(8.0, 4.0),
+            SourceVectorCommand.LineTo(8.0, 12.0)
+        )
+    )
+
+    private fun rectangleSymbol(name: String): SourceSymbol = SourceSymbol(
+        name = name,
+        pivotX = 8.0,
+        pivotY = 8.0,
+        width = 16.0,
+        height = 16.0,
+        commands = listOf(
+            SourceVectorCommand.MoveTo(4.0, 2.0),
+            SourceVectorCommand.LineTo(12.0, 2.0),
+            SourceVectorCommand.LineTo(12.0, 14.0),
+            SourceVectorCommand.LineTo(4.0, 14.0),
+            SourceVectorCommand.ClosePath
+        )
+    )
+
+    private fun uprightCrossSymbol(name: String): SourceSymbol = SourceSymbol(
+        name = name,
+        pivotX = 8.0,
+        pivotY = 8.0,
+        width = 16.0,
+        height = 16.0,
+        commands = listOf(
+            SourceVectorCommand.MoveTo(8.0, 1.0),
+            SourceVectorCommand.LineTo(8.0, 15.0),
+            SourceVectorCommand.MoveTo(3.0, 8.0),
+            SourceVectorCommand.LineTo(13.0, 8.0)
+        )
+    )
+
 }

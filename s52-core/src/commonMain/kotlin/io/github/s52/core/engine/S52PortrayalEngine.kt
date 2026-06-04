@@ -37,7 +37,7 @@ class S52PortrayalEngine(
     ): List<S52DrawCommand> {
         return lookupTable.matchDetailed(feature, settings, context).flatMap { match ->
             expandInstructions(match, feature, settings, context)
-                .mapNotNull { instruction -> instruction.toDrawCommand(feature, match.record) }
+                .mapNotNull { instruction -> instruction.toDrawCommand(feature, match.record, settings) }
         }
     }
 
@@ -68,7 +68,8 @@ class S52PortrayalEngine(
 
     private fun S52Instruction.toDrawCommand(
         feature: EncFeature,
-        record: LookupRecord
+        record: LookupRecord,
+        settings: MarinerSettings
     ): S52DrawCommand? {
         return when (this) {
             is S52Instruction.AreaColor -> S52DrawCommand.AreaFill(
@@ -118,7 +119,7 @@ class S52PortrayalEngine(
                 category = record.displayCategory,
                 overRadar = record.overRadar
             )
-            is S52Instruction.Text -> S52DrawCommand.Text(
+            is S52Instruction.Text -> if (!settings.showText) null else S52DrawCommand.Text(
                 featureId = feature.id,
                 geometry = feature.geometry,
                 textExpression = textExpression,

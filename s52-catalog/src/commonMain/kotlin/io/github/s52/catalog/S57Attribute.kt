@@ -128,6 +128,7 @@ enum class S57Attribute(
     SURTYP("SURTYP", null, S57AttributeValueKind.Enumeration),
     TECSOU("TECSOU", null, S57AttributeValueKind.EnumerationList),
     TXTDSC("TXTDSC", 156, S57AttributeValueKind.Text),
+    TOPSHP("TOPSHP", null, S57AttributeValueKind.Enumeration),
     TS_TSP("TS_TSP", null, S57AttributeValueKind.Decimal),
     TS_TSV("TS_TSV", null, S57AttributeValueKind.Decimal),
     T_ACWL("T_ACWL", null, S57AttributeValueKind.Decimal),

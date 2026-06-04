@@ -18,9 +18,9 @@ class GeneratedPhase2PresLibTest {
         assertFalse(report.hasErrors, report.toMarkdown())
         assertTrue(report.lookupRecordCount >= 8)
         assertTrue(report.referencedSymbols.contains("BOYLAT01"))
-        assertTrue(report.referencedLineStyles.contains("SOLD"))
+        assertTrue(report.referencedLineStyles.contains("COALNE01"))
         assertTrue(report.referencedPatterns.contains("APACHR01"))
-        assertTrue(report.referencedCsps.contains("DEPARE"))
+        assertTrue(report.referencedCsps.containsAll(setOf("DEPARE", "DEPCNT", "SOUNDG", "WRECKS", "OBSTRN", "LIGHTS", "TOPMAR")))
     }
 
     @Test
