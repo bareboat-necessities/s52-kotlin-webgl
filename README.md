@@ -18,9 +18,9 @@ Optional WebGL2 renderer
 
 Experimental. Not type-approved ECDIS. Not for navigation.
 
-## Phase 19 status
+## Phase 20 status
 
-Phase 19 is complete in this increment:
+Phase 20 is complete in this increment:
 
 - Phase 16 `s52-api` remains the stable consumer-facing facade.
 - Phase 17 diagnostic bundles remain the support and CI handoff format.
@@ -28,16 +28,17 @@ Phase 19 is complete in this increment:
 - Added Phase 19 portable text artifact bundles through `S52ArtifactBundle`, `S52ArtifactExporter`, and `S52PortrayalSession.artifactBundle(...)`.
 - Artifact bundles can include manifest, diagnostics, profile summary, static-completeness report, command-validation report, and command transcript files.
 - Added an artifact-bundle integration sample.
-- CI now runs `phase19Check`.
+- Added Phase 20 s52lib-compatible pack and browser gallery routes.
+- CI now runs `phase20Check`.
 
-The project still uses a synthetic Presentation Library pack. Official IHO Presentation Library source assets are not bundled.
+The default browser demo now uses the s52lib-compatible pack. Official IHO Presentation Library source assets are still not bundled; the compatibility pack renders all assets present in the loaded pack.
 
 ## Build
 
 This project is configured for Gradle 8.14.5 and Kotlin 2.3.21.
 
 ```bash
-gradle phase19Check
+gradle phase20Check
 ```
 
 The CI workflow installs Gradle and Java 21, then runs the same task.
@@ -45,7 +46,7 @@ The CI workflow installs Gradle and Java 21, then runs the same task.
 To build the release handoff archive:
 
 ```bash
-gradle phase19SourceArchive
+gradle phase20SourceArchive
 ```
 
 ## Modules
@@ -56,7 +57,7 @@ s52-core          core model, instructions, lookup, CSP interface, portrayal eng
 s52-preslib       Presentation Library source model, builder, validation, generator, registries
 s52-csp           CSP implementations and coverage validation
 s52-render-webgl  JS/WebGL2 renderer for S52DrawCommand
-s52-api           consumer-facing facade, diagnostics, profiles, and artifact bundles
+s52-api           consumer-facing facade, diagnostics, profiles, artifact bundles, and gallery helpers
 s52-tests         golden portrayal tests and S-64/Chart-1-style validation harness
 demo              Kotlin/JS browser demo
 ```
@@ -68,3 +69,8 @@ Official IHO Presentation Library assets should be treated as external input unl
 ## Next step
 
 Use the Phase 16 facade, Phase 17 diagnostic bundle, Phase 18 profile presets, and Phase 19 artifact bundles as the stable downstream integration/support boundary, then continue with broader performance work and official Presentation Library import tooling when ready.
+
+
+## Browser gallery
+
+Run `gradle :demo:jsBrowserDevelopmentRun` and open `#symbols`, `#lines`, `#patterns`, `#colors`, or `#all` to render the loaded S-52 library assets in browser.

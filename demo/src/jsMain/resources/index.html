@@ -1,44 +1,18 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>s52-kotlin-webgl Phase 8 Demo</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>s52-kotlin-webgl phase20 demo</title>
   <style>
-    html, body {
-      margin: 0;
-      width: 100%;
-      height: 100%;
-      font-family: system-ui, sans-serif;
-    }
-    #app {
-      display: grid;
-      grid-template-rows: auto 1fr auto;
-      width: 100%;
-      height: 100%;
-    }
-    header, footer {
-      padding: 0.75rem 1rem;
-      background: #111827;
-      color: white;
-    }
-    canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-    code {
-      color: #bae6fd;
-    }
+    html, body { margin: 0; padding: 0; height: 100%; font-family: system-ui, sans-serif; }
+    body { display: grid; grid-template-rows: auto 1fr; }
+    #status { padding: 0.75rem 1rem; background: #0b1f33; color: white; font-size: 14px; }
+    #chart { width: 100%; height: 100%; display: block; }
   </style>
 </head>
 <body>
-<div id="app">
-  <header>
-    <strong>s52-kotlin-webgl</strong> Phase 8 demo — command-only WebGL2 renderer
-  </header>
+  <div id="status">Loading… routes: #chart #symbols #lines #patterns #colors #all</div>
   <canvas id="chart"></canvas>
-  <footer id="status">Loading…</footer>
-</div>
-<script src="demo.js"></script>
 </body>
 </html>

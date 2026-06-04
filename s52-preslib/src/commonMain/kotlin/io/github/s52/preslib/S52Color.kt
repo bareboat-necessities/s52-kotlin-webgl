@@ -24,4 +24,6 @@ class ColorTables(
         color(palette, token) ?: error("Missing S-52 color token $token in palette $palette")
 
     fun tokens(palette: S52Palette): Set<String> = tables[palette]?.keys.orEmpty()
+
+    fun all(palette: S52Palette): List<S52Color> = tables[palette].orEmpty().values.sortedBy { it.token }
 }

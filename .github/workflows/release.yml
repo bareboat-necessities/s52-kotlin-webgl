@@ -24,11 +24,11 @@ jobs:
         with:
           gradle-version: 8.14.5
 
-      - name: Build and test Phase 19
-        run: gradle --no-daemon phase19Check
+      - name: Build and test Phase 20
+        run: gradle --no-daemon phase20Check
 
       - name: Build source archive
-        run: gradle --no-daemon phase19SourceArchive
+        run: gradle --no-daemon phase20SourceArchive
 
       - name: Upload source archive
         uses: actions/upload-artifact@v4

@@ -19,5 +19,7 @@ data class PresLibPack(
         fun phase0Minimal(): PresLibPack = phase2Synthetic()
 
         fun phase2Synthetic(): PresLibPack = io.github.s52.preslib.generated.GeneratedPhase2PresLib.pack()
+
+        fun s52LibCompat(): PresLibPack = io.github.s52.preslib.s52lib.S52LibCompatPresLib.pack()
     }
 }

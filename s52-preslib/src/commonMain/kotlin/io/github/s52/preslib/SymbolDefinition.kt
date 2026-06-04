@@ -24,4 +24,6 @@ class SymbolRegistry(
         find(name) ?: error("Missing S-52 symbol $name")
 
     fun names(): Set<String> = symbols.keys
+
+    fun all(): List<SymbolDefinition> = symbols.values.sortedBy { it.name }
 }

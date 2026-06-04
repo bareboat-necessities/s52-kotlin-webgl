@@ -1,3 +1,10 @@
+## Phase 20
+
+- Added s52lib-compatible Presentation Library pack using the public 63-token libS52/S52raz color set.
+- Added browser gallery routes for all loaded symbols, line styles, patterns, and colors.
+- Added `S52GalleryBuilder`, `S52GalleryRequest`, `S52GallerySection`, and `S52PortrayalSession.gallery(...)`.
+- Demo now defaults to `PresLibPack.s52LibCompat()`.
+
 # Changelog
 
 ## 0.1.0-SNAPSHOT

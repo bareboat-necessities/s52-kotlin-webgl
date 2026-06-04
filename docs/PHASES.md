@@ -419,3 +419,8 @@ Completed deliverables:
 Phase 19 remains additive. It does not add S-57 parsing, S-63, navigation, AIS, GPS, route management, or ECDIS certification scope.
 
 See [`ARTIFACTS_PHASE19.md`](ARTIFACTS_PHASE19.md).
+
+
+## Phase 20 — s52lib-compatible browser rendering
+
+Add `PresLibPack.s52LibCompat()`, gallery APIs, and browser demo routes to render every symbol, line style, pattern, and color available in the loaded S-52 library pack.

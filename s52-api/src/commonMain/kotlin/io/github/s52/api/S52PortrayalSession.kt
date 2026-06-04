@@ -57,6 +57,9 @@ class S52PortrayalSession(
         )
     }
 
+    fun gallery(request: S52GalleryRequest = S52GalleryRequest()): S52GalleryResult =
+        S52GalleryBuilder.build(presLib = presLib, request = request)
+
     fun manifest(name: String = "s52-kotlin-webgl-runtime"): S52RuntimeManifest {
         val completeness = staticCompletenessReport
         return S52RuntimeManifest(
@@ -77,6 +80,14 @@ class S52PortrayalSession(
             failOnStaticCompletenessErrors: Boolean = true
         ): S52PortrayalSession = S52PortrayalSession(
             presLib = PresLibPack.phase2Synthetic(),
+            cspRegistry = DefaultCspRegistry.phase6Complete(),
+            failOnStaticCompletenessErrors = failOnStaticCompletenessErrors
+        )
+
+        fun s52LibCompat(
+            failOnStaticCompletenessErrors: Boolean = true
+        ): S52PortrayalSession = S52PortrayalSession(
+            presLib = PresLibPack.s52LibCompat(),
             cspRegistry = DefaultCspRegistry.phase6Complete(),
             failOnStaticCompletenessErrors = failOnStaticCompletenessErrors
         )
@@ -144,4 +155,5 @@ data class S52RuntimeManifest(
 /** Convenience entry point for consumers that want the default bundled synthetic fixture. */
 object S52 {
     fun synthetic(): S52PortrayalSession = S52PortrayalSession.syntheticPhase16()
+    fun s52LibCompat(): S52PortrayalSession = S52PortrayalSession.s52LibCompat()
 }

@@ -308,3 +308,44 @@ tasks.register("phase19Check") {
     description = "Runs Phase 19 artifact bundle checks and all previous phase checks."
     dependsOn("phase18Check", "phase19ArtifactsAudit", ":s52-api:build", ":s52-api:jvmTest", ":s52-tests:jvmTest")
 }
+
+
+tasks.register("phase20GalleryAudit") {
+    group = "verification"
+    description = "Checks Phase 20 s52lib-compatible browser-gallery API and docs."
+    doLast {
+        val requiredFiles = listOf(
+            "s52-preslib/src/commonMain/kotlin/io/github/s52/preslib/s52lib/S52LibCompatPresLib.kt",
+            "s52-api/src/commonMain/kotlin/io/github/s52/api/S52Gallery.kt",
+            "s52-api/src/jvmTest/kotlin/io/github/s52/api/S52GalleryTest.kt",
+            "docs/S52LIB_PHASE20.md",
+            "samples/integration/s52lib-gallery/README.md"
+        )
+        val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
+        check(missing.isEmpty()) { "Missing Phase 20 files: $missing" }
+        val readme = layout.projectDirectory.file("README.md").asFile.readText()
+        check("S52GalleryBuilder" in readme) { "README.md must document Phase 20 gallery API." }
+        check("phase20Check" in readme) { "README.md must document phase20Check." }
+        check("Not for navigation" in readme) { "README.md must keep the not-for-navigation boundary." }
+    }
+}
+
+tasks.register<org.gradle.api.tasks.bundling.Zip>("phase20SourceArchive") {
+    group = "distribution"
+    description = "Builds a source archive for Phase 20 release handoff."
+    archiveBaseName.set("s52-kotlin-webgl")
+    archiveClassifier.set("phase20-source")
+    archiveVersion.set(project.version.toString())
+    from(layout.projectDirectory) {
+        exclude(".git/**")
+        exclude(".gradle/**")
+        exclude("**/build/**")
+        exclude("build/**")
+    }
+}
+
+tasks.register("phase20Check") {
+    group = "verification"
+    description = "Runs Phase 20 s52lib-compatible browser-gallery checks and all previous phase checks."
+    dependsOn("phase19Check", "phase20GalleryAudit", ":s52-api:build", ":s52-api:jvmTest", ":demo:build", ":s52-tests:jvmTest")
+}
