@@ -19,7 +19,7 @@ import io.github.s52.core.settings.SymbolStyle
 object S52 {
     val version: S52Version = S52Version.Current
 
-    /** Build the default Phase 12 runtime using the synthetic pack and complete CSP registry. */
+    /** Build the default Phase 13 runtime using the synthetic pack and complete CSP registry. */
     fun defaultRuntime(): S52Runtime = S52Runtime.synthetic()
 
     /** Stable default mariner settings used by examples and tests. */
@@ -64,6 +64,9 @@ object S52 {
         displayScale = settings.scale,
         viewportId = viewportId
     )
+
+    /** Cached convenience runtime for repeated repaint cycles. */
+    fun cachedRuntime(maxEntries: Int = 64): S52CachedRuntime = defaultRuntime().cached(maxEntries)
 
     /** One-call convenience portrayal using the default runtime. */
     fun portray(

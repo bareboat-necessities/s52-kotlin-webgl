@@ -4,6 +4,8 @@ import io.github.s52.core.csp.CspRegistry
 import io.github.s52.core.draw.DrawCommandValidator
 import io.github.s52.core.draw.S52DrawCommand
 import io.github.s52.core.draw.S52DrawCommandTranscript
+import io.github.s52.core.performance.PortrayalCache
+import io.github.s52.core.performance.PortrayalPerformanceReport
 import io.github.s52.core.engine.S52PortrayalEngine
 import io.github.s52.core.lookup.LookupExplanation
 import io.github.s52.core.model.EncFeature
@@ -52,6 +54,20 @@ class S52Runtime private constructor(
         settings: MarinerSettings = S52.defaultSettings(),
         context: PortrayalContext = S52.defaultContext(settings)
     ): String = S52DrawCommandTranscript.serialize(portray(features, settings, context))
+
+
+    /** Build a cached wrapper for repeated repaint/portrayal cycles. */
+    fun cached(maxEntries: Int = 64): S52CachedRuntime = S52CachedRuntime(this, PortrayalCache(maxEntries))
+
+    /** Compute deterministic command batching and optional cache metrics. */
+    fun performanceReport(
+        features: List<EncFeature>,
+        settings: MarinerSettings = S52.defaultSettings(),
+        context: PortrayalContext = S52.defaultContext(settings)
+    ): PortrayalPerformanceReport = PortrayalPerformanceReport.from(
+        inputFeatureCount = features.size,
+        commands = portray(features, settings, context)
+    )
 
     /** Explain lookup-table candidate matching for one feature. */
     fun explainLookup(

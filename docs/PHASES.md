@@ -300,16 +300,22 @@ See [`PUBLIC_API_PHASE12.md`](PUBLIC_API_PHASE12.md).
 
 ## Phase 13 — Performance pass
 
-Goal: make portrayal and rendering viable for large real scenes.
+Status: **complete**.
 
-Optimize:
+Goal: make portrayal and rendering viable for repeated repaint loops and larger scenes.
 
-- Lookup indexing
-- Attribute-filter precompilation
-- CSP allocations
-- Draw-command batching
-- Viewport culling
-- Symbol/pattern/text atlas caching
+Completed deliverables:
+
+- Added stable content-based `PortrayalRequestKey`.
+- Added common-source `PortrayalCache` with hit/miss/eviction stats.
+- Added public `S52CachedRuntime` facade.
+- Added `S52.defaultRuntime().cached(...)` and `S52.cachedRuntime(...)`.
+- Added `DrawCommandBatcher`, `DrawBatchKey`, `DrawBatchReport`, and `PortrayalPerformanceReport`.
+- Extended WebGL `RenderStats` with batch metrics.
+- Added Phase 13 tests for cache behavior, stable request keys, batch grouping, and public performance reports.
+- CI target `phase13Check` runs all previous checks plus Phase 13 API/core tests.
+
+See [`PERFORMANCE_PHASE13.md`](PERFORMANCE_PHASE13.md).
 
 ## Phase 14 — Documentation and examples
 

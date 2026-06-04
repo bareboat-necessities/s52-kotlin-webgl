@@ -18,17 +18,18 @@ Optional WebGL2 renderer
 
 Experimental. Not type-approved ECDIS. Not for navigation.
 
-## Phase 12 status
+## Phase 13 status
 
-Phase 12 is complete in this increment:
+Phase 13 is complete in this increment:
 
-- Added `s52-api` as the stable high-level integration module.
-- Added `S52`, `S52Runtime`, `S52Version`, and `S52PortrayalResult`.
-- Added default settings/context helpers and one-call portrayal convenience.
-- Added validated portrayal, deterministic transcript generation, and lookup explanation helpers.
-- Updated the browser demo to use the public API facade.
-- Added Phase 12 API tests and public API documentation.
-- CI now runs `phase12Check`.
+- Added content-based portrayal request keys.
+- Added `PortrayalCache` with hit/miss/eviction stats.
+- Added `S52CachedRuntime` public cached facade.
+- Added `S52.defaultRuntime().cached(...)` and `S52.cachedRuntime(...)`.
+- Added draw-command batching and performance reports.
+- Extended WebGL render stats with batch metrics.
+- Added Phase 13 performance tests and documentation.
+- CI now runs `phase13Check`.
 
 The project still uses a synthetic Presentation Library pack by default. Official IHO Presentation Library source assets are not bundled.
 
@@ -37,7 +38,7 @@ The project still uses a synthetic Presentation Library pack by default. Officia
 This project is configured for Gradle 8.14.5 and Kotlin 2.3.21.
 
 ```bash
-gradle phase12Check
+gradle phase13Check
 ```
 
 The CI workflow installs Gradle and Java 21, then runs the same task.
@@ -61,4 +62,4 @@ Official IHO Presentation Library assets should be treated as external input unl
 
 ## Next step
 
-Begin Phase 13: performance pass and renderer/portrayal benchmarking.
+Begin Phase 14: documentation/examples polish and contributor guides.

@@ -2,6 +2,7 @@ package io.github.s52.render.webgl
 
 import io.github.s52.core.draw.DrawCommandKind
 import io.github.s52.core.draw.S52DrawCommand
+import io.github.s52.core.performance.DrawCommandBatcher
 import io.github.s52.core.settings.MarinerSettings
 import io.github.s52.preslib.PresLibPack
 import io.github.s52.render.webgl.internal.AreaFillRenderer
@@ -59,6 +60,7 @@ class WebGlS52Renderer(
         gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT)
 
         val projector = GeometryProjector(viewport, canvas.width, canvas.height)
+        val batchReport = DrawCommandBatcher.report(commands)
         val builder = RenderStatsBuilder()
 
         for (command in commands) {
@@ -73,7 +75,7 @@ class WebGlS52Renderer(
             }
             builder.add(command.kind, drawCalls)
         }
-        return builder.build()
+        return builder.build(batchReport.batchCount, batchReport.averageCommandsPerBatch)
     }
 
     private fun resizeToDisplaySize() {
@@ -93,7 +95,9 @@ data class RenderStats(
     val symbolCount: Int,
     val textCount: Int,
     val soundingCount: Int = 0,
-    val drawCalls: Int = 0
+    val drawCalls: Int = 0,
+    val batchCount: Int = 0,
+    val averageCommandsPerBatch: Double = 0.0
 )
 
 private class RenderStatsBuilder {
@@ -117,13 +121,15 @@ private class RenderStatsBuilder {
         drawCalls += calls
     }
 
-    fun build(): RenderStats = RenderStats(
+    fun build(batchCount: Int, averageCommandsPerBatch: Double): RenderStats = RenderStats(
         areaFillCount = areaFillCount,
         areaPatternCount = areaPatternCount,
         lineCount = lineCount,
         symbolCount = symbolCount,
         textCount = textCount,
         soundingCount = soundingCount,
-        drawCalls = drawCalls
+        drawCalls = drawCalls,
+        batchCount = batchCount,
+        averageCommandsPerBatch = averageCommandsPerBatch
     )
 }

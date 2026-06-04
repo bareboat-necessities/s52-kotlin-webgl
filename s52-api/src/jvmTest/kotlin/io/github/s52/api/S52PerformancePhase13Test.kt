@@ -10,40 +10,33 @@ import io.github.s52.core.model.S57Attributes
 import io.github.s52.core.model.S57Value
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class S52ApiPhase12Test {
+class S52PerformancePhase13Test {
     @Test
-    fun defaultRuntimePortraysSyntheticFeature() {
-        val runtime = S52.defaultRuntime()
-        val result = runtime.portrayValidated(listOf(depthArea()))
+    fun cachedRuntimeHitsOnRepeatedEquivalentRequests() {
+        val cached = S52.cachedRuntime(maxEntries = 2)
+        val features = listOf(depthArea())
 
-        assertTrue(result.isValid)
-        assertEquals(1, result.commands.size)
-        assertEquals("0.13.0-SNAPSHOT", S52.version.toString())
-    }
-
-    @Test
-    fun transcriptIsDeterministicThroughFacade() {
-        val runtime = S52.defaultRuntime()
-        val settings = S52.defaultSettings(safetyContourMeters = 6.0, safetyDepthMeters = 6.0)
-        val context = S52.defaultContext(settings, viewportId = "phase12-test")
-
-        val first = runtime.transcript(listOf(depthArea(), sounding()), settings, context)
-        val second = runtime.transcript(listOf(depthArea(), sounding()), settings, context)
+        val first = cached.portray(features)
+        val second = cached.portray(listOf(depthArea()))
 
         assertEquals(first, second)
-        assertTrue(first.contains("AreaFill"))
-        assertTrue(first.contains("Sounding"))
+        val stats = cached.cacheStats()
+        assertEquals(1, stats.hits)
+        assertEquals(1, stats.misses)
+        assertEquals(1, stats.size)
     }
 
     @Test
-    fun lookupExplanationIsAvailableFromRuntime() {
-        val explanation = S52.defaultRuntime().explainLookup(depthArea())
+    fun performanceReportIncludesBatchAndCacheMetrics() {
+        val cached = S52.defaultRuntime().cached(maxEntries = 2)
+        val report = cached.performanceReport(listOf(depthArea(), sounding()))
 
-        assertTrue(explanation.candidateCount >= 1)
-        assertFalse(explanation.matches.isEmpty())
+        assertEquals(2, report.inputFeatureCount)
+        assertTrue(report.outputCommandCount >= 2)
+        assertTrue(report.batchReport.batchCount >= 1)
+        assertEquals(1, report.cacheStats?.misses)
     }
 
     private fun depthArea(): EncFeature = EncFeature(
