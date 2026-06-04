@@ -19,6 +19,7 @@
 - Phase 16 `s52-api` consumer facade, runtime manifest, diagnostics result, and facade integration sample.
 - Phase 17 diagnostic bundle, Markdown/properties diagnostics, transcript preview, and diagnostics integration sample.
 - Phase 18 built-in portrayal profiles, profile summaries, profile-based facade convenience calls, and profile integration sample.
+- Phase 19 portable artifact bundles, artifact exporter API, artifact integration sample, and Phase 19 checks.
 
 ### Safety
 

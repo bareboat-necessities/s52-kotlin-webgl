@@ -266,3 +266,45 @@ tasks.register("phase18Check") {
     description = "Runs Phase 18 portrayal profile checks and all previous phase checks."
     dependsOn("phase17Check", "phase18ProfilesAudit", ":s52-api:build", ":s52-api:jvmTest", ":s52-tests:jvmTest")
 }
+
+tasks.register("phase19ArtifactsAudit") {
+    group = "verification"
+    description = "Checks Phase 19 artifact bundle API and integration documentation."
+
+    doLast {
+        val requiredFiles = listOf(
+            "s52-api/src/commonMain/kotlin/io/github/s52/api/S52ArtifactBundle.kt",
+            "s52-api/src/jvmTest/kotlin/io/github/s52/api/S52ArtifactBundleTest.kt",
+            "docs/ARTIFACTS_PHASE19.md",
+            "samples/integration/artifacts/README.md"
+        )
+        val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
+        check(missing.isEmpty()) { "Missing Phase 19 artifact bundle files: $missing" }
+
+        val readme = layout.projectDirectory.file("README.md").asFile.readText()
+        check("S52ArtifactBundle" in readme) { "README.md must document the Phase 19 artifact bundle API." }
+        check("phase19Check" in readme) { "README.md must document the Phase 19 check task." }
+        check("Not for navigation" in readme) { "README.md must keep the not-for-navigation boundary." }
+    }
+}
+
+tasks.register<org.gradle.api.tasks.bundling.Zip>("phase19SourceArchive") {
+    group = "distribution"
+    description = "Builds a source archive for Phase 19 release handoff."
+    archiveBaseName.set("s52-kotlin-webgl")
+    archiveClassifier.set("phase19-source")
+    archiveVersion.set(project.version.toString())
+
+    from(layout.projectDirectory) {
+        exclude(".git/**")
+        exclude(".gradle/**")
+        exclude("**/build/**")
+        exclude("build/**")
+    }
+}
+
+tasks.register("phase19Check") {
+    group = "verification"
+    description = "Runs Phase 19 artifact bundle checks and all previous phase checks."
+    dependsOn("phase18Check", "phase19ArtifactsAudit", ":s52-api:build", ":s52-api:jvmTest", ":s52-tests:jvmTest")
+}

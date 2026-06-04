@@ -398,3 +398,24 @@ Completed deliverables:
 Phase 18 remains additive. It does not add S-57 parsing, S-63, navigation, AIS, GPS, route management, or ECDIS certification scope.
 
 See [`PROFILES_PHASE18.md`](PROFILES_PHASE18.md).
+
+## Phase 19 — Portable portrayal artifact bundles
+
+Status: **complete**.
+
+Goal: let downstream apps and CI jobs export a complete, renderer-independent portrayal handoff as stable named text artifacts without adding a zip, JSON, file-system, or logging dependency to common code.
+
+Completed deliverables:
+
+- Added `S52Artifact`, `S52ArtifactBundle`, `S52ArtifactExportOptions`, and `S52ArtifactExporter` to the public `s52-api` module.
+- Added `S52PortrayalSession.artifactBundle(...)` overloads for request-based and profile-based exports.
+- Artifact exports can include manifest Markdown, diagnostics Markdown/properties, profile Markdown/properties, static completeness, command validation, full command transcript, and transcript preview.
+- Added compact export options for issue reports that should avoid large full transcripts.
+- Added artifact API tests and Phase 19 release-readiness tests.
+- Added artifact integration sample under `samples/integration/artifacts/`.
+- Added `phase19ArtifactsAudit`, `phase19SourceArchive`, and `phase19Check`.
+- Updated CI and release workflow to run `phase19Check`.
+
+Phase 19 remains additive. It does not add S-57 parsing, S-63, navigation, AIS, GPS, route management, or ECDIS certification scope.
+
+See [`ARTIFACTS_PHASE19.md`](ARTIFACTS_PHASE19.md).
