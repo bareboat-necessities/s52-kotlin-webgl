@@ -1,3 +1,9 @@
+## Phase 21
+
+- Added a JVM exporter that generates per-asset SVG images from `S52LibCompatPresLib`, not `PresLibPack.phase2Synthetic()`.
+- Added Gradle tasks `phase21GenerateSymbologyImages`, `phase21SymbologyImagesAudit`, `phase21SourceArchive`, and `phase21Check`.
+- CI and release workflows now upload `build/s52-symbology-images` as the `s52lib-symbology-images` artifact.
+
 ## Phase 20
 
 - Added s52lib-compatible Presentation Library pack using the public 63-token libS52/S52raz color set.

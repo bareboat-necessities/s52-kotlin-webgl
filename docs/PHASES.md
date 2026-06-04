@@ -424,3 +424,8 @@ See [`ARTIFACTS_PHASE19.md`](ARTIFACTS_PHASE19.md).
 ## Phase 20 — s52lib-compatible browser rendering
 
 Add `PresLibPack.s52LibCompat()`, gallery APIs, and browser demo routes to render every symbol, line style, pattern, and color available in the loaded S-52 library pack.
+
+
+## Phase 21 — Uploaded s52lib symbology image artifacts
+
+Generate per-symbol, per-line-style, per-pattern, and per-color SVG files from the s52lib-compatible pack using a JVM build task. Upload `build/s52-symbology-images` from CI and release workflows as the `s52lib-symbology-images` artifact.

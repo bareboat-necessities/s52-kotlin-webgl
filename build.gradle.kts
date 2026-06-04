@@ -349,3 +349,57 @@ tasks.register("phase20Check") {
     description = "Runs Phase 20 s52lib-compatible browser-gallery checks and all previous phase checks."
     dependsOn("phase19Check", "phase20GalleryAudit", ":s52-api:build", ":s52-api:jvmTest", ":demo:build", ":s52-tests:jvmTest")
 }
+
+tasks.register("phase21GenerateSymbologyImages") {
+    group = "documentation"
+    description = "Generates per-asset SVG images for every asset in the s52lib-compatible S-52 pack."
+    dependsOn(":s52-api:exportS52LibSymbologyImages")
+}
+tasks.register("phase21SymbologyImagesAudit") {
+    group = "verification"
+    description = "Checks Phase 21 s52lib-compatible symbology image export files and generated artifact output."
+    dependsOn("phase21GenerateSymbologyImages")
+
+    doLast {
+        val requiredFiles = listOf(
+            "s52-api/src/jvmMain/kotlin/io/github/s52/api/tools/S52SymbologyImageExportMain.kt",
+            "s52-api/src/jvmTest/kotlin/io/github/s52/api/S52SymbologyImageExporterTest.kt",
+            "docs/SYMBOLOGY_IMAGES_PHASE21.md"
+        )
+        val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
+        check(missing.isEmpty()) { "Missing Phase 21 symbology image export files: $missing" }
+
+        val out = layout.buildDirectory.dir("s52-symbology-images").get().asFile
+        check(out.resolve("index.html").isFile) { "Missing generated symbology index.html" }
+        check(out.resolve("manifest.properties").isFile) { "Missing generated symbology manifest.properties" }
+        check(out.resolve("symbols").listFiles().orEmpty().isNotEmpty()) { "No generated symbol SVGs found" }
+        check(out.resolve("lines").listFiles().orEmpty().isNotEmpty()) { "No generated line-style SVGs found" }
+        check(out.resolve("patterns").listFiles().orEmpty().isNotEmpty()) { "No generated pattern SVGs found" }
+        check(out.resolve("colors").listFiles().orEmpty().size >= 63) { "Expected the s52lib-compatible 63-color set" }
+
+        val manifest = out.resolve("manifest.properties").readText()
+        check("edition=phase20-s52lib-compat" in manifest) { "Exporter must use the s52lib-compatible pack, not the synthetic pack." }
+        check("synthetic=false" in manifest) { "Generated image artifact must be marked non-synthetic." }
+    }
+}
+
+tasks.register<org.gradle.api.tasks.bundling.Zip>("phase21SourceArchive") {
+    group = "distribution"
+    description = "Builds a source archive for Phase 21 release handoff."
+    archiveBaseName.set("s52-kotlin-webgl")
+    archiveClassifier.set("phase21-source")
+    archiveVersion.set(project.version.toString())
+
+    from(layout.projectDirectory) {
+        exclude(".git/**")
+        exclude(".gradle/**")
+        exclude("**/build/**")
+        exclude("build/**")
+    }
+}
+
+tasks.register("phase21Check") {
+    group = "verification"
+    description = "Runs Phase 21 symbology image export checks and all previous phase checks."
+    dependsOn("phase20Check", "phase21SymbologyImagesAudit", ":s52-api:jvmTest", ":s52-tests:jvmTest")
+}

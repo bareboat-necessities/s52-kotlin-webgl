@@ -24,11 +24,18 @@ jobs:
         with:
           gradle-version: 8.14.5
 
-      - name: Build and test Phase 20
-        run: gradle --no-daemon phase16Check phase17Check phase18Check phase20Check
+      - name: Build and test Phase 21
+        run: gradle --no-daemon phase21Check
 
       - name: Build source archive
-        run: gradle --no-daemon phase16SourceArchive phase17SourceArchive phase20SourceArchive
+        run: gradle --no-daemon phase16SourceArchive phase17SourceArchive phase20SourceArchive phase21SourceArchive
+
+      - name: Upload generated s52lib symbology images
+        uses: actions/upload-artifact@v4
+        with:
+          name: s52lib-symbology-images
+          path: build/s52-symbology-images
+          if-no-files-found: error
 
       - name: Upload source archive
         uses: actions/upload-artifact@v4
