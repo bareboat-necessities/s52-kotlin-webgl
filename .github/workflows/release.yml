@@ -1,13 +1,12 @@
-name: CI
+name: Release archive
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    tags:
+      - 'v*'
 
 jobs:
-  build:
+  release-archive:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,3 +26,12 @@ jobs:
 
       - name: Build and test Phase 15
         run: gradle --no-daemon phase15Check
+
+      - name: Build source archive
+        run: gradle --no-daemon phase15SourceArchive
+
+      - name: Upload source archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: s52-kotlin-webgl-source
+          path: build/distributions/*.zip

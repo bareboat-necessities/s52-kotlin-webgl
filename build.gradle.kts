@@ -4,7 +4,7 @@ plugins {
 
 allprojects {
     group = "io.github.s52"
-    version = "0.14.0-SNAPSHOT"
+    version = "0.1.0-SNAPSHOT"
 }
 
 tasks.register("phase0Check") {
@@ -95,23 +95,50 @@ tasks.register("phase11Check") {
     dependsOn("phase10Check", ":s52-tests:jvmTest")
 }
 
-
-tasks.register("phase12Check") {
+tasks.register("phase15ReleaseAudit") {
     group = "verification"
-    description = "Runs Phase 12 public API stabilization checks and all previous phase checks."
-    dependsOn("phase11Check", ":s52-api:build", ":s52-api:jvmTest")
+    description = "Checks Phase 15 release-readiness files and safety boundary."
+
+    doLast {
+        val requiredFiles = listOf(
+            "README.md",
+            "CHANGELOG.md",
+            "CONTRIBUTING.md",
+            "SECURITY.md",
+            "docs/PHASES.md",
+            "docs/RELEASE_PHASE15.md",
+            "samples/integration/minimal-core/README.md",
+            ".github/workflows/ci.yml",
+            ".github/workflows/release.yml"
+        )
+        val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
+        check(missing.isEmpty()) { "Missing Phase 15 release-readiness files: $missing" }
+
+        val readme = layout.projectDirectory.file("README.md").asFile.readText()
+        check("Experimental" in readme) { "README.md must keep the experimental safety statement." }
+        check("Not type-approved ECDIS" in readme) { "README.md must keep the ECDIS certification boundary." }
+        check("Not for navigation" in readme) { "README.md must keep the not-for-navigation boundary." }
+    }
 }
 
+tasks.register<org.gradle.api.tasks.bundling.Zip>("phase15SourceArchive") {
+    group = "distribution"
+    description = "Builds a source archive for Phase 15 release handoff."
+    archiveBaseName.set("s52-kotlin-webgl")
+    archiveClassifier.set("source")
+    archiveVersion.set(project.version.toString())
 
-tasks.register("phase13Check") {
-    group = "verification"
-    description = "Runs Phase 13 performance/cache/batching checks and all previous phase checks."
-    dependsOn("phase12Check", ":s52-core:jvmTest", ":s52-api:jvmTest", ":s52-render-webgl:build", ":demo:build")
+    from(layout.projectDirectory) {
+        exclude(".git/**")
+        exclude(".gradle/**")
+        exclude("**/build/**")
+        exclude("build/**")
+    }
 }
 
-
-tasks.register("phase14Check") {
+tasks.register("phase15Check") {
     group = "verification"
-    description = "Runs Phase 14 documentation/example checks and all previous phase checks."
-    dependsOn("phase13Check", ":s52-api:jvmTest", ":s52-tests:jvmTest")
+    description = "Runs Phase 15 release-readiness checks and all previous phase checks."
+    dependsOn("phase11Check", "phase15ReleaseAudit", ":s52-tests:jvmTest")
 }
+

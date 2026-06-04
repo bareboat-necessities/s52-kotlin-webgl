@@ -279,62 +279,59 @@ See [`S64_VALIDATION_PHASE11.md`](S64_VALIDATION_PHASE11.md).
 
 ## Phase 12 — Public API stabilization
 
-Status: **complete**.
+Goal: make the library consumable by other Kotlin/JS applications.
 
-Goal: make the library consumable by other Kotlin/JVM and Kotlin/JS applications.
+Deliverables:
 
-Completed deliverables:
-
-- Added `s52-api` as the stable high-level integration module.
-- Added `S52` convenience entry point.
-- Added `S52Runtime` facade around `PresLibPack`, `CspRegistry`, and `S52PortrayalEngine`.
-- Added `S52Version` semantic-version metadata.
-- Added `S52PortrayalResult` for validated command generation.
-- Added default settings/context helpers.
-- Added deterministic transcript and lookup-explanation helpers.
-- Updated the browser demo to use the public API facade.
-- Added Phase 12 API smoke tests.
-- CI target `phase12Check` runs all previous checks plus `:s52-api:jvmTest`.
-
-See [`PUBLIC_API_PHASE12.md`](PUBLIC_API_PHASE12.md).
+- SemVer
+- KDoc for public APIs
+- Minimal integration example
+- Stable module names and package structure
 
 ## Phase 13 — Performance pass
 
-Status: **complete**.
+Goal: make portrayal and rendering viable for large real scenes.
 
-Goal: make portrayal and rendering viable for repeated repaint loops and larger scenes.
+Optimize:
 
-Completed deliverables:
-
-- Added stable content-based `PortrayalRequestKey`.
-- Added common-source `PortrayalCache` with hit/miss/eviction stats.
-- Added public `S52CachedRuntime` facade.
-- Added `S52.defaultRuntime().cached(...)` and `S52.cachedRuntime(...)`.
-- Added `DrawCommandBatcher`, `DrawBatchKey`, `DrawBatchReport`, and `PortrayalPerformanceReport`.
-- Extended WebGL `RenderStats` with batch metrics.
-- Added Phase 13 tests for cache behavior, stable request keys, batch grouping, and public performance reports.
-- CI target `phase13Check` runs all previous checks plus Phase 13 API/core tests.
-
-See [`PERFORMANCE_PHASE13.md`](PERFORMANCE_PHASE13.md).
+- Lookup indexing
+- Attribute-filter precompilation
+- CSP allocations
+- Draw-command batching
+- Viewport culling
+- Symbol/pattern/text atlas caching
 
 ## Phase 14 — Documentation and examples
 
+Goal: make the project maintainable by contributors.
+
+Docs:
+
+- Architecture
+- Public API
+- Presentation Library import
+- Conditional symbology
+- WebGL renderer
+- Testing and validation
+- Safety/legal boundary
+
+## Phase 15 — Release readiness and handoff
+
 Status: **complete**.
 
-Goal: make the project maintainable by contributors and downstream integrators.
+Goal: make the repository self-auditing and ready for an experimental source release without changing the Phase 11 technical boundary.
 
 Completed deliverables:
 
-- Added architecture documentation with strict module boundaries.
-- Added safety/legal boundary documentation.
-- Added contributor guide.
-- Added CSP extension guide.
-- Added testing and validation guide.
-- Added example integration guide.
-- Added sample code for minimal API usage, deterministic transcripts, custom Presentation Library wiring, and browser/WebGL integration.
-- Added documentation/example smoke tests.
-- Bumped public API version metadata to `0.14.0-SNAPSHOT`.
-- CI target `phase14Check` runs all previous checks plus Phase 14 documentation/example checks.
+- Added `phase15ReleaseAudit` to verify required release/handoff files and safety statements.
+- Added `phase15SourceArchive` to build a source zip from the repository.
+- Added `phase15Check`, which runs all previous checks through `phase11Check` plus Phase 15 audit tests.
+- Added tag-based `.github/workflows/release.yml` that runs checks and uploads the source archive.
+- Added `CHANGELOG.md`, `CONTRIBUTING.md`, and `SECURITY.md`.
+- Added minimal downstream integration documentation under `samples/integration/minimal-core/`.
+- Updated CI to run `phase15Check`.
 
-See [`DOCUMENTATION_PHASE14.md`](DOCUMENTATION_PHASE14.md).
+Phase 15 intentionally does not implement Phases 12–14. It is an additive release-readiness layer over Phase 11.
+
+See [`RELEASE_PHASE15.md`](RELEASE_PHASE15.md).
 
