@@ -94,3 +94,10 @@ tasks.register("phase11Check") {
     description = "Runs Phase 11 S-64 / Chart-1 command validation harness checks and all previous phase checks."
     dependsOn("phase10Check", ":s52-tests:jvmTest")
 }
+
+
+tasks.register("phase12Check") {
+    group = "verification"
+    description = "Runs Phase 12 public API stabilization checks and all previous phase checks."
+    dependsOn("phase11Check", ":s52-api:build", ":s52-api:jvmTest")
+}

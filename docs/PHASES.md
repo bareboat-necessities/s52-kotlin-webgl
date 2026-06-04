@@ -279,14 +279,24 @@ See [`S64_VALIDATION_PHASE11.md`](S64_VALIDATION_PHASE11.md).
 
 ## Phase 12 — Public API stabilization
 
-Goal: make the library consumable by other Kotlin/JS applications.
+Status: **complete**.
 
-Deliverables:
+Goal: make the library consumable by other Kotlin/JVM and Kotlin/JS applications.
 
-- SemVer
-- KDoc for public APIs
-- Minimal integration example
-- Stable module names and package structure
+Completed deliverables:
+
+- Added `s52-api` as the stable high-level integration module.
+- Added `S52` convenience entry point.
+- Added `S52Runtime` facade around `PresLibPack`, `CspRegistry`, and `S52PortrayalEngine`.
+- Added `S52Version` semantic-version metadata.
+- Added `S52PortrayalResult` for validated command generation.
+- Added default settings/context helpers.
+- Added deterministic transcript and lookup-explanation helpers.
+- Updated the browser demo to use the public API facade.
+- Added Phase 12 API smoke tests.
+- CI target `phase12Check` runs all previous checks plus `:s52-api:jvmTest`.
+
+See [`PUBLIC_API_PHASE12.md`](PUBLIC_API_PHASE12.md).
 
 ## Phase 13 — Performance pass
 

@@ -18,24 +18,26 @@ Optional WebGL2 renderer
 
 Experimental. Not type-approved ECDIS. Not for navigation.
 
-## Phase 11 status
+## Phase 12 status
 
-Phase 11 is complete in this increment:
+Phase 12 is complete in this increment:
 
-- Added an S-64 / Chart-1-style command validation harness in `s52-tests`.
-- Added an external fixture parser for normalized feature fixtures and expected command transcripts.
-- Added synthetic Chart-1 and S-64-style validation fixtures for depth/danger, display settings, and overlay/quality cases.
-- Validation runs through the public `EncFeature -> S52PortrayalEngine -> S52DrawCommand` boundary and produces markdown reports.
-- CI now runs `phase11Check`.
+- Added `s52-api` as the stable high-level integration module.
+- Added `S52`, `S52Runtime`, `S52Version`, and `S52PortrayalResult`.
+- Added default settings/context helpers and one-call portrayal convenience.
+- Added validated portrayal, deterministic transcript generation, and lookup explanation helpers.
+- Updated the browser demo to use the public API facade.
+- Added Phase 12 API tests and public API documentation.
+- CI now runs `phase12Check`.
 
-The project still uses a synthetic Presentation Library pack. Official IHO Presentation Library source assets are not bundled.
+The project still uses a synthetic Presentation Library pack by default. Official IHO Presentation Library source assets are not bundled.
 
 ## Build
 
 This project is configured for Gradle 8.14.5 and Kotlin 2.3.21.
 
 ```bash
-gradle phase11Check
+gradle phase12Check
 ```
 
 The CI workflow installs Gradle and Java 21, then runs the same task.
@@ -47,6 +49,7 @@ s52-catalog       typed S-57 object/attribute catalogue subset; generated later
 s52-core          core model, instructions, lookup, CSP interface, portrayal engine
 s52-preslib       Presentation Library source model, builder, validation, generator, registries
 s52-csp           CSP implementations and coverage validation
+s52-api           stable public facade for downstream applications
 s52-render-webgl  JS/WebGL2 renderer for S52DrawCommand
 s52-tests         golden portrayal tests and S-64/Chart-1-style validation harness
 demo              Kotlin/JS browser demo
@@ -58,4 +61,4 @@ Official IHO Presentation Library assets should be treated as external input unl
 
 ## Next step
 
-Begin Phase 12: public API stabilization and integration examples.
+Begin Phase 13: performance pass and renderer/portrayal benchmarking.

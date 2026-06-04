@@ -1,18 +1,14 @@
 package io.github.s52.demo
 
+import io.github.s52.api.S52
 import io.github.s52.catalog.PrimitiveType
 import io.github.s52.catalog.S57Attribute
 import io.github.s52.catalog.S57ObjectClass
-import io.github.s52.core.engine.S52PortrayalEngine
 import io.github.s52.core.geometry.Coordinate
 import io.github.s52.core.geometry.EncGeometry
 import io.github.s52.core.model.EncFeature
 import io.github.s52.core.model.S57Attributes
 import io.github.s52.core.model.S57Value
-import io.github.s52.core.settings.MarinerSettings
-import io.github.s52.core.settings.PortrayalContext
-import io.github.s52.csp.DefaultCspRegistry
-import io.github.s52.preslib.PresLibPack
 import io.github.s52.render.webgl.WebGlS52Renderer
 import kotlinx.browser.document
 import org.w3c.dom.HTMLCanvasElement
@@ -22,14 +18,13 @@ fun main() {
     val canvas = document.getElementById("chart") as HTMLCanvasElement
     val status = document.getElementById("status") as HTMLElement
 
-    val presLib = PresLibPack.phase2Synthetic()
-    val settings = MarinerSettings()
-    val context = PortrayalContext(compilationScale = 50_000.0, displayScale = 50_000.0)
-    val engine = S52PortrayalEngine(presLib.lookupTable, DefaultCspRegistry.phase6Complete())
-    val commands = engine.portray(phase8SyntheticFeatures(), settings, context)
-    val stats = WebGlS52Renderer(canvas, presLib).render(commands, settings)
+    val runtime = S52.defaultRuntime()
+    val settings = S52.defaultSettings()
+    val context = S52.defaultContext(settings, viewportId = "demo")
+    val commands = runtime.portray(phase8SyntheticFeatures(), settings, context)
+    val stats = WebGlS52Renderer(canvas, runtime.presLib).render(commands, settings)
 
-    status.textContent = "Phase 8 WebGL2 renderer: ${commands.size} commands, $stats"
+    status.textContent = "Phase 12 public API + WebGL2 renderer: ${commands.size} commands, $stats"
 }
 
 private fun phase8SyntheticFeatures(): List<EncFeature> = listOf(
