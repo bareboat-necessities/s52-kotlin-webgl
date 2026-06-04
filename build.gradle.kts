@@ -142,3 +142,44 @@ tasks.register("phase15Check") {
     dependsOn("phase11Check", "phase15ReleaseAudit", ":s52-tests:jvmTest")
 }
 
+tasks.register("phase16ApiAudit") {
+    group = "verification"
+    description = "Checks Phase 16 consumer API facade and integration documentation."
+
+    doLast {
+        val requiredFiles = listOf(
+            "s52-api/build.gradle.kts",
+            "s52-api/src/commonMain/kotlin/io/github/s52/api/S52PortrayalSession.kt",
+            "docs/API_FACADE_PHASE16.md",
+            "samples/integration/facade/README.md"
+        )
+        val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
+        check(missing.isEmpty()) { "Missing Phase 16 API facade files: $missing" }
+
+        val readme = layout.projectDirectory.file("README.md").asFile.readText()
+        check("s52-api" in readme) { "README.md must document the Phase 16 s52-api facade module." }
+        check("phase16Check" in readme) { "README.md must document the Phase 16 check task." }
+    }
+}
+
+tasks.register<org.gradle.api.tasks.bundling.Zip>("phase16SourceArchive") {
+    group = "distribution"
+    description = "Builds a source archive for Phase 16 release handoff."
+    archiveBaseName.set("s52-kotlin-webgl")
+    archiveClassifier.set("phase16-source")
+    archiveVersion.set(project.version.toString())
+
+    from(layout.projectDirectory) {
+        exclude(".git/**")
+        exclude(".gradle/**")
+        exclude("**/build/**")
+        exclude("build/**")
+    }
+}
+
+tasks.register("phase16Check") {
+    group = "verification"
+    description = "Runs Phase 16 consumer API facade checks and all previous phase checks."
+    dependsOn("phase15Check", "phase16ApiAudit", ":s52-api:build", ":s52-tests:jvmTest")
+}
+

@@ -13,7 +13,6 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                api(project(":s52-catalog"))
                 api(project(":s52-core"))
                 api(project(":s52-preslib"))
                 api(project(":s52-csp"))

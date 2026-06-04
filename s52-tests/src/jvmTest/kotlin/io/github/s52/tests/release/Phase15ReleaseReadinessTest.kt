@@ -36,14 +36,14 @@ class Phase15ReleaseReadinessTest {
     @Test
     fun ciUsesPhase15Check() {
         val ci = root.resolve(".github/workflows/ci.yml").readText()
-        assertTrue(ci.contains("phase15Check"))
+        assertTrue(ci.contains("phase15Check") || ci.contains("phase16Check"))
     }
 
     @Test
     fun releaseWorkflowBuildsPhase15Archive() {
         val release = root.resolve(".github/workflows/release.yml").readText()
-        assertTrue(release.contains("phase15Check"))
-        assertTrue(release.contains("phase15SourceArchive"))
+        assertTrue(release.contains("phase15Check") || release.contains("phase16Check"))
+        assertTrue(release.contains("phase15SourceArchive") || release.contains("phase16SourceArchive"))
         assertTrue(release.contains("actions/upload-artifact"))
     }
 

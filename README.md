@@ -18,15 +18,15 @@ Optional WebGL2 renderer
 
 Experimental. Not type-approved ECDIS. Not for navigation.
 
-## Phase 15 status
+## Phase 16 status
 
-Phase 15 is complete in this increment:
+Phase 16 is complete in this increment:
 
-- Added release-readiness audit tasks.
-- Added a tag-based source-archive workflow.
-- Added `CHANGELOG.md`, `CONTRIBUTING.md`, `SECURITY.md`, and Phase 15 release docs.
-- Added a minimal downstream integration sample.
-- CI now runs `phase15Check`.
+- Added `s52-api`, a small consumer-facing facade over the existing portrayal modules.
+- Added `S52PortrayalSession`, `S52PortrayalRequest`, `S52PortrayalResult`, and `S52RuntimeManifest`.
+- The facade returns draw commands, validation reports, static-completeness reports, and deterministic transcripts.
+- Added a facade integration sample.
+- CI now runs `phase16Check`.
 
 The project still uses a synthetic Presentation Library pack. Official IHO Presentation Library source assets are not bundled.
 
@@ -35,7 +35,7 @@ The project still uses a synthetic Presentation Library pack. Official IHO Prese
 This project is configured for Gradle 8.14.5 and Kotlin 2.3.21.
 
 ```bash
-gradle phase15Check
+gradle phase16Check
 ```
 
 The CI workflow installs Gradle and Java 21, then runs the same task.
@@ -43,7 +43,7 @@ The CI workflow installs Gradle and Java 21, then runs the same task.
 To build the release handoff archive:
 
 ```bash
-gradle phase15SourceArchive
+gradle phase16SourceArchive
 ```
 
 ## Modules
@@ -54,6 +54,7 @@ s52-core          core model, instructions, lookup, CSP interface, portrayal eng
 s52-preslib       Presentation Library source model, builder, validation, generator, registries
 s52-csp           CSP implementations and coverage validation
 s52-render-webgl  JS/WebGL2 renderer for S52DrawCommand
+s52-api           consumer-facing facade around core, preslib, and CSP modules
 s52-tests         golden portrayal tests and S-64/Chart-1-style validation harness
 demo              Kotlin/JS browser demo
 ```
@@ -64,4 +65,4 @@ Official IHO Presentation Library assets should be treated as external input unl
 
 ## Next step
 
-Use Phase 15 artifacts to tag an experimental source release, then continue with Phase 12 public API stabilization when ready.
+Use the Phase 16 facade as the stable integration entry point, then continue with broader public API stabilization, performance work, and official Presentation Library import tooling when ready.

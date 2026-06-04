@@ -335,3 +335,22 @@ Phase 15 intentionally does not implement Phases 12–14. It is an additive rele
 
 See [`RELEASE_PHASE15.md`](RELEASE_PHASE15.md).
 
+## Phase 16 — Consumer API facade
+
+Status: **complete**.
+
+Goal: provide a stable, small integration entry point over the Phase 11/15 modules without changing the portrayal boundary or adding chartplotter scope.
+
+Completed deliverables:
+
+- Added `s52-api` as a consumer-facing Kotlin Multiplatform module.
+- Added `S52PortrayalSession`, `S52PortrayalRequest`, `S52PortrayalResult`, `S52RuntimeManifest`, and `S52.synthetic()`.
+- The facade wires `PresLibPack`, `CspRegistry`, `S52PortrayalEngine`, static completeness validation, draw-command validation, and command transcript generation.
+- Added facade JVM tests and a minimal facade integration sample.
+- Added `phase16ApiAudit` and `phase16Check`.
+- Updated CI and the release workflow to run `phase16Check`.
+
+Phase 16 remains additive. It still uses the synthetic Presentation Library fixture and does not implement S-57 parsing, S-63, navigation, AIS, or ECDIS certification.
+
+See [`API_FACADE_PHASE16.md`](API_FACADE_PHASE16.md).
+
