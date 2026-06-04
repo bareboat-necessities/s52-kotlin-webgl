@@ -1,3 +1,5 @@
+import org.gradle.process.CommandLineArgumentProvider
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
 }
@@ -22,4 +24,20 @@ kotlin {
             }
         }
     }
+}
+
+tasks.register<JavaExec>("generateSymbologyImages") {
+    group = "documentation"
+    description = "Generates SVG image artifacts for every known synthetic S-52 symbol, line style, and pattern."
+
+    val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
+    dependsOn("jvmMainClasses")
+    classpath = files(jvmCompilation.output.allOutputs, jvmCompilation.runtimeDependencyFiles)
+    mainClass.set("io.github.s52.preslib.generator.SymbologyImageGenerator")
+
+    val outputDir = layout.buildDirectory.dir("symbology-images")
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf(outputDir.get().asFile.absolutePath)
+    })
+    outputs.dir(outputDir)
 }

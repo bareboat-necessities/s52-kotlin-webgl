@@ -45,3 +45,15 @@ jobs:
 
       - name: Build and test Phase ${{ matrix.phase }}
         run: gradle --no-daemon phase${{ matrix.phase }}Check
+
+      - name: Generate symbology image artifacts
+        if: matrix.phase == 14
+        run: gradle --no-daemon :s52-preslib:generateSymbologyImages
+
+      - name: Upload symbology image artifacts
+        if: matrix.phase == 14
+        uses: actions/upload-artifact@v4
+        with:
+          name: s52-symbology-images
+          path: s52-preslib/build/symbology-images
+          if-no-files-found: error
