@@ -127,6 +127,8 @@ object S52SymbologyImageExporter {
         }
         return """
             |<svg xmlns="http://www.w3.org/2000/svg" width="${rendered.width}" height="${rendered.height}" viewBox="0 0 ${rendered.width} ${rendered.height}" overflow="visible" shape-rendering="geometricPrecision" role="img" aria-label="${xml(asset.name)}">
+            |  <title>${xml(asset.name)} $title</title>
+            |  <desc>colorRefs=${xml(asset.colorRefs.joinToString(","))}; unresolvedColors=${xml(rendered.unresolvedColorTokens.joinToString(","))}</desc>
             |  <rect width="100%" height="100%" fill="white"/>
             |  <g transform="translate(${rendered.offsetX} ${rendered.offsetY})">
             |${rendered.elements.joinToString("\n") { "    $it" }}
@@ -221,6 +223,8 @@ object S52SymbologyImageExporter {
         appendLine("svgBoundsAware=true")
         appendLine("lineStyleSampleRepeated=true")
         appendLine("hpglArcCenterAware=true")
+            appendLine("svgPenLetterColorAware=true")
+            appendLine("svgColorRefDiagnostics=true")
     }
 
     private fun renderIndexHtml(metadataName: String, metadataEdition: String, symbols: List<String>, lineStyles: List<String>, patterns: List<String>, colors: List<String>): String = buildString {
@@ -275,11 +279,12 @@ object S52SymbologyImageExporter {
         private var penDown = false
         private var strokeWidth = 1.5
         private var dashArray: String? = null
+        private val elements = mutableListOf<String>()
+        private val unresolvedColorTokens = mutableListOf<String>()
         private var currentColor = resolveColor(null)
         private var currentPath = StringBuilder()
         private var polygonPath = StringBuilder()
         private var polygonMode = false
-        private val elements = mutableListOf<String>()
         private val bounds = MutableBounds()
         private var maxStrokeWidth = strokeWidth
 
@@ -318,7 +323,7 @@ object S52SymbologyImageExporter {
             val padding = max(12.0, maxStrokeWidth * 2.0 + 8.0)
             val width = ceil(max(32.0, bounds.width + padding * 2.0))
             val height = ceil(max(32.0, bounds.height + padding * 2.0 + 12.0))
-            return RenderedSvg(width, height, padding - bounds.minX, padding - bounds.minY, elements)
+            return RenderedSvg(width, height, padding - bounds.minX, padding - bounds.minY, elements, unresolvedColorTokens.sorted().distinct())
         }
 
         private fun handleMove(args: String, draw: Boolean) {
@@ -452,17 +457,42 @@ object S52SymbologyImageExporter {
         private fun resolveColor(arg: String?): String {
             val token = colorToken(arg)
             val color = colors[token.uppercase()]
-            return if (color != null) rgbHex(color.r, color.g, color.b) else "#000000"
+            if (color != null) return rgbHex(color.r, color.g, color.b)
+            unresolvedColorTokens += token
+            return fallbackVisibleColorForPen(arg)
         }
 
         private fun colorToken(arg: String?): String {
-            val raw = arg.orEmpty().trim()
+            val raw = arg.orEmpty().trim().uppercase()
             if (raw.isBlank()) return asset.colorRefs.firstOrNull() ?: "CHBLK"
+
             raw.toIntOrNull()?.let { index ->
-                if (index == 0) return asset.colorRefs.firstOrNull() ?: "CHBLK"
-                return asset.colorRefs.getOrNull(index - 1) ?: asset.colorRefs.firstOrNull() ?: "CHBLK"
+                return colorRefByIndex(if (index <= 0) 0 else index - 1)
             }
-            return if (raw.length >= 4) raw.take(8) else asset.colorRefs.firstOrNull() ?: "CHBLK"
+
+            if (raw.length == 1 && raw[0] in 'A'..'Z') {
+                return colorRefByIndex(raw[0] - 'A')
+            }
+
+            val known = colors.keys
+            if (raw in known) return raw
+            if (raw.length > 4 && raw.drop(1) in known) return raw.drop(1)
+
+            return raw.take(8)
+        }
+
+        private fun colorRefByIndex(index: Int): String =
+            asset.colorRefs.getOrNull(index)
+                ?: asset.colorRefs.firstOrNull()
+                ?: "CHBLK"
+
+        private fun fallbackVisibleColorForPen(arg: String?): String = when (arg.orEmpty().trim().uppercase()) {
+            "1", "A", "" -> "#000000"
+            "2", "B" -> "#C02020"
+            "3", "C" -> "#208040"
+            "4", "D" -> "#2040C0"
+            "5", "E" -> "#B08000"
+            else -> "#000000"
         }
 
         private fun dashArrayFor(args: String): String? {
@@ -481,7 +511,7 @@ object S52SymbologyImageExporter {
         private fun dashAttr(): String = dashArray?.let { " stroke-dasharray=\"$it\"" }.orEmpty()
     }
 
-    private data class RenderedSvg(val width: Double, val height: Double, val offsetX: Double, val offsetY: Double, val elements: List<String>)
+    private data class RenderedSvg(val width: Double, val height: Double, val offsetX: Double, val offsetY: Double, val elements: List<String>, val unresolvedColorTokens: List<String> = emptyList())
 
     private class MutableBounds {
         var minX: Double = Double.POSITIVE_INFINITY

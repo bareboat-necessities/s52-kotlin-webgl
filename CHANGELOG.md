@@ -1,5 +1,11 @@
 ## Phase 26 replacement
 
+- Fixed OpenCPN color-ref parsing for prefixed pen/color references such as `ACHBLK`, `BCHRED`, and `CCHGRN`.
+- Fixed SVG HPGL `SPA`/`SPB`/`SPC` letter-pen mapping to imported color-ref entries.
+- Added SVG color diagnostics using `colorRefs=` and `unresolvedColors=` in `<desc>`.
+
+## Phase 26 replacement
+
 - Improved OpenCPN SVG export bounds so stroke width is included in generated viewBox padding.
 - Fixed HPGL `AA` arc handling to use center-point arc semantics.
 - Added rectangle command support for `EA`, `RA`, `ER`, and `RR`.

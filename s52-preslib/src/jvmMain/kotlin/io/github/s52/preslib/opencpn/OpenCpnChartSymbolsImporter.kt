@@ -106,7 +106,7 @@ object OpenCpnChartSymbolsImporter {
                 name = name.take(8),
                 kind = OpenCpnAssetKind.LineStyle,
                 description = line.childText("description").orEmpty(),
-                colorRefs = parseColorRefs(line.childText("color-ref")),
+                colorRefs = line.colorRefs(),
                 hpgl = hpgl,
                 width = vector?.getAttribute("width")?.toDoubleOrNull() ?: 64.0,
                 height = vector?.getAttribute("height")?.toDoubleOrNull() ?: 16.0,
@@ -125,7 +125,7 @@ object OpenCpnChartSymbolsImporter {
                 name = name.take(8),
                 kind = OpenCpnAssetKind.Pattern,
                 description = pattern.childText("description").orEmpty(),
-                colorRefs = parseColorRefs(pattern.childText("color-ref")),
+                colorRefs = pattern.colorRefs(),
                 hpgl = hpgl,
                 width = vector?.getAttribute("width")?.toDoubleOrNull() ?: 32.0,
                 height = vector?.getAttribute("height")?.toDoubleOrNull() ?: 32.0,
@@ -146,7 +146,7 @@ object OpenCpnChartSymbolsImporter {
                 name = name.take(8),
                 kind = OpenCpnAssetKind.Symbol,
                 description = symbol.childText("description").orEmpty(),
-                colorRefs = parseColorRefs(symbol.childText("color-ref")),
+                colorRefs = symbol.colorRefs(),
                 hpgl = hpgl,
                 width = vector?.getAttribute("width")?.toDoubleOrNull() ?: max(1.0, bounds.maxX - bounds.minX),
                 height = vector?.getAttribute("height")?.toDoubleOrNull() ?: max(1.0, bounds.maxY - bounds.minY),
@@ -197,11 +197,59 @@ object OpenCpnChartSymbolsImporter {
         commands = commands
     )
 
-    private fun parseColorRefs(text: String?): List<String> = text.orEmpty()
-        .split(',', ';', ' ', '\t', '\n', '\r')
-        .map { it.trim() }
-        .filter { it.isNotBlank() }
-        .map { it.take(8) }
+    private fun Element.colorRefs(): List<String> = childElements("color-ref")
+        .flatMap { parseColorRefs(it.textContent) }
+        .ifEmpty { parseColorRefs(childText("color-ref")) }
+
+    private fun parseColorRefs(text: String?): List<String> {
+        val rawTokens = text.orEmpty()
+            .split(',', ';', ' ', '\t', '\n', '\r')
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+
+        val result = mutableListOf<String>()
+        var index = 0
+        while (index < rawTokens.size) {
+            val token = rawTokens[index].uppercase()
+            val next = rawTokens.getOrNull(index + 1)?.uppercase()
+
+            if (token.length == 1 && token[0] in 'A'..'Z' && next != null) {
+                normalizedColorToken(next)?.let(result::add)
+                index += 2
+                continue
+            }
+
+            normalizedColorToken(token)?.let(result::add)
+            index++
+        }
+
+        return result.distinct()
+    }
+
+    private fun normalizedColorToken(raw: String): String? {
+        val token = raw.trim().uppercase().takeIf { it.isNotBlank() } ?: return null
+        val known = knownColorTokens()
+        if (token in known) return token
+
+        // OpenCPN/S-52 color references may carry a leading HPGL pen id,
+        // for example A+CHGRD as ACHGRD or B+CHMGD as BCHMGD.
+        if (token.length > 4) {
+            val tail = token.drop(1)
+            if (tail in known || looksLikeColorToken(tail)) return tail.take(8)
+        }
+
+        return token.take(8).takeIf { it.length >= 4 && looksLikeColorToken(it) }
+    }
+
+    private fun knownColorTokens(): Set<String> = S52LibCompatPresLib.s52LibColors()
+        .map { it.token.uppercase() }
+        .toSet()
+
+    private fun looksLikeColorToken(token: String): Boolean {
+        val upper = token.uppercase()
+        val prefixes = listOf("CH", "DEP", "LIT", "LAN", "CST", "SND", "RAD", "ARP", "NINF", "RES", "SH", "PS", "SY", "PL", "APL", "UI", "OUT", "BK", "TR", "IS", "DN")
+        return upper.length in 4..8 && prefixes.any { upper.startsWith(it) }
+    }
 
     private fun paletteFromName(raw: String): S52Palette = when (raw.lowercase()) {
         "day", "daybright", "day-bright", "rgb" -> S52Palette.DayBright

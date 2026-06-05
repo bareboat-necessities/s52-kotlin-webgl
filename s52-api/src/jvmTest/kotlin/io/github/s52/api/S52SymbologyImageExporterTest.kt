@@ -40,6 +40,9 @@ class S52SymbologyImageExporterTest {
 
         val coloredSymbolSvg = dir.resolve("symbols/SYM000.svg").readText()
         assertTrue("#C80000" in coloredSymbolSvg)
+        assertTrue("#00A000" in coloredSymbolSvg)
+        assertTrue("colorRefs=CHBLK,CHRED,CHGRN" in coloredSymbolSvg)
+        assertTrue("unresolvedColors=" in coloredSymbolSvg)
         assertTrue("fill-rule=\"evenodd\"" in coloredSymbolSvg)
         assertTrue("overflow=\"visible\"" in coloredSymbolSvg)
         assertTrue("viewBox=\"0 0" in coloredSymbolSvg)

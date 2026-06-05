@@ -456,3 +456,8 @@ but workflows and docs keep legacy audit strings visible for existing tests.
 ## Phase 26 — OpenCPN SVG color, contour, bounds, and line-style fix
 
 Fix generated SVG symbology images so OpenCPN `chartsymbols.xml` HPGL is exported with `color-ref`/`SP` colors, `SW` stroke widths, `LT` dash hints, polygon contour/fill handling (`PM`, `FP`, `EP`), rectangle commands (`EA`, `RA`, `ER`, `RR`), stroke-aware viewBox bounds, and repeated line-style samples. Raster atlases remain unused.
+
+
+### Phase 26 replacement color references
+
+Fix OpenCPN color-ref parsing for pen-prefixed tokens such as `ACHBLK`, `BCHRED`, and `CCHGRN`, and map HPGL letter pens `SPA`, `SPB`, and `SPC` to the imported color-ref list during SVG export. Generated SVGs include `colorRefs=` and `unresolvedColors=` diagnostics in `<desc>`.

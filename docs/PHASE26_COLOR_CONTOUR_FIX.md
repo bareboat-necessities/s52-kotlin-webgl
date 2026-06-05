@@ -48,3 +48,12 @@ hpglArcCenterAware=true
 ```
 
 Raster atlases remain intentionally unused.
+
+
+## Replacement color-reference fix
+
+This replacement Phase 26 also fixes the case where OpenCPN color references
+use HPGL pen prefixes such as `ACHBLK`, `BCHRED`, and `CCHGRN`, while HPGL uses
+`SPA`, `SPB`, and `SPC`. The SVG exporter now maps both numeric pens and
+letter pens to the corresponding imported color-ref list, and emits SVG
+`<desc>` diagnostics with `colorRefs=` and `unresolvedColors=`.

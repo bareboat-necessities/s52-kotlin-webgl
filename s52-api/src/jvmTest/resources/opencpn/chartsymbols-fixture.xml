@@ -3,17 +3,18 @@
   <color name="CHBLK" r="0" g="0" b="0"/>
   <color name="CHRED" r="200" g="0" b="0"/>
   <color name="CHWHT" r="255" g="255" b="255"/>
+  <color name="CHGRN" r="0" g="160" b="0"/>
   <color name="DEPDW" r="240" g="248" b="255"/>
 </color-table></color-tables>
 <symbols><symbol RCID="1">
   <name>SYM000</name>
   <description>fixture symbol 0</description>
   <definition>V</definition>
-  <color-ref>CHBLK CHRED</color-ref>
+  <color-ref>ACHBLK BCHRED CCHGRN</color-ref>
   <vector width="16" height="16">
     <origin x="0" y="0"/>
     <pivot x="8" y="8"/>
-    <HPGL>SP2;SW2;PM0;PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;PM2;FP;EP;</HPGL>
+    <HPGL>SPB;SW2;PM0;PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;PM2;FP;EP;SPC;PU12,0;PD12,10;</HPGL>
   </vector>
 </symbol><symbol RCID="2">
   <name>SYM001</name>
