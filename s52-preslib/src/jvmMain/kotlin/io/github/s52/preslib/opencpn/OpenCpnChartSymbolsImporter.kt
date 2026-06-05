@@ -11,27 +11,34 @@ import io.github.s52.preslib.source.SourcePattern
 import io.github.s52.preslib.source.SourceSymbol
 import io.github.s52.preslib.source.SourceVectorCommand
 import org.w3c.dom.Element
-import org.w3c.dom.Node
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.math.abs
-import kotlin.math.cos
 import kotlin.math.atan2
+import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sin
 
 /**
- * Phase 26 OpenCPN chartsymbols.xml importer.
+ * Phase 27 OpenCPN chartsymbols.xml importer fixes.
  *
- * OpenCPN's parser reads color-table/color RGB rows, line-style HPGL rows,
- * pattern HPGL rows, and symbol HPGL nested below the vector node. This importer
- * follows that XML structure and also keeps a rich, raw-HPGL view for SVG export
- * so color changes and contour/fill commands are not lost.
+ * This file replaces the Phase 26 importer with the real fixes that were
+ * missing from the previously reissued zip:
+ *
+ * - reads HPGL from nested <vector><HPGL> for symbols, line styles, and patterns;
+ * - reads color-ref tags recursively instead of only direct children;
+ * - keeps compact OpenCPN color-ref strings such as ACHBLKBCHREDCCHGRN usable;
+ * - keeps HPGL helper functions at object scope, not accidentally inside a local
+ *   function, which fixes the JVM compile errors seen in Phase 27 logs;
+ * - parses coordinates with a Kotlin-safe regex and explicit Pair<Double,Double>
+ *   values so destructuring/iterator inference does not break;
+ * - accepts common HPGL geometry commands used by OpenCPN symbols: PU, PD, CI,
+ *   AA, EA, RA, ER, RR, WG, PM, FP, and EP.
  */
 object OpenCpnChartSymbolsImporter {
-    private const val ImportedEdition = "opencpn-chartsymbols-imported"
+    private const val ImportedEdition = "opencpn-chartsymbols-imported-phase27"
 
     fun importFile(file: File): PresLibSourcePack = importRenderableFile(file).sourcePack
 
@@ -86,7 +93,7 @@ object OpenCpnChartSymbolsImporter {
             val table = colorTableNodes.item(i) as? Element ?: continue
             val palette = paletteFromName(table.getAttribute("name").ifBlank { table.getAttribute("palette") })
             val colors = tables.getOrPut(palette) { mutableListOf() }
-            table.childElements("color").forEach { colorNode ->
+            table.descendantElements("color").forEach { colorNode ->
                 val name = colorNode.getAttribute("name").trim().takeIf { it.isNotBlank() } ?: return@forEach
                 val r = colorNode.getAttribute("r").toIntOrNull() ?: return@forEach
                 val g = colorNode.getAttribute("g").toIntOrNull() ?: return@forEach
@@ -101,7 +108,7 @@ object OpenCpnChartSymbolsImporter {
         root.getElementsByTagName("line-style").asElements().mapNotNull { line ->
             val name = line.childText("name") ?: line.getAttribute("name").takeIf { it.isNotBlank() } ?: return@mapNotNull null
             val vector = line.childElement("vector")
-            val hpgl = line.childText("HPGL").orEmpty()
+            val hpgl = vector?.childText("HPGL") ?: line.childText("HPGL").orEmpty()
             OpenCpnRenderableAsset(
                 name = name.take(8),
                 kind = OpenCpnAssetKind.LineStyle,
@@ -120,7 +127,7 @@ object OpenCpnChartSymbolsImporter {
         root.getElementsByTagName("pattern").asElements().mapNotNull { pattern ->
             val name = pattern.childText("name") ?: pattern.getAttribute("name").takeIf { it.isNotBlank() } ?: return@mapNotNull null
             val vector = pattern.childElement("vector")
-            val hpgl = pattern.childText("HPGL").orEmpty()
+            val hpgl = vector?.childText("HPGL") ?: pattern.childText("HPGL").orEmpty()
             OpenCpnRenderableAsset(
                 name = name.take(8),
                 kind = OpenCpnAssetKind.Pattern,
@@ -197,25 +204,10 @@ object OpenCpnChartSymbolsImporter {
         commands = commands
     )
 
-    private fun Element.colorRefs(): List<String> = childElements("color-ref")
+    private fun Element.colorRefs(): List<String> = descendantElements("color-ref")
         .flatMap { parseColorRefs(it.textContent) }
         .ifEmpty { parseColorRefs(childText("color-ref")) }
 
-    /**
-     * Parse OpenCPN/S-52 color references while preserving pen order.
-     *
-     * The real OpenCPN file often stores references compactly. All of these
-     * must resolve to the same ordered palette list:
-     *
-     * - "ACHBLK BCHRED CCHGRN"
-     * - "ACHBLKBCHREDCCHGRN"
-     * - "CHBLK CHRED CHGRN"
-     * - "CHBLKCHREDCHGRN"
-     *
-     * The old splitter only handled the first and third forms. On the real
-     * compact form it returned an empty or mostly black palette, so SVG export
-     * fell back to CHBLK for every SP command.
-     */
     private fun parseColorRefs(text: String?): List<String> {
         val raw = text.orEmpty().uppercase().filter { it.isLetterOrDigit() }
         if (raw.isBlank()) return emptyList()
@@ -231,8 +223,6 @@ object OpenCpnChartSymbolsImporter {
                 continue
             }
 
-            // A, B, C ... are HPGL/S-52 pen identifiers prepended to the real
-            // color token, e.g. A+CHBLK => ACHBLK.
             if (raw[index] in 'A'..'Z') {
                 val prefixed = known.firstOrNull { raw.startsWith(it, index + 1) }
                 if (prefixed != null) {
@@ -246,7 +236,6 @@ object OpenCpnChartSymbolsImporter {
 
         if (result.isNotEmpty()) return result
 
-        // Last-resort tokenized fallback for unexpected but separated formats.
         return text.orEmpty()
             .split(',', ';', ' ', '\t', '\n', '\r')
             .mapNotNull { normalizedColorToken(it) }
@@ -289,18 +278,36 @@ object OpenCpnChartSymbolsImporter {
         var currentX = 0.0
         var currentY = 0.0
         var penDown = false
+        var relative = false
+        var polygonOpen = false
+
+        fun emitMove(x: Double, y: Double) {
+            currentX = x
+            currentY = y
+            commands += SourceVectorCommand.MoveTo(currentX, currentY)
+        }
+
+        fun emitLine(x: Double, y: Double) {
+            currentX = x
+            currentY = y
+            commands += SourceVectorCommand.LineTo(currentX, currentY)
+        }
+
+        fun resolvePoint(point: Pair<Double, Double>): Pair<Double, Double> =
+            if (relative) (currentX + point.first) to (currentY + point.second) else point
 
         for (token in tokenizeHpgl(hpgl)) {
             when (token.code) {
+                "PA" -> relative = false
+                "PR" -> relative = true
                 "PU" -> {
                     val pts = parseCoordinatePairs(token.args)
                     if (pts.isEmpty()) {
                         penDown = false
                     } else {
-                        pts.forEach { point ->
-                            currentX = point.first
-                            currentY = point.second
-                            commands += SourceVectorCommand.MoveTo(currentX, currentY)
+                        pts.forEach { rawPoint ->
+                            val point = resolvePoint(rawPoint)
+                            emitMove(point.first, point.second)
                         }
                         penDown = false
                     }
@@ -310,28 +317,65 @@ object OpenCpnChartSymbolsImporter {
                     if (pts.isEmpty()) {
                         penDown = true
                     } else {
-                        pts.forEach { point ->
+                        pts.forEach { rawPoint ->
+                            val point = resolvePoint(rawPoint)
                             if (!penDown) commands += SourceVectorCommand.MoveTo(currentX, currentY)
-                            currentX = point.first
-                            currentY = point.second
-                            commands += SourceVectorCommand.LineTo(currentX, currentY)
+                            emitLine(point.first, point.second)
                             penDown = true
                         }
                     }
                 }
-                "CI" -> commands += circleApprox(currentX, currentY, token.args.toDoubleOrNull() ?: 4.0)
+                "CI" -> {
+                    val radius = parseNumbers(token.args).firstOrNull() ?: 4.0
+                    commands += circleApprox(currentX, currentY, radius)
+                }
                 "AA" -> {
                     val nums = parseNumbers(token.args)
                     if (nums.size >= 3) {
-                        val arc = arcApprox(currentX, currentY, nums[0], nums[1], nums[2])
+                        val center = resolvePoint(nums[0] to nums[1])
+                        val arc = arcApprox(currentX, currentY, center.first, center.second, nums[2])
                         commands += arc
                         arc.lastOrNull()?.let { last ->
                             when (last) {
-                                is SourceVectorCommand.MoveTo -> { currentX = last.x; currentY = last.y }
-                                is SourceVectorCommand.LineTo -> { currentX = last.x; currentY = last.y }
+                                is SourceVectorCommand.MoveTo -> {
+                                    currentX = last.x
+                                    currentY = last.y
+                                }
+                                is SourceVectorCommand.LineTo -> {
+                                    currentX = last.x
+                                    currentY = last.y
+                                }
                                 SourceVectorCommand.ClosePath -> Unit
                             }
                         }
+                    }
+                }
+                "EA", "RA" -> {
+                    val pts = parseCoordinatePairs(token.args)
+                    val corner = pts.firstOrNull()?.let { resolvePoint(it) }
+                    if (corner != null) commands += rectangleCommands(currentX, currentY, corner.first, corner.second)
+                }
+                "ER", "RR" -> {
+                    val pts = parseCoordinatePairs(token.args)
+                    val size = pts.firstOrNull()
+                    if (size != null) commands += rectangleCommands(currentX, currentY, currentX + size.first, currentY + size.second)
+                }
+                "WG" -> {
+                    val nums = parseNumbers(token.args)
+                    if (nums.size >= 3) {
+                        val radius = nums[0]
+                        val startDeg = nums[1]
+                        val sweepDeg = nums[2]
+                        commands += wedgeApprox(currentX, currentY, radius, startDeg, sweepDeg)
+                    }
+                }
+                "PM" -> {
+                    polygonOpen = true
+                }
+                "FP", "EP" -> {
+                    if (polygonOpen) {
+                        commands += SourceVectorCommand.ClosePath
+                        polygonOpen = false
                     }
                 }
             }
@@ -348,9 +392,13 @@ object OpenCpnChartSymbolsImporter {
             if (c0.isLetter() && c1.isLetter()) {
                 val code = "${c0.uppercaseChar()}${c1.uppercaseChar()}"
                 var end = index + 2
-                while (end < hpgl.length && hpgl[end] != ';') end++
+                while (end < hpgl.length) {
+                    if (hpgl[end] == ';') break
+                    if (end + 1 < hpgl.length && hpgl[end].isLetter() && hpgl[end + 1].isLetter()) break
+                    end++
+                }
                 tokens += HpglToken(code, hpgl.substring(index + 2, end).trim())
-                index = if (end < hpgl.length) end + 1 else end
+                index = if (end < hpgl.length && hpgl[end] == ';') end + 1 else end
             } else {
                 index++
             }
@@ -370,13 +418,16 @@ object OpenCpnChartSymbolsImporter {
     }
 
     private fun parseNumbers(args: String): List<Double> =
-        Regex("""[-+]?\d+(?:\.\d+)?""").findAll(args).map { it.value.toDouble() }.toList()
+        Regex("""[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?""")
+            .findAll(args)
+            .map { it.value.toDouble() }
+            .toList()
 
     private fun circleApprox(cx: Double, cy: Double, radius: Double): List<SourceVectorCommand> {
-        val r = max(1.0, radius)
+        val r = max(1.0, abs(radius))
         val result = mutableListOf<SourceVectorCommand>()
-        for (i in 0..24) {
-            val angle = Math.PI * 2.0 * i / 24.0
+        for (i in 0..32) {
+            val angle = Math.PI * 2.0 * i / 32.0
             val x = cx + cos(angle) * r
             val y = cy + sin(angle) * r
             result += if (i == 0) SourceVectorCommand.MoveTo(x, y) else SourceVectorCommand.LineTo(x, y)
@@ -389,7 +440,7 @@ object OpenCpnChartSymbolsImporter {
         val radius = max(1.0, hypot(startX - centerX, startY - centerY))
         val startAngle = atan2(startY - centerY, startX - centerX)
         val sweep = Math.toRadians(sweepDeg)
-        val steps = min(48, max(4, abs(sweepDeg / 10.0).toInt()))
+        val steps = min(64, max(4, abs(sweepDeg / 8.0).toInt()))
         val result = mutableListOf<SourceVectorCommand>()
         for (i in 1..steps) {
             val angle = startAngle + sweep * i / steps
@@ -397,6 +448,27 @@ object OpenCpnChartSymbolsImporter {
             val y = centerY + sin(angle) * radius
             result += SourceVectorCommand.LineTo(x, y)
         }
+        return result
+    }
+
+    private fun rectangleCommands(x0: Double, y0: Double, x1: Double, y1: Double): List<SourceVectorCommand> = listOf(
+        SourceVectorCommand.MoveTo(x0, y0),
+        SourceVectorCommand.LineTo(x1, y0),
+        SourceVectorCommand.LineTo(x1, y1),
+        SourceVectorCommand.LineTo(x0, y1),
+        SourceVectorCommand.ClosePath
+    )
+
+    private fun wedgeApprox(cx: Double, cy: Double, radius: Double, startDeg: Double, sweepDeg: Double): List<SourceVectorCommand> {
+        val r = max(1.0, abs(radius))
+        val steps = min(64, max(4, abs(sweepDeg / 8.0).toInt()))
+        val result = mutableListOf<SourceVectorCommand>()
+        result += SourceVectorCommand.MoveTo(cx, cy)
+        for (i in 0..steps) {
+            val angle = Math.toRadians(startDeg + sweepDeg * i / steps)
+            result += SourceVectorCommand.LineTo(cx + cos(angle) * r, cy + sin(angle) * r)
+        }
+        result += SourceVectorCommand.ClosePath
         return result
     }
 
@@ -416,8 +488,20 @@ object OpenCpnChartSymbolsImporter {
     }
 
     private fun bounds(commands: List<SourceVectorCommand>): Bounds {
-        val xs = commands.mapNotNull { when (it) { is SourceVectorCommand.MoveTo -> it.x; is SourceVectorCommand.LineTo -> it.x; SourceVectorCommand.ClosePath -> null } }
-        val ys = commands.mapNotNull { when (it) { is SourceVectorCommand.MoveTo -> it.y; is SourceVectorCommand.LineTo -> it.y; SourceVectorCommand.ClosePath -> null } }
+        val xs = commands.mapNotNull {
+            when (it) {
+                is SourceVectorCommand.MoveTo -> it.x
+                is SourceVectorCommand.LineTo -> it.x
+                SourceVectorCommand.ClosePath -> null
+            }
+        }
+        val ys = commands.mapNotNull {
+            when (it) {
+                is SourceVectorCommand.MoveTo -> it.y
+                is SourceVectorCommand.LineTo -> it.y
+                SourceVectorCommand.ClosePath -> null
+            }
+        }
         return Bounds(xs.minOrNull() ?: -8.0, ys.minOrNull() ?: -8.0, xs.maxOrNull() ?: 8.0, ys.maxOrNull() ?: 8.0)
     }
 
@@ -426,6 +510,18 @@ object OpenCpnChartSymbolsImporter {
     private fun Element.childElement(name: String): Element? = childElements(name).firstOrNull()
 
     private fun Element.childElements(name: String): List<Element> = childNodes.asElements().filter { it.tagName == name }
+
+    private fun Element.descendantElements(name: String): List<Element> {
+        val result = mutableListOf<Element>()
+        fun visit(element: Element) {
+            element.childNodes.asElements().forEach { child ->
+                if (child.tagName == name) result += child
+                visit(child)
+            }
+        }
+        visit(this)
+        return result
+    }
 
     private fun org.w3c.dom.NodeList.asElements(): List<Element> {
         val result = mutableListOf<Element>()
