@@ -439,3 +439,8 @@ Fix the Phase 21 fallback-subset issue by requiring a real S-52/libS52 Presentat
 ## Phase 22 — OpenCPN vector symbology import
 
 Import scalable/vector symbology from OpenCPN `chartsymbols.xml`, export all imported assets as SVGs in CI, fail the build on suspiciously small symbol counts, and change the project license to GPL-2.0-or-later for OpenCPN compatibility.
+
+
+## Phase 23 — OpenCPN importer compile fix
+
+Replace the broken Phase 22 importer source with a JVM-safe OpenCPN `chartsymbols.xml`/flat HPGL importer. Fix unresolved helpers, malformed character literals, ambiguous destructuring inference, and keep the vector-only no-raster symbology path.

@@ -1,3 +1,9 @@
+## Phase 23
+
+- Fixed the OpenCPN importer JVM compile failure caused by malformed character literals.
+- Replaced the importer with a JVM-safe XML/flat HPGL parser path.
+- Kept raster atlas use disabled.
+
 ## Phase 22
 
 - Added OpenCPN `chartsymbols.xml` vector/scalable symbology importer.
