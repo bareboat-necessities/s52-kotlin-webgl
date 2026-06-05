@@ -1,3 +1,17 @@
+## Phase 22
+
+- Added OpenCPN `chartsymbols.xml` vector/scalable symbology importer.
+- Symbology SVG export now uses real imported OpenCPN data and refuses tiny placeholder subsets.
+- CI now accepts `OPENCPN_CHARTSYMBOLS_XML_BASE64` and uploads `opencpn-symbology-images`.
+- Project license changed to GPL-2.0-or-later for OpenCPN compatibility.
+
+## Phase 22
+
+- Added real S-52/libS52 Presentation Library importer for `SYMB`, `LNST`, and `PATT` records.
+- Changed symbology-image export so it refuses the small fallback compatibility subset.
+- CI now requires `S52LIB_PLIB_BASE64` and uploads images generated from the decoded real PLib payload.
+- Added a minimum real symbol-count gate to prevent publishing incomplete image artifacts.
+
 ## Phase 21
 
 - Added a JVM exporter that generates per-asset SVG images from `S52LibCompatPresLib`, not `PresLibPack.phase2Synthetic()`.

@@ -429,3 +429,13 @@ Add `PresLibPack.s52LibCompat()`, gallery APIs, and browser demo routes to rende
 ## Phase 21 — Uploaded s52lib symbology image artifacts
 
 Generate per-symbol, per-line-style, per-pattern, and per-color SVG files from the s52lib-compatible pack using a JVM build task. Upload `build/s52-symbology-images` from CI and release workflows as the `s52lib-symbology-images` artifact.
+
+
+## Phase 22 — Real S-52/libS52 symbology import
+
+Fix the Phase 21 fallback-subset issue by requiring a real S-52/libS52 Presentation Library payload for image export. Add a JVM importer for `SYMB`, `LNST`, and `PATT` records, fail the build when the symbol count is suspiciously small, and update CI to decode `S52LIB_PLIB_BASE64` before uploading `s52lib-symbology-images`.
+
+
+## Phase 22 — OpenCPN vector symbology import
+
+Import scalable/vector symbology from OpenCPN `chartsymbols.xml`, export all imported assets as SVGs in CI, fail the build on suspiciously small symbol counts, and change the project license to GPL-2.0-or-later for OpenCPN compatibility.

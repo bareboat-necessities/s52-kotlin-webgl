@@ -75,3 +75,23 @@ Use the Phase 16 facade, Phase 17 diagnostic bundle, Phase 18 profile presets, a
 ## Browser gallery
 
 Run `gradle :demo:jsBrowserDevelopmentRun` and open `#symbols`, `#lines`, `#patterns`, `#colors`, or `#all` to render the loaded S-52 library assets in browser.
+
+
+## Phase 22 OpenCPN symbology import
+
+Use OpenCPN `chartsymbols.xml` as the real scalable symbology source. No raster atlas is used in this path.
+
+```bash
+gradle --no-daemon phase22Check -Popencpn.chartsymbols=/path/to/chartsymbols.xml
+```
+
+or:
+
+```bash
+export OPENCPN_CHARTSYMBOLS_XML_FILE=/path/to/chartsymbols.xml
+gradle --no-daemon phase22Check
+```
+
+The generated GitHub Actions artifact is `opencpn-symbology-images`.
+
+License note: Phase 22 changes this project to **GPL-2.0-or-later** for compatibility with the OpenCPN symbology import path.

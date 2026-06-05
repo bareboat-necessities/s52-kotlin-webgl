@@ -26,9 +26,9 @@ kotlin {
     }
 }
 
-tasks.register<JavaExec>("exportS52LibSymbologyImages") {
+tasks.register<JavaExec>("exportOpenCpnSymbologyImages") {
     group = "documentation"
-    description = "Generates per-asset SVG images for every asset in the s52lib-compatible S-52 pack."
+    description = "Generates per-asset SVG images from a real imported OpenCPN chartsymbols.xml payload."
     val jvmJarTask = tasks.named<org.gradle.jvm.tasks.Jar>("jvmJar")
     dependsOn(jvmJarTask)
     mainClass.set("io.github.s52.api.tools.S52SymbologyImageExportMainKt")
@@ -36,5 +36,13 @@ tasks.register<JavaExec>("exportS52LibSymbologyImages") {
         files(jvmJarTask.flatMap { it.archiveFile }),
         configurations.named("jvmRuntimeClasspath")
     )
-    args(rootProject.layout.buildDirectory.dir("s52-symbology-images").get().asFile.absolutePath)
+
+    doFirst {
+        val outputDir = rootProject.layout.buildDirectory.dir("s52-symbology-images").get().asFile.absolutePath
+        val plibPath = providers.gradleProperty("opencpn.chartsymbols")
+            .orElse(providers.environmentVariable("OPENCPN_CHARTSYMBOLS_XML_FILE"))
+            .orNull
+            ?: error("Missing real OpenCPN chartsymbols.xml payload. Set -Popencpn.chartsymbols=/path/to/chartsymbols.xml or OPENCPN_CHARTSYMBOLS_XML_FILE.")
+        args(outputDir, plibPath)
+    }
 }

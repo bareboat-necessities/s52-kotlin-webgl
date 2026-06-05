@@ -158,7 +158,7 @@ tasks.register("phase16ApiAudit") {
 
         val readme = layout.projectDirectory.file("README.md").asFile.readText()
         check("s52-api" in readme) { "README.md must document the Phase 16 s52-api facade module." }
-        //check("phase16Check" in readme) { "README.md must document the Phase 16 check task." }
+        check("phase16Check" in readme) { "README.md must document the Phase 16 check task." }
     }
 }
 
@@ -199,8 +199,8 @@ tasks.register("phase17DiagnosticsAudit") {
         check(missing.isEmpty()) { "Missing Phase 17 diagnostic files: $missing" }
 
         val readme = layout.projectDirectory.file("README.md").asFile.readText()
-        //check("S52DiagnosticBundle" in readme) { "README.md must document the Phase 17 diagnostic bundle." }
-        //check("phase17Check" in readme) { "README.md must document the Phase 17 check task." }
+        check("S52DiagnosticBundle" in readme) { "README.md must document the Phase 17 diagnostic bundle." }
+        check("phase17Check" in readme) { "README.md must document the Phase 17 check task." }
     }
 }
 
@@ -240,8 +240,8 @@ tasks.register("phase18ProfilesAudit") {
         check(missing.isEmpty()) { "Missing Phase 18 profile files: $missing" }
 
         val readme = layout.projectDirectory.file("README.md").asFile.readText()
-        //check("S52ProfileCatalog" in readme) { "README.md must document the Phase 18 profile API." }
-        //check("phase18Check" in readme) { "README.md must document the Phase 18 check task." }
+        check("S52ProfileCatalog" in readme) { "README.md must document the Phase 18 profile API." }
+        check("phase18Check" in readme) { "README.md must document the Phase 18 check task." }
         check("Not for navigation" in readme) { "README.md must keep the not-for-navigation boundary." }
     }
 }
@@ -282,8 +282,8 @@ tasks.register("phase19ArtifactsAudit") {
         check(missing.isEmpty()) { "Missing Phase 19 artifact bundle files: $missing" }
 
         val readme = layout.projectDirectory.file("README.md").asFile.readText()
-        //check("S52ArtifactBundle" in readme) { "README.md must document the Phase 19 artifact bundle API." }
-        //check("phase19Check" in readme) { "README.md must document the Phase 19 check task." }
+        check("S52ArtifactBundle" in readme) { "README.md must document the Phase 19 artifact bundle API." }
+        check("phase19Check" in readme) { "README.md must document the Phase 19 check task." }
         check("Not for navigation" in readme) { "README.md must keep the not-for-navigation boundary." }
     }
 }
@@ -324,8 +324,8 @@ tasks.register("phase20GalleryAudit") {
         val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
         check(missing.isEmpty()) { "Missing Phase 20 files: $missing" }
         val readme = layout.projectDirectory.file("README.md").asFile.readText()
-        //check("S52GalleryBuilder" in readme) { "README.md must document Phase 20 gallery API." }
-        //check("phase20Check" in readme) { "README.md must document phase20Check." }
+        check("S52GalleryBuilder" in readme) { "README.md must document Phase 20 gallery API." }
+        check("phase20Check" in readme) { "README.md must document phase20Check." }
         check("Not for navigation" in readme) { "README.md must keep the not-for-navigation boundary." }
     }
 }
@@ -350,10 +350,16 @@ tasks.register("phase20Check") {
     dependsOn("phase19Check", "phase20GalleryAudit", ":s52-api:build", ":s52-api:jvmTest", ":demo:build", ":s52-tests:jvmTest")
 }
 
+tasks.register("phase22GenerateOpenCpnSymbologyImages") {
+    group = "documentation"
+    description = "Generates per-asset SVG images from a real imported OpenCPN chartsymbols.xml payload."
+    dependsOn(":s52-api:exportOpenCpnSymbologyImages")
+}
+
 tasks.register("phase21GenerateSymbologyImages") {
     group = "documentation"
-    description = "Generates per-asset SVG images for every asset in the s52lib-compatible S-52 pack."
-    dependsOn(":s52-api:exportS52LibSymbologyImages")
+    description = "Compatibility alias for Phase 22 real symbology export. Requires -Popencpn.chartsymbols or OPENCPN_CHARTSYMBOLS_XML_FILE."
+    dependsOn("phase22GenerateOpenCpnSymbologyImages")
 }
 tasks.register("phase21SymbologyImagesAudit") {
     group = "verification"
@@ -375,11 +381,31 @@ tasks.register("phase21SymbologyImagesAudit") {
         check(out.resolve("symbols").listFiles().orEmpty().isNotEmpty()) { "No generated symbol SVGs found" }
         check(out.resolve("lines").listFiles().orEmpty().isNotEmpty()) { "No generated line-style SVGs found" }
         check(out.resolve("patterns").listFiles().orEmpty().isNotEmpty()) { "No generated pattern SVGs found" }
-        check(out.resolve("colors").listFiles().orEmpty().size >= 63) { "Expected the s52lib-compatible 63-color set" }
+        check(out.resolve("colors").listFiles().orEmpty().size >= 63) { "Expected at least some imported/fallback color entries" }
 
         val manifest = out.resolve("manifest.properties").readText()
-        check("edition=phase20-s52lib-compat" in manifest) { "Exporter must use the s52lib-compatible pack, not the synthetic pack." }
+        check("edition=opencpn-chartsymbols-imported" in manifest) { "Exporter must use an imported real OpenCPN chartsymbols.xml pack, not the fallback compatibility or synthetic pack." }
         check("synthetic=false" in manifest) { "Generated image artifact must be marked non-synthetic." }
+        val symbolCount = manifest.lineSequence().firstOrNull { it.startsWith("symbols=") }?.substringAfter("=")?.toIntOrNull() ?: 0
+        check(symbolCount >= 50) { "Imported pack has too few symbols ($symbolCount); this is probably not the full OpenCPN chartsymbols.xml." }
+    }
+}
+
+tasks.register("phase22RealSymbologyImportAudit") {
+    group = "verification"
+    description = "Checks the Phase 22 OpenCPN chartsymbols importer and refuses tiny placeholder symbology exports."
+    doLast {
+        val requiredFiles = listOf(
+            "s52-preslib/src/jvmMain/kotlin/io/github/s52/preslib/opencpn/OpenCpnChartSymbolsImporter.kt",
+            "s52-api/src/jvmMain/kotlin/io/github/s52/api/tools/S52SymbologyImageExportMain.kt",
+            "s52-api/src/jvmTest/resources/opencpn/chartsymbols-fixture.xml",
+            "docs/OPENCPN_PHASE22.md"
+        )
+        val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
+        check(missing.isEmpty()) { "Missing Phase 22 real-import files: $missing" }
+        val readme = layout.projectDirectory.file("README.md").asFile.readText()
+        check("opencpn.chartsymbols" in readme) { "README.md must explain the required real PLib input path." }
+        check("phase22Check" in readme) { "README.md must document phase22Check." }
     }
 }
 
@@ -400,6 +426,26 @@ tasks.register<org.gradle.api.tasks.bundling.Zip>("phase21SourceArchive") {
 
 tasks.register("phase21Check") {
     group = "verification"
-    description = "Runs Phase 21 symbology image export checks and all previous phase checks."
-    dependsOn("phase20Check", "phase21SymbologyImagesAudit", ":s52-api:jvmTest", ":s52-tests:jvmTest")
+    description = "Runs Phase 21/22 OpenCPN symbology image export checks and all previous phase checks."
+    dependsOn("phase20Check", "phase21SymbologyImagesAudit", "phase22RealSymbologyImportAudit", ":s52-api:jvmTest", ":s52-tests:jvmTest")
+}
+
+tasks.register<org.gradle.api.tasks.bundling.Zip>("phase22SourceArchive") {
+    group = "distribution"
+    description = "Builds a source archive for Phase 22 real symbology import handoff."
+    archiveBaseName.set("s52-kotlin-webgl")
+    archiveClassifier.set("phase22-source")
+    archiveVersion.set(project.version.toString())
+    from(layout.projectDirectory) {
+        exclude(".git/**")
+        exclude(".gradle/**")
+        exclude("**/build/**")
+        exclude("build/**")
+    }
+}
+
+tasks.register("phase22Check") {
+    group = "verification"
+    description = "Runs Phase 22 OpenCPN chartsymbols import and symbology image export checks."
+    dependsOn("phase21Check")
 }

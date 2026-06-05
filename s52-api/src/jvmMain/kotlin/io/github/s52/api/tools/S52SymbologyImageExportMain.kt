@@ -5,31 +5,52 @@ import io.github.s52.preslib.PatternDefinition
 import io.github.s52.preslib.S52Color
 import io.github.s52.preslib.SymbolDefinition
 import io.github.s52.preslib.VectorCommand
+import io.github.s52.preslib.source.PresLibPackBuilder
+import io.github.s52.preslib.source.PresLibSourcePack
 import io.github.s52.preslib.s52lib.S52LibCompatPresLib
+import io.github.s52.preslib.opencpn.OpenCpnChartSymbolsImporter
 import java.io.File
 import kotlin.math.max
 
 /**
- * JVM-only Phase 21 exporter for CI artifacts.
+ * JVM-only Phase 22 exporter for CI artifacts.
  *
- * It intentionally exports from [S52LibCompatPresLib], not from
- * PresLibPack.phase2Synthetic(), so the artifact folder reflects the real
- * s52lib-compatible pack configured for the library. When a fuller imported
- * s52lib/IHO-compatible pack is wired into S52LibCompatPresLib, this exporter
- * will emit every asset from that pack without changing CI.
+ * It exports from a real imported OpenCPN `chartsymbols.xml` payload using
+ * scalable/vector definitions only. Raster atlases are intentionally ignored.
  */
 object S52SymbologyImageExporter {
-    fun exportS52LibCompat(outputDirectory: File): SymbologyImageExportReport {
-        val sourcePack = S52LibCompatPresLib.sourcePack()
-        require("s52lib" in sourcePack.metadata.edition.lowercase()) {
-            "Refusing to export symbology images from non-s52lib pack: ${sourcePack.metadata.edition}"
+    const val MinimumRealSymbolCount: Int = 50
+
+    fun exportOpenCpn(outputDirectory: File): SymbologyImageExportReport {
+        val input = configuredPlibFile()
+            ?: error(
+                "Real OpenCPN symbology export requires -Dopencpn.chartsymbols=/path/to/real/chartsymbols.xml " +
+                    "or OPENCPN_CHARTSYMBOLS_XML_FILE. The built-in compatibility fallback is intentionally refused " +
+                    "because it contains only a small subset."
+            )
+        return exportImportedOpenCpn(outputDirectory, input)
+    }
+
+    fun exportImportedOpenCpn(outputDirectory: File, plibFile: File): SymbologyImageExportReport {
+        val sourcePack = OpenCpnChartSymbolsImporter.importFile(plibFile)
+        return exportSourcePack(outputDirectory, sourcePack)
+    }
+
+    fun exportSourcePack(outputDirectory: File, sourcePack: PresLibSourcePack): SymbologyImageExportReport {
+        require("import" in sourcePack.metadata.edition.lowercase()) {
+            "Refusing to export non-imported S-52 symbology pack: ${sourcePack.metadata.edition}"
         }
 
-        val pack = S52LibCompatPresLib.pack()
+        val pack = PresLibPackBuilder.build(sourcePack)
         val symbols = pack.symbols.all()
         val lineStyles = pack.lineStyles.all()
         val patterns = pack.patterns.all()
         val colors = pack.colors.all(io.github.s52.core.settings.S52Palette.DayBright)
+
+        require(symbols.size >= MinimumRealSymbolCount) {
+            "Imported OpenCPN symbol count is too small (${symbols.size}). " +
+                "This usually means a wrong or truncated chartsymbols.xml input was supplied instead of the real Presentation Library payload."
+        }
 
         outputDirectory.deleteRecursively()
         outputDirectory.mkdirs()
@@ -70,6 +91,7 @@ object S52SymbologyImageExporter {
         files += writeText(outputDirectory.resolve("manifest.properties"), manifest)
 
         return SymbologyImageExportReport(
+            sourceKind = "opencpn-chartsymbols",
             outputDirectory = outputDirectory,
             symbolCount = symbols.size,
             lineStyleCount = lineStyles.size,
@@ -78,6 +100,10 @@ object S52SymbologyImageExporter {
             fileCount = files.size
         )
     }
+
+    private fun configuredPlibFile(): File? =
+        System.getProperty("opencpn.chartsymbols")?.takeIf { it.isNotBlank() }?.let(::File)
+            ?: System.getenv("OPENCPN_CHARTSYMBOLS_XML_FILE")?.takeIf { it.isNotBlank() }?.let(::File)
 
     private fun renderSymbolSvg(symbol: SymbolDefinition): String {
         val width = max(32.0, symbol.width + 24.0)
@@ -180,6 +206,7 @@ object S52SymbologyImageExporter {
 }
 
 data class SymbologyImageExportReport(
+    val sourceKind: String,
     val outputDirectory: File,
     val symbolCount: Int,
     val lineStyleCount: Int,
@@ -188,11 +215,16 @@ data class SymbologyImageExportReport(
     val fileCount: Int
 ) {
     override fun toString(): String =
-        "symbols=$symbolCount lines=$lineStyleCount patterns=$patternCount colors=$colorCount files=$fileCount output=${outputDirectory.absolutePath}"
+        "source=$sourceKind symbols=$symbolCount lines=$lineStyleCount patterns=$patternCount colors=$colorCount files=$fileCount output=${outputDirectory.absolutePath}"
 }
 
 fun main(args: Array<String>) {
-    val output = File(args.firstOrNull() ?: "build/s52-symbology-images")
-    val report = S52SymbologyImageExporter.exportS52LibCompat(output)
+    val output = File(args.getOrNull(0) ?: "build/s52-symbology-images")
+    val input = args.getOrNull(1)?.let(::File)
+        ?: System.getProperty("opencpn.chartsymbols")?.let(::File)
+        ?: System.getenv("OPENCPN_CHARTSYMBOLS_XML_FILE")?.let(::File)
+        ?: error("Missing OpenCPN chartsymbols.xml file. Pass outputDir inputFile, -Dopencpn.chartsymbols, or OPENCPN_CHARTSYMBOLS_XML_FILE.")
+    val report = S52SymbologyImageExporter.exportImportedOpenCpn(output, input)
     println(report)
 }
+

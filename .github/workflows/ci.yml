@@ -25,12 +25,26 @@ jobs:
         with:
           gradle-version: 8.14.5
 
-      - name: Build and test Phase 21
-        run: gradle --no-daemon phase21Check
+      - name: Decode OpenCPN chartsymbols.xml payload
+        env:
+          OPENCPN_CHARTSYMBOLS_XML_BASE64: ${{ secrets.OPENCPN_CHARTSYMBOLS_XML_BASE64 }}
+        run: |
+          if [ -z "$OPENCPN_CHARTSYMBOLS_XML_BASE64" ]; then
+            echo "Missing required repository secret OPENCPN_CHARTSYMBOLS_XML_BASE64."
+            echo "This must contain a base64-encoded OpenCPN chartsymbols.xml payload."
+            exit 1
+          fi
+          mkdir -p build/opencpn
+          printf '%s' "$OPENCPN_CHARTSYMBOLS_XML_BASE64" | base64 --decode > build/opencpn/chartsymbols.xml
 
-      - name: Upload generated s52lib symbology images
+      - name: Build, test, and generate OpenCPN symbology images
+        env:
+          OPENCPN_CHARTSYMBOLS_XML_FILE: ${{ github.workspace }}/build/opencpn/chartsymbols.xml
+        run: gradle --no-daemon phase22Check
+
+      - name: Upload generated OpenCPN symbology images
         uses: actions/upload-artifact@v4
         with:
-          name: s52lib-symbology-images
+          name: opencpn-symbology-images
           path: build/s52-symbology-images
           if-no-files-found: error
