@@ -38,7 +38,7 @@ import kotlin.math.sin
  *   AA, EA, RA, ER, RR, WG, PM, FP, and EP.
  */
 object OpenCpnChartSymbolsImporter {
-    private const val ImportedEdition = "opencpn-chartsymbols-imported-phase27"
+    private const val ImportedEdition = "opencpn-chartsymbols-imported"
 
     fun importFile(file: File): PresLibSourcePack = importRenderableFile(file).sourcePack
 
