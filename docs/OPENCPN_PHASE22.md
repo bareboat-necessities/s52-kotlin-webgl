@@ -25,12 +25,6 @@ export OPENCPN_CHARTSYMBOLS_XML_FILE=/path/to/chartsymbols.xml
 gradle --no-daemon phase22Check
 ```
 
-For GitHub Actions, set repository secret:
-
-```text
-OPENCPN_CHARTSYMBOLS_XML_BASE64
-```
-
 ## Generated artifact
 
 CI uploads `build/s52-symbology-images` as `opencpn-symbology-images`.

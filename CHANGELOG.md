@@ -14,7 +14,7 @@
 
 - Added OpenCPN `chartsymbols.xml` vector/scalable symbology importer.
 - Symbology SVG export now uses real imported OpenCPN data and refuses tiny placeholder subsets.
-- CI now accepts `OPENCPN_CHARTSYMBOLS_XML_BASE64` and uploads `opencpn-symbology-images`.
+- CI now accepts `OPENCPN_CHARTSYMBOLS_XML_FILE` and uploads `opencpn-symbology-images`.
 - Project license changed to GPL-2.0-or-later for OpenCPN compatibility.
 
 ## Phase 22
