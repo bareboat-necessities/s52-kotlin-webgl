@@ -1,3 +1,9 @@
+## Phase 25
+
+- Fixed OpenCPN `chartsymbols.xml` import to parse real XML records with nested `<HPGL>` vector payloads.
+- Removed the flat-stream assumption from the main importer path.
+- Added XML HPGL regression fixtures for symbols, line styles, and patterns.
+
 ## Phase 24
 
 - Restored historical Phase 15–19 readiness-test markers in CI/release workflows.
@@ -14,7 +20,7 @@
 
 - Added OpenCPN `chartsymbols.xml` vector/scalable symbology importer.
 - Symbology SVG export now uses real imported OpenCPN data and refuses tiny placeholder subsets.
-- CI now accepts `OPENCPN_CHARTSYMBOLS_XML_FILE` and uploads `opencpn-symbology-images`.
+- CI now accepts `OPENCPN_CHARTSYMBOLS_XML_BASE64` and uploads `opencpn-symbology-images`.
 - Project license changed to GPL-2.0-or-later for OpenCPN compatibility.
 
 ## Phase 22

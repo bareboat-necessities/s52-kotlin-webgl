@@ -451,3 +451,8 @@ Replace the broken Phase 22 importer source with a JVM-safe OpenCPN `chartsymbol
 Preserve historical Phase 15–19 readiness markers and safety-boundary text after
 the Phase 22/23 OpenCPN symbology importer changes. CI still runs `phase22Check`,
 but workflows and docs keep legacy audit strings visible for existing tests.
+
+
+## Phase 25 — OpenCPN XML HPGL importer fix
+
+Fix `OpenCpnChartSymbolsImporter` to parse OpenCPN `chartsymbols.xml` as XML with nested `<HPGL>` vector payloads for symbols, line styles, and patterns. Keep the importer vector-only and independent of raster atlases.

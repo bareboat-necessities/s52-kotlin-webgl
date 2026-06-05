@@ -1,73 +1,66 @@
-<chartsymbols><color-table palette="day">
-<color name="CHBLK" r="0" g="0" b="0"/>
-<color name="CHWHT" r="255" g="255" b="255"/>
-<color name="DEPDW" r="240" g="248" b="255"/>
-</color-table><symbols><symbol name="SYM000"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM001"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM002"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM003"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM004"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM005"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM006"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM007"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM008"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM009"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM010"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM011"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM012"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM013"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM014"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM015"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM016"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM017"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM018"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM019"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM020"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM021"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM022"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM023"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM024"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM025"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM026"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM027"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM028"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM029"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM030"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM031"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM032"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM033"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM034"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM035"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM036"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM037"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM038"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM039"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM040"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM041"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM042"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM043"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM044"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM045"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM046"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM047"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM048"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM049"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM050"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM051"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM052"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM053"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM054"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM055"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM056"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM057"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM058"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol>
-<symbol name="SYM059"><vector>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</vector></symbol></symbols><line-styles><line-style name="L000" />
-<line-style name="L001" />
-<line-style name="L002" />
-<line-style name="L003" />
-<line-style name="L004" />
-<line-style name="L005" /></line-styles><patterns><pattern name="P000" />
-<pattern name="P001" />
-<pattern name="P002" />
-<pattern name="P003" />
-<pattern name="P004" /></patterns></chartsymbols>
+<chartsymbols>
+<color-tables><color-table name='DAY'><color name='CHBLK' r='0' g='0' b='0'/><color name='CHWHT' r='255' g='255' b='255'/></color-table></color-tables>
+<line-styles><line-style RCID='1'><name>DASH</name><description>dash</description><color-ref>CHBLK</color-ref><HPGL>PU0,0;PD20,0;</HPGL><vector width='20' height='4'><pivot x='0' y='0'/></vector></line-style></line-styles>
+<patterns><pattern RCID='2'><name>HATCH</name><description>hatch</description><definition>V</definition><color-ref>CHBLK</color-ref><HPGL>PU0,0;PD10,10;</HPGL><vector width='10' height='10'><pivot x='5' y='5'/></vector></pattern></patterns>
+<symbols>
+<symbol RCID='10'><name>SYM000</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='11'><name>SYM001</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='12'><name>SYM002</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='13'><name>SYM003</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='14'><name>SYM004</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='15'><name>SYM005</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='16'><name>SYM006</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='17'><name>SYM007</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='18'><name>SYM008</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='19'><name>SYM009</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='20'><name>SYM010</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='21'><name>SYM011</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='22'><name>SYM012</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='23'><name>SYM013</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='24'><name>SYM014</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='25'><name>SYM015</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='26'><name>SYM016</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='27'><name>SYM017</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='28'><name>SYM018</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='29'><name>SYM019</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='30'><name>SYM020</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='31'><name>SYM021</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='32'><name>SYM022</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='33'><name>SYM023</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='34'><name>SYM024</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='35'><name>SYM025</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='36'><name>SYM026</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='37'><name>SYM027</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='38'><name>SYM028</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='39'><name>SYM029</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='40'><name>SYM030</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='41'><name>SYM031</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='42'><name>SYM032</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='43'><name>SYM033</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='44'><name>SYM034</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='45'><name>SYM035</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='46'><name>SYM036</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='47'><name>SYM037</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='48'><name>SYM038</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='49'><name>SYM039</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='50'><name>SYM040</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='51'><name>SYM041</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='52'><name>SYM042</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='53'><name>SYM043</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='54'><name>SYM044</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='55'><name>SYM045</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='56'><name>SYM046</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='57'><name>SYM047</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='58'><name>SYM048</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='59'><name>SYM049</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='60'><name>SYM050</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='61'><name>SYM051</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='62'><name>SYM052</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='63'><name>SYM053</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='64'><name>SYM054</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='65'><name>SYM055</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='66'><name>SYM056</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='67'><name>SYM057</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='68'><name>SYM058</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+<symbol RCID='69'><name>SYM059</name><description>symbol</description><definition>V</definition><prefer-bitmap>no</prefer-bitmap><vector width='16' height='16'><pivot x='8' y='8'/><HPGL>PU0,0;PD10,0;PD10,10;PD0,10;PD0,0;</HPGL></vector></symbol>
+</symbols></chartsymbols>

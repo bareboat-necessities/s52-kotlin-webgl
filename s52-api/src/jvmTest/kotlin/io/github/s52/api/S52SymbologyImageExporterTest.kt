@@ -37,7 +37,9 @@ class S52SymbologyImageExporterTest {
     fun exporterRejectsTinyPack() {
         val tiny = OpenCpnChartSymbolsImporter.importXml("""
             <chartsymbols>
-              <symbol name="ONE"><vector>PU0,0;PD5,0;PD5,5;</vector></symbol>
+              <symbols>
+                <symbol><name>ONE1</name><vector width="10" height="10"><pivot x="5" y="5"/><HPGL>PU0,0;PD5,0;PD5,5;</HPGL></vector></symbol>
+              </symbols>
             </chartsymbols>
         """.trimIndent(), "tiny.xml")
         assertFailsWith<IllegalArgumentException> {
