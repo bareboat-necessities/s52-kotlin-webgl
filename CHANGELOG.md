@@ -1,8 +1,16 @@
-## Phase 25
+## Phase 26 replacement
 
-- Fixed OpenCPN `chartsymbols.xml` import to parse real XML records with nested `<HPGL>` vector payloads.
-- Removed the flat-stream assumption from the main importer path.
-- Added XML HPGL regression fixtures for symbols, line styles, and patterns.
+- Improved OpenCPN SVG export bounds so stroke width is included in generated viewBox padding.
+- Fixed HPGL `AA` arc handling to use center-point arc semantics.
+- Added rectangle command support for `EA`, `RA`, `ER`, and `RR`.
+- Added `LT` line-type dash mapping.
+- Replaced line-style SVG placeholders with repeated samples of the imported line-style HPGL.
+
+## Phase 26
+
+- Fixed OpenCPN SVG symbology export to preserve `color-ref` / `SP` color mapping.
+- Fixed contour handling for HPGL polygon mode (`PM`, `FP`, `EP`).
+- Added color/contour-aware manifest flags and regression tests.
 
 ## Phase 24
 

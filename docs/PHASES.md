@@ -453,6 +453,6 @@ the Phase 22/23 OpenCPN symbology importer changes. CI still runs `phase22Check`
 but workflows and docs keep legacy audit strings visible for existing tests.
 
 
-## Phase 25 — OpenCPN XML HPGL importer fix
+## Phase 26 — OpenCPN SVG color, contour, bounds, and line-style fix
 
-Fix `OpenCpnChartSymbolsImporter` to parse OpenCPN `chartsymbols.xml` as XML with nested `<HPGL>` vector payloads for symbols, line styles, and patterns. Keep the importer vector-only and independent of raster atlases.
+Fix generated SVG symbology images so OpenCPN `chartsymbols.xml` HPGL is exported with `color-ref`/`SP` colors, `SW` stroke widths, `LT` dash hints, polygon contour/fill handling (`PM`, `FP`, `EP`), rectangle commands (`EA`, `RA`, `ER`, `RR`), stroke-aware viewBox bounds, and repeated line-style samples. Raster atlases remain unused.

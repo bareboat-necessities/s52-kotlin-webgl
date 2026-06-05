@@ -5,8 +5,8 @@ import io.github.s52.preslib.opencpn.OpenCpnChartSymbolsImporter
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 
 class S52SymbologyImageExporterTest {
     @Test
@@ -19,7 +19,7 @@ class S52SymbologyImageExporterTest {
     }
 
     @Test
-    fun exporterWritesSvgArtifactsFromOpenCpnFixture() {
+    fun exporterWritesBoundsSafeColoredSvgArtifactsFromOpenCpnFixture() {
         val dir = File("build/test-opencpn-symbology-images")
         val report = S52SymbologyImageExporter.exportImportedOpenCpn(dir, fixtureFile())
         assertTrue(report.symbolCount >= S52SymbologyImageExporter.MinimumRealSymbolCount)
@@ -28,24 +28,44 @@ class S52SymbologyImageExporterTest {
         assertTrue(dir.resolve("symbols").listFiles().orEmpty().size >= S52SymbologyImageExporter.MinimumRealSymbolCount)
         assertTrue(dir.resolve("lines").listFiles().orEmpty().isNotEmpty())
         assertTrue(dir.resolve("patterns").listFiles().orEmpty().isNotEmpty())
+
         val manifest = dir.resolve("manifest.properties").readText()
         assertTrue("edition=opencpn-chartsymbols-imported" in manifest)
         assertTrue("synthetic=false" in manifest)
+        assertTrue("svgColorAware=true" in manifest)
+        assertTrue("svgContourAware=true" in manifest)
+        assertTrue("svgBoundsAware=true" in manifest)
+        assertTrue("lineStyleSampleRepeated=true" in manifest)
+        assertTrue("hpglArcCenterAware=true" in manifest)
+
+        val coloredSymbolSvg = dir.resolve("symbols/SYM000.svg").readText()
+        assertTrue("#C80000" in coloredSymbolSvg)
+        assertTrue("fill-rule=\"evenodd\"" in coloredSymbolSvg)
+        assertTrue("overflow=\"visible\"" in coloredSymbolSvg)
+        assertTrue("viewBox=\"0 0" in coloredSymbolSvg)
+
+        val lineStyleSvg = dir.resolve("lines/LINETST.svg").readText()
+        assertTrue("line-style-tile" in lineStyleSvg)
+        assertTrue("repeated line-style sample" in lineStyleSvg)
+        assertTrue(lineStyleSvg.split("line-style-tile").size > 2)
     }
 
     @Test
     fun exporterRejectsTinyPack() {
-        val tiny = OpenCpnChartSymbolsImporter.importXml("""
+        val tiny = OpenCpnChartSymbolsImporter.importXml(
+            """
             <chartsymbols>
               <symbols>
-                <symbol><name>ONE1</name><vector width="10" height="10"><pivot x="5" y="5"/><HPGL>PU0,0;PD5,0;PD5,5;</HPGL></vector></symbol>
+                <symbol><name>ONE</name><definition>V</definition><color-ref>CHBLK</color-ref><vector width="8" height="8"><HPGL>SP1;PU0,0;PD5,0;PD5,5;</HPGL></vector></symbol>
               </symbols>
             </chartsymbols>
-        """.trimIndent(), "tiny.xml")
+            """.trimIndent(),
+            "tiny.xml"
+        )
         assertFailsWith<IllegalArgumentException> {
             S52SymbologyImageExporter.exportSourcePack(File("build/tiny-symbology-images"), tiny)
         }
     }
 
-    private fun fixtureFile(): File = File(requireNotNull(javaClass.getResource("/opencpn/chartsymbols-fixture.xml")) .toURI())
+    private fun fixtureFile(): File = File(requireNotNull(javaClass.getResource("/opencpn/chartsymbols-fixture.xml")).toURI())
 }

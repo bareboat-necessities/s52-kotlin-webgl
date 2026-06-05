@@ -16,240 +16,216 @@ import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.math.abs
 import kotlin.math.cos
+import kotlin.math.atan2
 import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sin
 
 /**
- * Phase 25 importer for OpenCPN `chartsymbols.xml`.
+ * Phase 26 OpenCPN chartsymbols.xml importer.
  *
- * The file is XML. OpenCPN reads symbol, line-style, pattern, color-table,
- * vector, pivot/origin, and HPGL nodes from it. This importer mirrors that
- * structure and intentionally ignores raster atlas data.
+ * OpenCPN's parser reads color-table/color RGB rows, line-style HPGL rows,
+ * pattern HPGL rows, and symbol HPGL nested below the vector node. This importer
+ * follows that XML structure and also keeps a rich, raw-HPGL view for SVG export
+ * so color changes and contour/fill commands are not lost.
  */
 object OpenCpnChartSymbolsImporter {
     private const val ImportedEdition = "opencpn-chartsymbols-imported"
 
-    fun importFile(file: File): PresLibSourcePack {
+    fun importFile(file: File): PresLibSourcePack = importRenderableFile(file).sourcePack
+
+    fun importXml(xml: String, sourceName: String = "chartsymbols.xml"): PresLibSourcePack =
+        importRenderableXml(xml, sourceName).sourcePack
+
+    fun importRenderableFile(file: File): OpenCpnRenderablePack {
         require(file.isFile) { "OpenCPN chartsymbols.xml file does not exist: ${file.absolutePath}" }
-        return importXml(file.readText(), sourceName = file.name)
+        return importRenderableXml(file.readText(), file.name)
     }
 
-    fun importXml(xml: String, sourceName: String = "chartsymbols.xml"): PresLibSourcePack {
-        val document = documentBuilder().parse(xml.byteInputStream())
+    fun importRenderableXml(xml: String, sourceName: String = "chartsymbols.xml"): OpenCpnRenderablePack {
+        val document = parseXml(xml)
+        val root = document.documentElement
+        val colorsByPalette = parseColorTables(root)
+        val symbols = parseSymbols(root)
+        val lineStyles = parseLineStyles(root)
+        val patterns = parsePatterns(root)
 
-        val symbols = parseSymbols(document.documentElement)
-        val lineStyles = parseLineStyles(document.documentElement)
-        val patterns = parsePatterns(document.documentElement)
-        val colorsByPalette = parseColorTables(document.documentElement)
-
-        return buildPack(
+        val sourcePack = buildSourcePack(
             sourceName = sourceName,
             symbols = symbols,
             lineStyles = lineStyles,
             patterns = patterns,
-            colorsByPalette = colorsByPalette,
-            sourceDescription = "Imported from OpenCPN XML chartsymbols.xml; symbols=${symbols.size}, lines=${lineStyles.size}, patterns=${patterns.size}"
+            colorsByPalette = colorsByPalette
+        )
+
+        return OpenCpnRenderablePack(
+            sourcePack = sourcePack,
+            symbols = symbols,
+            lineStyles = lineStyles,
+            patterns = patterns,
+            colorsByPalette = colorsByPalette
         )
     }
 
-    fun importText(text: String, sourceName: String = "chartsymbols.xml"): PresLibSourcePack =
-        importXml(text, sourceName)
+    private fun parseXml(xml: String): org.w3c.dom.Document {
+        val factory = DocumentBuilderFactory.newInstance().apply {
+            isNamespaceAware = false
+            isExpandEntityReferences = false
+            runCatching { setFeature("http://apache.org/xml/features/disallow-doctype-decl", true) }
+            runCatching { setFeature("http://xml.org/sax/features/external-general-entities", false) }
+            runCatching { setFeature("http://xml.org/sax/features/external-parameter-entities", false) }
+        }
+        return factory.newDocumentBuilder().parse(xml.byteInputStream())
+    }
 
-    private fun documentBuilder() = DocumentBuilderFactory.newInstance().apply {
-        isNamespaceAware = false
-        isExpandEntityReferences = false
-        runCatching { setFeature("http://apache.org/xml/features/disallow-doctype-decl", true) }
-    }.newDocumentBuilder()
-
-    private fun parseColorTables(root: Element): Map<S52Palette, LinkedHashMap<String, SourceColor>> {
-        val result = mutableMapOf<S52Palette, LinkedHashMap<String, SourceColor>>()
-        val colorTables = root.getElementsByTagName("color-table")
-        for (i in 0 until colorTables.length) {
-            val table = colorTables.item(i) as? Element ?: continue
-            val palette = paletteFrom(table.getAttribute("name").ifBlank { table.getAttribute("table-name") })
-            val colors = result.getOrPut(palette) { linkedMapOf() }
-            val colorNodes = table.getElementsByTagName("color")
-            for (j in 0 until colorNodes.length) {
-                val color = colorNodes.item(j) as? Element ?: continue
-                val name = color.getAttribute("name").takeIf { it.isNotBlank() } ?: continue
-                val r = color.getAttribute("r").toIntOrNull() ?: continue
-                val g = color.getAttribute("g").toIntOrNull() ?: continue
-                val b = color.getAttribute("b").toIntOrNull() ?: continue
-                colors[name.uppercase()] = SourceColor(name.take(8), r.coerceIn(0, 255), g.coerceIn(0, 255), b.coerceIn(0, 255))
+    private fun parseColorTables(root: Element): Map<S52Palette, List<SourceColor>> {
+        val tables = linkedMapOf<S52Palette, MutableList<SourceColor>>()
+        val colorTableNodes = root.getElementsByTagName("color-table")
+        for (i in 0 until colorTableNodes.length) {
+            val table = colorTableNodes.item(i) as? Element ?: continue
+            val palette = paletteFromName(table.getAttribute("name").ifBlank { table.getAttribute("palette") })
+            val colors = tables.getOrPut(palette) { mutableListOf() }
+            table.childElements("color").forEach { colorNode ->
+                val name = colorNode.getAttribute("name").trim().takeIf { it.isNotBlank() } ?: return@forEach
+                val r = colorNode.getAttribute("r").toIntOrNull() ?: return@forEach
+                val g = colorNode.getAttribute("g").toIntOrNull() ?: return@forEach
+                val b = colorNode.getAttribute("b").toIntOrNull() ?: return@forEach
+                colors += SourceColor(name.take(8), r.coerceIn(0, 255), g.coerceIn(0, 255), b.coerceIn(0, 255))
             }
         }
-        return result
+        return tables.mapValues { (_, colors) -> colors.distinctBy { it.token.uppercase() }.sortedBy { it.token } }
     }
 
-    private fun parseLineStyles(root: Element): List<SourceLineStyle> {
-        val result = linkedMapOf<String, SourceLineStyle>()
-        val containers = elementsNamed(root, "line-styles", "lineStyles", "linestyles")
-        for (container in containers) {
-            for (child in childElements(container)) {
-                val name = directText(child, "name") ?: child.getAttribute("name").takeIf { it.isNotBlank() } ?: continue
-                val hpgl = directText(child, "HPGL")
-                if (!looksLikeS52Token(name) || hpgl.isNullOrBlank()) continue
-                val description = directText(child, "description") ?: "Imported OpenCPN line style"
-                result.putIfAbsent(name.uppercase(), SourceLineStyle(name.take(8), description))
-            }
+    private fun parseLineStyles(root: Element): List<OpenCpnRenderableAsset> =
+        root.getElementsByTagName("line-style").asElements().mapNotNull { line ->
+            val name = line.childText("name") ?: line.getAttribute("name").takeIf { it.isNotBlank() } ?: return@mapNotNull null
+            val vector = line.childElement("vector")
+            val hpgl = line.childText("HPGL").orEmpty()
+            OpenCpnRenderableAsset(
+                name = name.take(8),
+                kind = OpenCpnAssetKind.LineStyle,
+                description = line.childText("description").orEmpty(),
+                colorRefs = parseColorRefs(line.childText("color-ref")),
+                hpgl = hpgl,
+                width = vector?.getAttribute("width")?.toDoubleOrNull() ?: 64.0,
+                height = vector?.getAttribute("height")?.toDoubleOrNull() ?: 16.0,
+                pivotX = vector?.childElement("pivot")?.getAttribute("x")?.toDoubleOrNull() ?: 0.0,
+                pivotY = vector?.childElement("pivot")?.getAttribute("y")?.toDoubleOrNull() ?: 0.0,
+                commands = parseHpglAsSourceCommands(hpgl)
+            )
         }
-        return result.values.sortedBy { it.name }
-    }
 
-    private fun parsePatterns(root: Element): List<SourcePattern> {
-        val result = linkedMapOf<String, SourcePattern>()
-        val containers = elementsNamed(root, "patterns")
-        for (container in containers) {
-            for (child in childElements(container)) {
-                val name = directText(child, "name") ?: child.getAttribute("name").takeIf { it.isNotBlank() } ?: continue
-                val hpgl = directText(child, "HPGL")
-                val definition = directText(child, "definition")
-                if (!looksLikeS52Token(name) || (hpgl.isNullOrBlank() && definition != "V")) continue
-                val description = directText(child, "description") ?: "Imported OpenCPN pattern"
-                result.putIfAbsent(name.uppercase(), SourcePattern(name.take(8), description))
-            }
+    private fun parsePatterns(root: Element): List<OpenCpnRenderableAsset> =
+        root.getElementsByTagName("pattern").asElements().mapNotNull { pattern ->
+            val name = pattern.childText("name") ?: pattern.getAttribute("name").takeIf { it.isNotBlank() } ?: return@mapNotNull null
+            val vector = pattern.childElement("vector")
+            val hpgl = pattern.childText("HPGL").orEmpty()
+            OpenCpnRenderableAsset(
+                name = name.take(8),
+                kind = OpenCpnAssetKind.Pattern,
+                description = pattern.childText("description").orEmpty(),
+                colorRefs = parseColorRefs(pattern.childText("color-ref")),
+                hpgl = hpgl,
+                width = vector?.getAttribute("width")?.toDoubleOrNull() ?: 32.0,
+                height = vector?.getAttribute("height")?.toDoubleOrNull() ?: 32.0,
+                pivotX = vector?.childElement("pivot")?.getAttribute("x")?.toDoubleOrNull() ?: 0.0,
+                pivotY = vector?.childElement("pivot")?.getAttribute("y")?.toDoubleOrNull() ?: 0.0,
+                commands = parseHpglAsSourceCommands(hpgl)
+            )
         }
-        return result.values.sortedBy { it.name }
-    }
 
-    private fun parseSymbols(root: Element): List<SourceSymbol> {
-        val result = linkedMapOf<String, SourceSymbol>()
-        val containers = elementsNamed(root, "symbols")
-        for (container in containers) {
-            for (symbolElement in childElements(container)) {
-                val name = directText(symbolElement, "name") ?: symbolElement.getAttribute("name").takeIf { it.isNotBlank() } ?: continue
-                if (!looksLikeS52Token(name)) continue
-
-                val vector = directChild(symbolElement, "vector") ?: continue
-                val hpgl = directText(vector, "HPGL") ?: continue
-                val commands = parseHpglLikeVector(hpgl)
-                if (commands.isEmpty()) continue
-
-                val size = parseVectorSize(vector)
-                result.putIfAbsent(
-                    name.uppercase(),
-                    symbolFromCommands(
-                        name = name.take(8),
-                        commands = commands,
-                        pivotX = size.pivotX,
-                        pivotY = size.pivotY,
-                        explicitWidth = size.width,
-                        explicitHeight = size.height
-                    )
-                )
-            }
+    private fun parseSymbols(root: Element): List<OpenCpnRenderableAsset> =
+        root.getElementsByTagName("symbol").asElements().mapNotNull { symbol ->
+            val name = symbol.childText("name") ?: symbol.getAttribute("name").takeIf { it.isNotBlank() } ?: return@mapNotNull null
+            val vector = symbol.childElement("vector")
+            val hpgl = vector?.childText("HPGL") ?: symbol.childText("HPGL").orEmpty()
+            val commands = parseHpglAsSourceCommands(hpgl).ifEmpty { fallbackSymbolCommands(name) }
+            val bounds = bounds(commands)
+            OpenCpnRenderableAsset(
+                name = name.take(8),
+                kind = OpenCpnAssetKind.Symbol,
+                description = symbol.childText("description").orEmpty(),
+                colorRefs = parseColorRefs(symbol.childText("color-ref")),
+                hpgl = hpgl,
+                width = vector?.getAttribute("width")?.toDoubleOrNull() ?: max(1.0, bounds.maxX - bounds.minX),
+                height = vector?.getAttribute("height")?.toDoubleOrNull() ?: max(1.0, bounds.maxY - bounds.minY),
+                pivotX = vector?.childElement("pivot")?.getAttribute("x")?.toDoubleOrNull() ?: (bounds.minX + bounds.maxX) / 2.0,
+                pivotY = vector?.childElement("pivot")?.getAttribute("y")?.toDoubleOrNull() ?: (bounds.minY + bounds.maxY) / 2.0,
+                commands = commands
+            )
         }
-        return result.values.sortedBy { it.name }
-    }
 
-    private data class VectorSize(
-        val width: Double?,
-        val height: Double?,
-        val pivotX: Double?,
-        val pivotY: Double?
-    )
-
-    private fun parseVectorSize(vector: Element): VectorSize {
-        val width = vector.getAttribute("width").toDoubleOrNull()
-        val height = vector.getAttribute("height").toDoubleOrNull()
-        val pivot = directChild(vector, "pivot")
-        return VectorSize(
-            width = width,
-            height = height,
-            pivotX = pivot?.getAttribute("x")?.toDoubleOrNull(),
-            pivotY = pivot?.getAttribute("y")?.toDoubleOrNull()
-        )
-    }
-
-    private fun buildPack(
+    private fun buildSourcePack(
         sourceName: String,
-        symbols: List<SourceSymbol>,
-        lineStyles: List<SourceLineStyle>,
-        patterns: List<SourcePattern>,
-        colorsByPalette: Map<S52Palette, LinkedHashMap<String, SourceColor>>,
-        sourceDescription: String
+        symbols: List<OpenCpnRenderableAsset>,
+        lineStyles: List<OpenCpnRenderableAsset>,
+        patterns: List<OpenCpnRenderableAsset>,
+        colorsByPalette: Map<S52Palette, List<SourceColor>>
     ): PresLibSourcePack {
         val fallback = S52LibCompatPresLib.sourcePack()
         val colorTables = if (colorsByPalette.isEmpty()) {
             S52Palette.entries.map { SourceColorTable(it, S52LibCompatPresLib.s52LibColors()) }
         } else {
             S52Palette.entries.map { palette ->
-                val colors = colorsByPalette[palette]?.values?.sortedBy { it.token }
-                    ?: colorsByPalette[S52Palette.DayBright]?.values?.sortedBy { it.token }
+                val colors = colorsByPalette[palette]
+                    ?: colorsByPalette[S52Palette.DayBright]
                     ?: S52LibCompatPresLib.s52LibColors()
                 SourceColorTable(palette, colors)
             }
         }
-
         return fallback.copy(
             metadata = PresLibMetadata(
                 name = "OpenCPN chartsymbols Presentation Library pack",
                 edition = ImportedEdition,
-                sourceDescription = "$sourceDescription; source=$sourceName",
+                sourceDescription = "Imported scalable/vector OpenCPN chartsymbols.xml from $sourceName; symbols=${symbols.size}, lines=${lineStyles.size}, patterns=${patterns.size}",
                 generatedBy = "OpenCpnChartSymbolsImporter"
             ),
             colorTables = colorTables,
-            symbols = symbols,
-            lineStyles = if (lineStyles.isEmpty()) fallback.lineStyles else lineStyles,
-            patterns = if (patterns.isEmpty()) fallback.patterns else patterns
+            symbols = symbols.map { it.toSourceSymbol() }.sortedBy { it.name },
+            lineStyles = if (lineStyles.isEmpty()) fallback.lineStyles else lineStyles.map { SourceLineStyle(it.name, it.description) }.sortedBy { it.name },
+            patterns = if (patterns.isEmpty()) fallback.patterns else patterns.map { SourcePattern(it.name, it.description) }.sortedBy { it.name }
         )
     }
 
-    private fun symbolFromCommands(
-        name: String,
-        commands: List<SourceVectorCommand>,
-        pivotX: Double?,
-        pivotY: Double?,
-        explicitWidth: Double?,
-        explicitHeight: Double?
-    ): SourceSymbol {
-        val xs = commands.mapNotNull {
-            when (it) {
-                is SourceVectorCommand.MoveTo -> it.x
-                is SourceVectorCommand.LineTo -> it.x
-                SourceVectorCommand.ClosePath -> null
-            }
-        }
-        val ys = commands.mapNotNull {
-            when (it) {
-                is SourceVectorCommand.MoveTo -> it.y
-                is SourceVectorCommand.LineTo -> it.y
-                SourceVectorCommand.ClosePath -> null
-            }
-        }
-        val minX = xs.minOrNull() ?: 0.0
-        val maxX = xs.maxOrNull() ?: 1.0
-        val minY = ys.minOrNull() ?: 0.0
-        val maxY = ys.maxOrNull() ?: 1.0
-        return SourceSymbol(
-            name = name,
-            pivotX = pivotX ?: ((minX + maxX) / 2.0),
-            pivotY = pivotY ?: ((minY + maxY) / 2.0),
-            width = max(1.0, explicitWidth ?: (maxX - minX)),
-            height = max(1.0, explicitHeight ?: (maxY - minY)),
-            commands = commands
-        )
+    private fun OpenCpnRenderableAsset.toSourceSymbol(): SourceSymbol = SourceSymbol(
+        name = name,
+        pivotX = pivotX,
+        pivotY = pivotY,
+        width = width,
+        height = height,
+        commands = commands
+    )
+
+    private fun parseColorRefs(text: String?): List<String> = text.orEmpty()
+        .split(',', ';', ' ', '\t', '\n', '\r')
+        .map { it.trim() }
+        .filter { it.isNotBlank() }
+        .map { it.take(8) }
+
+    private fun paletteFromName(raw: String): S52Palette = when (raw.lowercase()) {
+        "day", "daybright", "day-bright", "rgb" -> S52Palette.DayBright
+        "dayblackback", "day-black-back" -> S52Palette.DayBlackBack
+        "daywhiteback", "day-white-back" -> S52Palette.DayWhiteBack
+        "dusk" -> S52Palette.Dusk
+        "night", "dark" -> S52Palette.Night
+        else -> S52Palette.DayBright
     }
 
-    private fun parseHpglLikeVector(hpgl: String): List<SourceVectorCommand> {
+    internal fun parseHpglAsSourceCommands(hpgl: String): List<SourceVectorCommand> {
         val commands = mutableListOf<SourceVectorCommand>()
-        val tokenRegex = Regex("(PU|PD|CI|AA|SP|SW|ST|PM|EP|FP|SC|AP|AC)([^;]*)")
-        var penDown = false
         var currentX = 0.0
         var currentY = 0.0
+        var penDown = false
 
-        for (match in tokenRegex.findAll(hpgl)) {
-            val code = match.groupValues[1]
-            val args = match.groupValues[2]
-            when (code) {
+        for (token in tokenizeHpgl(hpgl)) {
+            when (token.code) {
                 "PU" -> {
-                    val points = parseCoordinatePairs(args)
-                    if (points.isEmpty()) {
+                    val pts = parseCoordinatePairs(token.args)
+                    if (pts.isEmpty()) {
                         penDown = false
                     } else {
-                        for (point in points) {
+                        pts.forEach { point ->
                             currentX = point.first
                             currentY = point.second
                             commands += SourceVectorCommand.MoveTo(currentX, currentY)
@@ -258,11 +234,11 @@ object OpenCpnChartSymbolsImporter {
                     }
                 }
                 "PD" -> {
-                    val points = parseCoordinatePairs(args)
-                    if (points.isEmpty()) {
+                    val pts = parseCoordinatePairs(token.args)
+                    if (pts.isEmpty()) {
                         penDown = true
                     } else {
-                        for (point in points) {
+                        pts.forEach { point ->
                             if (!penDown) commands += SourceVectorCommand.MoveTo(currentX, currentY)
                             currentX = point.first
                             currentY = point.second
@@ -271,23 +247,52 @@ object OpenCpnChartSymbolsImporter {
                         }
                     }
                 }
-                "CI" -> commands += circleApprox(currentX, currentY, args.trim().toDoubleOrNull() ?: 4.0)
+                "CI" -> commands += circleApprox(currentX, currentY, token.args.toDoubleOrNull() ?: 4.0)
                 "AA" -> {
-                    val nums = parseNumbers(args)
-                    if (nums.size >= 3) commands += arcApprox(currentX, currentY, nums[0], nums[1], nums[2])
+                    val nums = parseNumbers(token.args)
+                    if (nums.size >= 3) {
+                        val arc = arcApprox(currentX, currentY, nums[0], nums[1], nums[2])
+                        commands += arc
+                        arc.lastOrNull()?.let { last ->
+                            when (last) {
+                                is SourceVectorCommand.MoveTo -> { currentX = last.x; currentY = last.y }
+                                is SourceVectorCommand.LineTo -> { currentX = last.x; currentY = last.y }
+                                SourceVectorCommand.ClosePath -> Unit
+                            }
+                        }
+                    }
                 }
             }
         }
         return commands
     }
 
+    internal fun tokenizeHpgl(hpgl: String): List<HpglToken> {
+        val tokens = mutableListOf<HpglToken>()
+        var index = 0
+        while (index < hpgl.length - 1) {
+            val c0 = hpgl[index]
+            val c1 = hpgl[index + 1]
+            if (c0.isLetter() && c1.isLetter()) {
+                val code = "${c0.uppercaseChar()}${c1.uppercaseChar()}"
+                var end = index + 2
+                while (end < hpgl.length && hpgl[end] != ';') end++
+                tokens += HpglToken(code, hpgl.substring(index + 2, end).trim())
+                index = if (end < hpgl.length) end + 1 else end
+            } else {
+                index++
+            }
+        }
+        return tokens
+    }
+
     private fun parseCoordinatePairs(args: String): List<Pair<Double, Double>> {
         val nums = parseNumbers(args)
         val result = mutableListOf<Pair<Double, Double>>()
-        var index = 0
-        while (index + 1 < nums.size) {
-            result += nums[index] to nums[index + 1]
-            index += 2
+        var i = 0
+        while (i + 1 < nums.size) {
+            result += nums[i] to nums[i + 1]
+            i += 2
         }
         return result
     }
@@ -308,53 +313,81 @@ object OpenCpnChartSymbolsImporter {
         return result
     }
 
-    private fun arcApprox(cx: Double, cy: Double, endX: Double, endY: Double, sweepDeg: Double): List<SourceVectorCommand> {
-        val radius = max(1.0, hypot(endX - cx, endY - cy))
-        val steps = min(24, max(4, abs(sweepDeg / 15.0).toInt()))
+    private fun arcApprox(startX: Double, startY: Double, centerX: Double, centerY: Double, sweepDeg: Double): List<SourceVectorCommand> {
+        val radius = max(1.0, hypot(startX - centerX, startY - centerY))
+        val startAngle = atan2(startY - centerY, startX - centerX)
+        val sweep = Math.toRadians(sweepDeg)
+        val steps = min(48, max(4, abs(sweepDeg / 10.0).toInt()))
         val result = mutableListOf<SourceVectorCommand>()
-        for (i in 0..steps) {
-            val angle = Math.toRadians(sweepDeg * i / steps)
-            val x = cx + cos(angle) * radius
-            val y = cy + sin(angle) * radius
+        for (i in 1..steps) {
+            val angle = startAngle + sweep * i / steps
+            val x = centerX + cos(angle) * radius
+            val y = centerY + sin(angle) * radius
+            result += SourceVectorCommand.LineTo(x, y)
+        }
+        return result
+    }
+
+    private fun fallbackSymbolCommands(name: String): List<SourceVectorCommand> {
+        val seed = name.fold(0) { acc, ch -> acc + ch.code }
+        val sides = 3 + (seed % 5)
+        val r = 8.0
+        val result = mutableListOf<SourceVectorCommand>()
+        for (i in 0 until sides) {
+            val angle = -Math.PI / 2.0 + Math.PI * 2.0 * i / sides
+            val x = cos(angle) * r
+            val y = sin(angle) * r
             result += if (i == 0) SourceVectorCommand.MoveTo(x, y) else SourceVectorCommand.LineTo(x, y)
         }
+        result += SourceVectorCommand.ClosePath
         return result
     }
 
-    private fun elementsNamed(root: Element, vararg names: String): List<Element> {
-        val result = mutableListOf<Element>()
-        for (name in names) {
-            val nodes = root.getElementsByTagName(name)
-            for (i in 0 until nodes.length) {
-                (nodes.item(i) as? Element)?.let { result += it }
-            }
-        }
-        return result.distinct()
+    private fun bounds(commands: List<SourceVectorCommand>): Bounds {
+        val xs = commands.mapNotNull { when (it) { is SourceVectorCommand.MoveTo -> it.x; is SourceVectorCommand.LineTo -> it.x; SourceVectorCommand.ClosePath -> null } }
+        val ys = commands.mapNotNull { when (it) { is SourceVectorCommand.MoveTo -> it.y; is SourceVectorCommand.LineTo -> it.y; SourceVectorCommand.ClosePath -> null } }
+        return Bounds(xs.minOrNull() ?: -8.0, ys.minOrNull() ?: -8.0, xs.maxOrNull() ?: 8.0, ys.maxOrNull() ?: 8.0)
     }
 
-    private fun childElements(element: Element): List<Element> {
+    private fun Element.childText(name: String): String? = childElement(name)?.textContent?.trim()?.takeIf { it.isNotBlank() }
+
+    private fun Element.childElement(name: String): Element? = childElements(name).firstOrNull()
+
+    private fun Element.childElements(name: String): List<Element> = childNodes.asElements().filter { it.tagName == name }
+
+    private fun org.w3c.dom.NodeList.asElements(): List<Element> {
         val result = mutableListOf<Element>()
-        val children = element.childNodes
-        for (i in 0 until children.length) {
-            (children.item(i) as? Element)?.let { result += it }
-        }
+        for (i in 0 until length) (item(i) as? Element)?.let(result::add)
         return result
     }
 
-    private fun directChild(element: Element, name: String): Element? =
-        childElements(element).firstOrNull { it.tagName == name }
+    data class HpglToken(val code: String, val args: String)
+    private data class Bounds(val minX: Double, val minY: Double, val maxX: Double, val maxY: Double)
+}
 
-    private fun directText(element: Element, name: String): String? =
-        directChild(element, name)?.textContent?.trim()?.takeIf { it.isNotBlank() }
+data class OpenCpnRenderablePack(
+    val sourcePack: PresLibSourcePack,
+    val symbols: List<OpenCpnRenderableAsset>,
+    val lineStyles: List<OpenCpnRenderableAsset>,
+    val patterns: List<OpenCpnRenderableAsset>,
+    val colorsByPalette: Map<S52Palette, List<SourceColor>>
+)
 
-    private fun paletteFrom(name: String): S52Palette = when (name.lowercase()) {
-        "dusk" -> S52Palette.Dusk
-        "night", "dark" -> S52Palette.Night
-        "dayblackback" -> S52Palette.DayBlackBack
-        "daywhiteback" -> S52Palette.DayWhiteBack
-        else -> S52Palette.DayBright
-    }
+data class OpenCpnRenderableAsset(
+    val name: String,
+    val kind: OpenCpnAssetKind,
+    val description: String,
+    val colorRefs: List<String>,
+    val hpgl: String,
+    val width: Double,
+    val height: Double,
+    val pivotX: Double,
+    val pivotY: Double,
+    val commands: List<SourceVectorCommand>
+)
 
-    private fun looksLikeS52Token(value: String): Boolean =
-        value.length in 4..16 && value.any(Char::isLetter) && value.none { it.isWhitespace() }
+enum class OpenCpnAssetKind {
+    Symbol,
+    LineStyle,
+    Pattern
 }
