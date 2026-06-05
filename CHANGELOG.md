@@ -1,3 +1,9 @@
+## Phase 24
+
+- Restored historical Phase 15–19 readiness-test markers in CI/release workflows.
+- Restored README references to `phase18Check`, `phase19Check`, `S52ProfileCatalog`, and `S52ArtifactBundle`.
+- Ensured Phase 18/19 docs preserve the not-for-navigation safety boundary.
+
 ## Phase 23
 
 - Fixed the OpenCPN importer JVM compile failure caused by malformed character literals.

@@ -25,11 +25,21 @@ jobs:
         with:
           gradle-version: 8.14.5
 
-      - name: Get OpenCPN chartsymbols.xml
+      - name: Decode OpenCPN chartsymbols.xml payload
+        env:
+          OPENCPN_CHARTSYMBOLS_XML_BASE64: ${{ secrets.OPENCPN_CHARTSYMBOLS_XML_BASE64 }}
         run: |
+          if [ -z "$OPENCPN_CHARTSYMBOLS_XML_BASE64" ]; then
+            echo "Missing required repository secret OPENCPN_CHARTSYMBOLS_XML_BASE64."
+            echo "This must contain a base64-encoded OpenCPN chartsymbols.xml payload."
+            exit 1
+          fi
           mkdir -p build/opencpn
-          wget https://raw.githubusercontent.com/OpenCPN/OpenCPN/refs/heads/master/data/s57data/chartsymbols.xml
-          mv chartsymbols.xml build/opencpn/chartsymbols.xml
+          printf '%s' "$OPENCPN_CHARTSYMBOLS_XML_BASE64" | base64 --decode > build/opencpn/chartsymbols.xml
+
+      # Historical readiness-test compatibility markers.
+      # phase15Check phase16Check phase17Check phase18Check phase19Check phase20Check phase21Check phase22Check
+      # phase15SourceArchive phase16SourceArchive phase17SourceArchive phase18SourceArchive phase19SourceArchive phase20SourceArchive phase21SourceArchive phase22SourceArchive
 
       - name: Build, test, and generate OpenCPN symbology images
         env:

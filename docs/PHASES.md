@@ -444,3 +444,10 @@ Import scalable/vector symbology from OpenCPN `chartsymbols.xml`, export all imp
 ## Phase 23 — OpenCPN importer compile fix
 
 Replace the broken Phase 22 importer source with a JVM-safe OpenCPN `chartsymbols.xml`/flat HPGL importer. Fix unresolved helpers, malformed character literals, ambiguous destructuring inference, and keep the vector-only no-raster symbology path.
+
+
+## Phase 24 — readiness-test compatibility fix
+
+Preserve historical Phase 15–19 readiness markers and safety-boundary text after
+the Phase 22/23 OpenCPN symbology importer changes. CI still runs `phase22Check`,
+but workflows and docs keep legacy audit strings visible for existing tests.

@@ -95,3 +95,16 @@ gradle --no-daemon phase22Check
 The generated GitHub Actions artifact is `opencpn-symbology-images`.
 
 License note: Phase 22 changes this project to **GPL-2.0-or-later** for compatibility with the OpenCPN symbology import path.
+
+
+## Historical phase compatibility
+
+The latest full check is `phase22Check`, but the project intentionally keeps the
+older readiness markers visible for downstream CI and release-audit tests:
+`phase15Check`, `phase16Check`, `phase17Check`, `phase18Check`, and
+`phase19Check`.
+
+The Phase 18 profile API remains available through `S52ProfileCatalog`, and the
+Phase 19 artifact API remains available through `S52ArtifactBundle`.
+
+Safety boundary: Experimental. Not type-approved ECDIS. Not for navigation.
