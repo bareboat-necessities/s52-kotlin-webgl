@@ -10,7 +10,7 @@
   <name>SYM000</name>
   <description>fixture symbol 0</description>
   <definition>V</definition>
-  <color-ref>ACHBLK BCHRED CCHGRN</color-ref>
+  <color-ref>ACHBLKBCHREDCCHGRN</color-ref>
   <vector width="16" height="16">
     <origin x="0" y="0"/>
     <pivot x="8" y="8"/>

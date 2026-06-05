@@ -461,3 +461,8 @@ Fix generated SVG symbology images so OpenCPN `chartsymbols.xml` HPGL is exporte
 ### Phase 26 replacement color references
 
 Fix OpenCPN color-ref parsing for pen-prefixed tokens such as `ACHBLK`, `BCHRED`, and `CCHGRN`, and map HPGL letter pens `SPA`, `SPB`, and `SPC` to the imported color-ref list during SVG export. Generated SVGs include `colorRefs=` and `unresolvedColors=` diagnostics in `<desc>`.
+
+
+### Phase 26 correction — compact OpenCPN color refs
+
+The SVG exporter now parses compact OpenCPN color-reference strings such as `ACHBLKBCHREDCCHGRN`, preserves pen order, and records `svgCompactColorRefAware=true` in the manifest.

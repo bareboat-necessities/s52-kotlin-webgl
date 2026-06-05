@@ -201,38 +201,62 @@ object OpenCpnChartSymbolsImporter {
         .flatMap { parseColorRefs(it.textContent) }
         .ifEmpty { parseColorRefs(childText("color-ref")) }
 
+    /**
+     * Parse OpenCPN/S-52 color references while preserving pen order.
+     *
+     * The real OpenCPN file often stores references compactly. All of these
+     * must resolve to the same ordered palette list:
+     *
+     * - "ACHBLK BCHRED CCHGRN"
+     * - "ACHBLKBCHREDCCHGRN"
+     * - "CHBLK CHRED CHGRN"
+     * - "CHBLKCHREDCHGRN"
+     *
+     * The old splitter only handled the first and third forms. On the real
+     * compact form it returned an empty or mostly black palette, so SVG export
+     * fell back to CHBLK for every SP command.
+     */
     private fun parseColorRefs(text: String?): List<String> {
-        val rawTokens = text.orEmpty()
-            .split(',', ';', ' ', '\t', '\n', '\r')
-            .map { it.trim() }
-            .filter { it.isNotBlank() }
+        val raw = text.orEmpty().uppercase().filter { it.isLetterOrDigit() }
+        if (raw.isBlank()) return emptyList()
 
+        val known = knownColorTokens().sortedByDescending { it.length }
         val result = mutableListOf<String>()
         var index = 0
-        while (index < rawTokens.size) {
-            val token = rawTokens[index].uppercase()
-            val next = rawTokens.getOrNull(index + 1)?.uppercase()
-
-            if (token.length == 1 && token[0] in 'A'..'Z' && next != null) {
-                normalizedColorToken(next)?.let(result::add)
-                index += 2
+        while (index < raw.length) {
+            val direct = known.firstOrNull { raw.startsWith(it, index) }
+            if (direct != null) {
+                result += direct
+                index += direct.length
                 continue
             }
 
-            normalizedColorToken(token)?.let(result::add)
+            // A, B, C ... are HPGL/S-52 pen identifiers prepended to the real
+            // color token, e.g. A+CHBLK => ACHBLK.
+            if (raw[index] in 'A'..'Z') {
+                val prefixed = known.firstOrNull { raw.startsWith(it, index + 1) }
+                if (prefixed != null) {
+                    result += prefixed
+                    index += prefixed.length + 1
+                    continue
+                }
+            }
             index++
         }
 
-        return result.distinct()
+        if (result.isNotEmpty()) return result
+
+        // Last-resort tokenized fallback for unexpected but separated formats.
+        return text.orEmpty()
+            .split(',', ';', ' ', '\t', '\n', '\r')
+            .mapNotNull { normalizedColorToken(it) }
     }
 
     private fun normalizedColorToken(raw: String): String? {
-        val token = raw.trim().uppercase().takeIf { it.isNotBlank() } ?: return null
+        val token = raw.trim().uppercase().filter { it.isLetterOrDigit() }.takeIf { it.isNotBlank() } ?: return null
         val known = knownColorTokens()
         if (token in known) return token
 
-        // OpenCPN/S-52 color references may carry a leading HPGL pen id,
-        // for example A+CHGRD as ACHGRD or B+CHMGD as BCHMGD.
         if (token.length > 4) {
             val tail = token.drop(1)
             if (tail in known || looksLikeColorToken(tail)) return tail.take(8)

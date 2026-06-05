@@ -37,6 +37,7 @@ class S52SymbologyImageExporterTest {
         assertTrue("svgBoundsAware=true" in manifest)
         assertTrue("lineStyleSampleRepeated=true" in manifest)
         assertTrue("hpglArcCenterAware=true" in manifest)
+        assertTrue("svgCompactColorRefAware=true" in manifest)
 
         val coloredSymbolSvg = dir.resolve("symbols/SYM000.svg").readText()
         assertTrue("#C80000" in coloredSymbolSvg)

@@ -57,3 +57,8 @@ use HPGL pen prefixes such as `ACHBLK`, `BCHRED`, and `CCHGRN`, while HPGL uses
 `SPA`, `SPB`, and `SPC`. The SVG exporter now maps both numeric pens and
 letter pens to the corresponding imported color-ref list, and emits SVG
 `<desc>` diagnostics with `colorRefs=` and `unresolvedColors=`.
+
+
+## Compact OpenCPN color-ref fix
+
+OpenCPN `chartsymbols.xml` can encode color references compactly, for example `ACHBLKBCHREDCCHGRN`. Phase 26 now scans these strings against the known S-52 color-token set and preserves pen order so `SPA`, `SPB`, `SPC` resolve to `CHBLK`, `CHRED`, `CHGRN` respectively.

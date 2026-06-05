@@ -1,3 +1,9 @@
+## Phase 26 color-reference correction
+
+- Fixed OpenCPN compact `color-ref` parsing such as `ACHBLKBCHREDCCHGRN`.
+- Preserved pen order for compact and separated color-reference formats.
+- Added standard fallback pen colors for malformed/missing color-ref lists so SP2/SPB do not collapse to black.
+
 ## Phase 26 replacement
 
 - Fixed OpenCPN color-ref parsing for prefixed pen/color references such as `ACHBLK`, `BCHRED`, and `CCHGRN`.

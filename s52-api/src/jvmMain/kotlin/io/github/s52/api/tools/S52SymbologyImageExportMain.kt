@@ -225,6 +225,7 @@ object S52SymbologyImageExporter {
         appendLine("hpglArcCenterAware=true")
             appendLine("svgPenLetterColorAware=true")
             appendLine("svgColorRefDiagnostics=true")
+            appendLine("svgCompactColorRefAware=true")
     }
 
     private fun renderIndexHtml(metadataName: String, metadataEdition: String, symbols: List<String>, lineStyles: List<String>, patterns: List<String>, colors: List<String>): String = buildString {
@@ -483,8 +484,13 @@ object S52SymbologyImageExporter {
 
         private fun colorRefByIndex(index: Int): String =
             asset.colorRefs.getOrNull(index)
+                ?: standardPenColorRefs().getOrNull(index)
                 ?: asset.colorRefs.firstOrNull()
                 ?: "CHBLK"
+
+        private fun standardPenColorRefs(): List<String> = listOf(
+            "CHBLK", "CHRED", "CHGRN", "CHYLW", "CHMGD", "CHBRN", "CHWHT", "CHGRD"
+        )
 
         private fun fallbackVisibleColorForPen(arg: String?): String = when (arg.orEmpty().trim().uppercase()) {
             "1", "A", "" -> "#000000"
