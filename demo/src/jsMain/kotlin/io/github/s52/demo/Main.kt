@@ -3,15 +3,19 @@ package io.github.s52.demo
 import io.github.s52.api.S52GalleryBuilder
 import io.github.s52.api.S52GalleryRequest
 import io.github.s52.api.S52GallerySection
+import io.github.s52.api.S52OpenCpnDiagnostics
 import io.github.s52.catalog.PrimitiveType
 import io.github.s52.catalog.S57Attribute
 import io.github.s52.catalog.S57ObjectClass
+import io.github.s52.core.draw.S52DrawCommand
 import io.github.s52.core.engine.S52PortrayalEngine
 import io.github.s52.core.geometry.Coordinate
 import io.github.s52.core.geometry.EncGeometry
+import io.github.s52.core.instruction.InstructionKind
 import io.github.s52.core.model.EncFeature
 import io.github.s52.core.model.S57Attributes
 import io.github.s52.core.model.S57Value
+import io.github.s52.core.settings.DisplayCategory
 import io.github.s52.core.settings.MarinerSettings
 import io.github.s52.core.settings.PortrayalContext
 import io.github.s52.csp.DefaultCspRegistry
@@ -36,20 +40,59 @@ fun main() {
         val sectionHash = if (useOpenCpn) "#" + route.removePrefix("opencpn-").ifBlank { "symbols" } else window.location.hash
         val section = S52GallerySection.fromHash(sectionHash)
 
-        if (section == S52GallerySection.Chart) {
-            val engine = S52PortrayalEngine(presLib.lookupTable, if (useOpenCpn) DefaultCspRegistry.openCpn() else DefaultCspRegistry.phase6Complete())
-            val commands = engine.portray(phase20SyntheticFeatures(), settings, context)
-            val stats = renderer.render(commands, settings)
-            status.textContent = "${if (useOpenCpn) "OpenCPN" else "Compat"} chart demo: ${commands.size} commands, $stats. Routes: #chart #symbols #opencpn-symbols #opencpn-colors"
-        } else {
-            val gallery = S52GalleryBuilder.build(presLib, S52GalleryRequest(section = section))
-            val stats = renderer.render(gallery.commands, settings)
-            status.textContent = "${if (useOpenCpn) "OpenCPN " else ""}${gallery.title}: ${gallery.assetCommandCount} asset commands, ${gallery.totalCommandCount} total commands, $stats. Routes: #chart #symbols #opencpn-symbols #opencpn-lines #opencpn-patterns #opencpn-colors"
+        when {
+            route == "opencpn-diagnostics" -> {
+                val report = S52OpenCpnDiagnostics.report(presLib, DefaultCspRegistry.openCpn())
+                val commands = textPanel(report.toPlainText(maxItems = 10).lines().take(14))
+                val stats = renderer.render(commands, settings)
+                status.textContent = report.toPlainText(maxItems = 10) + "\n" + stats + "\nRoutes: #opencpn-symbols #opencpn-lines #opencpn-patterns #opencpn-lookups #opencpn-diagnostics"
+            }
+            route == "opencpn-lookups" -> {
+                val report = S52OpenCpnDiagnostics.report(presLib, DefaultCspRegistry.openCpn())
+                val lines = listOf(
+                    "OpenCPN lookup summary",
+                    "lookups=${report.lookupCount}",
+                    "presentationTables=${report.presentationTableCounts.entries.sortedBy { it.key }.joinToString { it.key + "=" + it.value }}",
+                    "primitives=${report.primitiveCounts.entries.sortedBy { it.key }.joinToString { it.key + "=" + it.value }}",
+                    "displayCategories=${report.displayCategoryCounts.entries.sortedBy { it.key }.joinToString { it.key + "=" + it.value }}",
+                    "referencedSymbols=${report.referencedSymbols.size} referencedLineStyles=${report.referencedLineStyles.size} referencedPatterns=${report.referencedPatterns.size}",
+                    "referencedCsps=${report.referencedCsps.size} unresolvedCsps=${report.unresolvedCsps.size}"
+                )
+                val stats = renderer.render(textPanel(lines), settings)
+                status.textContent = lines.joinToString("\n") + "\n" + stats + "\nRoutes: #opencpn-symbols #opencpn-lines #opencpn-patterns #opencpn-diagnostics"
+            }
+            section == S52GallerySection.Chart -> {
+                val engine = S52PortrayalEngine(presLib.lookupTable, if (useOpenCpn) DefaultCspRegistry.openCpn() else DefaultCspRegistry.phase6Complete())
+                val commands = engine.portray(phase20SyntheticFeatures(), settings, context)
+                val stats = renderer.render(commands, settings)
+                status.textContent = "${if (useOpenCpn) "OpenCPN" else "Compat"} chart demo: ${commands.size} commands, $stats. Routes: #chart #symbols #opencpn-symbols #opencpn-colors #opencpn-lookups #opencpn-diagnostics"
+            }
+            else -> {
+                val gallery = S52GalleryBuilder.build(presLib, S52GalleryRequest(section = section))
+                val stats = renderer.render(gallery.commands, settings)
+                status.textContent = "${if (useOpenCpn) "OpenCPN " else ""}${gallery.title}: ${gallery.assetCommandCount} asset commands, ${gallery.totalCommandCount} total commands, $stats. Routes: #chart #symbols #opencpn-symbols #opencpn-lines #opencpn-patterns #opencpn-colors #opencpn-lookups #opencpn-diagnostics"
+            }
         }
     }
 
     renderCurrentRoute()
     window.onhashchange = { _ -> renderCurrentRoute() }
+}
+
+
+private fun textPanel(lines: List<String>): List<S52DrawCommand> = lines.mapIndexed { index, line ->
+    S52DrawCommand.Text(
+        featureId = 90_000L + index,
+        geometry = EncGeometry.Point(Coordinate(-74.08, 40.18 - index * 0.012)),
+        textExpression = line.take(96),
+        rawArgs = listOf(line),
+        textKind = InstructionKind.TX,
+        colorToken = "CHBLK",
+        priority = 100,
+        viewingGroup = 99999,
+        category = DisplayCategory.Other,
+        overRadar = true
+    )
 }
 
 private fun phase20SyntheticFeatures(): List<EncFeature> = listOf(

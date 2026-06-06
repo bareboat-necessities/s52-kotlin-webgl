@@ -456,3 +456,10 @@ tasks.register("phase29Check") {
     description = "Runs OpenCPN lookup table selection, attrib-code matching, and CSP coverage checks."
     dependsOn(":s52-core:jvmTest", ":s52-preslib:jvmTest", ":s52-csp:jvmTest", ":s52-api:jvmTest")
 }
+
+// Phase 32: OpenCPN diagnostics, demo routes, and validation smoke tests.
+tasks.register("phase32Check") {
+    group = "verification"
+    description = "Runs OpenCPN diagnostics and representative validation checks."
+    dependsOn("phase29Check", ":s52-api:jvmTest", ":s52-tests:jvmTest", ":demo:build")
+}
