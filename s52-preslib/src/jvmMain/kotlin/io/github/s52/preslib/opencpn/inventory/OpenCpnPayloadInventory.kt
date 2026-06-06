@@ -41,13 +41,16 @@ object OpenCpnPayloadInventoryReader {
         val atlases = listOf("rastersymbols-day.png", "rastersymbols-dusk.png", "rastersymbols-dark.png")
             .mapNotNull { fileName -> readRasterAtlas(directory.resolve(fileName), warnings) }
 
+        val lookupDiagnostics = chartSymbols?.let { OpenCpnLookupRawParser.diagnostics(it, csvCatalog) }
+
         return OpenCpnPayloadInventory(
             directory = directory,
             files = files,
             chartSymbols = chartSymbols,
             csvCatalog = csvCatalog,
             rasterAtlases = atlases,
-            diagnostics = OpenCpnInventoryDiagnostics(missingRequiredFiles = missing, parseWarnings = warnings)
+            diagnostics = OpenCpnInventoryDiagnostics(missingRequiredFiles = missing, parseWarnings = warnings),
+            lookupDiagnostics = lookupDiagnostics
         )
     }
 

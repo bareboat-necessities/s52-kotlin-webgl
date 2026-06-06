@@ -15,7 +15,8 @@ data class OpenCpnPayloadInventory(
     val chartSymbols: OpenCpnChartSymbolsSummary?,
     val csvCatalog: OpenCpnCsvCatalogSummary,
     val rasterAtlases: List<OpenCpnRasterAtlas>,
-    val diagnostics: OpenCpnInventoryDiagnostics
+    val diagnostics: OpenCpnInventoryDiagnostics,
+    val lookupDiagnostics: OpenCpnLookupDiagnostics? = null
 ) {
     fun toHumanText(): String = buildString {
         appendLine("OpenCPN portrayal payload: ${directory.absolutePath}")
@@ -25,6 +26,7 @@ data class OpenCpnPayloadInventory(
             appendLine("  colorTables=${summary.colorTables.size}")
             appendLine("  colors=${summary.colorTables.sumOf { it.colors.size }}")
             appendLine("  lookups=${summary.lookupCount}")
+            appendLine("  lookupObjects=${summary.lookups.map { it.objectClassKey.acronym }.distinct().size}")
             appendLine("  symbols=${summary.symbols.size}")
             appendLine("  lineStyles=${summary.lineStyles.size}")
             appendLine("  patterns=${summary.patterns.size}")
@@ -42,6 +44,9 @@ data class OpenCpnPayloadInventory(
         appendLine("rasterAtlases=${rasterAtlases.size}")
         rasterAtlases.forEach { atlas ->
             appendLine("  ${atlas.fileName}: ${atlas.width}x${atlas.height} ${atlas.paletteHint}")
+        }
+        lookupDiagnostics?.let { lookup ->
+            appendLine(lookup.toHumanText().trimEnd())
         }
         if (diagnostics.hasIssues()) {
             appendLine("diagnostics:")
@@ -84,7 +89,8 @@ data class OpenCpnChartSymbolsSummary(
     val lookupCount: Int,
     val symbols: List<OpenCpnRawAsset>,
     val lineStyles: List<OpenCpnRawAsset>,
-    val patterns: List<OpenCpnRawAsset>
+    val patterns: List<OpenCpnRawAsset>,
+    val lookups: List<OpenCpnRawLookupRecord> = emptyList()
 )
 
 data class OpenCpnRawColorTable(

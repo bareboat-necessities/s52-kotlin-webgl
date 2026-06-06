@@ -14,12 +14,14 @@ object OpenCpnChartSymbolsRawParser {
     fun parseXml(xml: String, sourceName: String = "chartsymbols.xml"): OpenCpnChartSymbolsSummary {
         val document = parseSecureXml(xml, sourceName)
         val root = document.documentElement
+        val lookups = OpenCpnLookupRawParser.parseLookups(root)
         return OpenCpnChartSymbolsSummary(
             colorTables = parseColorTables(root),
-            lookupCount = root.getElementsByTagName("lookup").length,
+            lookupCount = lookups.size,
             symbols = parseAssets(root, "symbol", OpenCpnRawAssetKind.Symbol),
             lineStyles = parseAssets(root, "line-style", OpenCpnRawAssetKind.LineStyle),
-            patterns = parseAssets(root, "pattern", OpenCpnRawAssetKind.Pattern)
+            patterns = parseAssets(root, "pattern", OpenCpnRawAssetKind.Pattern),
+            lookups = lookups
         )
     }
 
