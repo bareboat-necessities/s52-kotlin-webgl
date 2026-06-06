@@ -10,8 +10,10 @@ import io.github.s52.render.webgl.internal.AreaPatternRenderer
 import io.github.s52.render.webgl.internal.ColorResolver
 import io.github.s52.render.webgl.internal.GeometryProjector
 import io.github.s52.render.webgl.internal.LineRenderer
+import io.github.s52.render.webgl.internal.RasterAtlasCache
 import io.github.s52.render.webgl.internal.SolidColorProgram
 import io.github.s52.render.webgl.internal.SymbolRenderer
+import io.github.s52.render.webgl.internal.TextureProgram
 import io.github.s52.render.webgl.internal.TextRenderer
 import org.khronos.webgl.WebGLRenderingContext
 import org.w3c.dom.HTMLCanvasElement
@@ -26,17 +28,20 @@ import org.w3c.dom.HTMLCanvasElement
  */
 class WebGlS52Renderer(
     private val canvas: HTMLCanvasElement,
-    private val presLib: PresLibPack
+    private val presLib: PresLibPack,
+    private val onResourcesChanged: (() -> Unit)? = null
 ) {
     private val gl: WebGLRenderingContext =
         canvas.getContext("webgl2") as? WebGLRenderingContext
             ?: error("WebGL2 is not available in this browser")
 
     private val solidProgram = SolidColorProgram(gl)
+    private val textureProgram = TextureProgram(gl)
+    private val rasterAtlasCache = RasterAtlasCache(gl, onAtlasReady = onResourcesChanged)
     private val areaFillRenderer = AreaFillRenderer(gl, solidProgram)
     private val areaPatternRenderer = AreaPatternRenderer(gl, solidProgram)
     private val lineRenderer = LineRenderer(gl, solidProgram)
-    private val symbolRenderer = SymbolRenderer(gl, solidProgram, presLib)
+    private val symbolRenderer = SymbolRenderer(gl, solidProgram, textureProgram, rasterAtlasCache, presLib)
     private val textRenderer = TextRenderer(gl, solidProgram)
 
     fun render(
@@ -69,7 +74,7 @@ class WebGlS52Renderer(
                 is S52DrawCommand.AreaPattern -> areaPatternRenderer.render(command, projector, colors)
                 is S52DrawCommand.LineSimple -> lineRenderer.renderSimple(command, projector, colors)
                 is S52DrawCommand.LineComplex -> lineRenderer.renderComplex(command, projector, colors)
-                is S52DrawCommand.PointSymbol -> symbolRenderer.render(command, projector, colors)
+                is S52DrawCommand.PointSymbol -> symbolRenderer.render(command, projector, colors, settings.palette)
                 is S52DrawCommand.Text -> textRenderer.renderText(command, projector, colors)
                 is S52DrawCommand.Sounding -> textRenderer.renderSounding(command, projector, colors)
             }

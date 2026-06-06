@@ -27,21 +27,24 @@ fun main() {
     val status = document.getElementById("status") as HTMLElement
 
     fun renderCurrentRoute() {
-        val presLib = PresLibPack.s52LibCompat()
+        val route = window.location.hash.removePrefix("#").lowercase()
+        val useOpenCpn = route.startsWith("opencpn-") || route == "opencpn"
+        val presLib = if (useOpenCpn) PresLibPack.openCpn() else PresLibPack.s52LibCompat()
         val settings = MarinerSettings()
         val context = PortrayalContext(compilationScale = 50_000.0, displayScale = 50_000.0)
-        val renderer = WebGlS52Renderer(canvas, presLib)
-        val section = S52GallerySection.fromHash(window.location.hash)
+        val renderer = WebGlS52Renderer(canvas, presLib) { renderCurrentRoute() }
+        val sectionHash = if (useOpenCpn) "#" + route.removePrefix("opencpn-").ifBlank { "symbols" } else window.location.hash
+        val section = S52GallerySection.fromHash(sectionHash)
 
         if (section == S52GallerySection.Chart) {
-            val engine = S52PortrayalEngine(presLib.lookupTable, DefaultCspRegistry.phase6Complete())
+            val engine = S52PortrayalEngine(presLib.lookupTable, if (useOpenCpn) DefaultCspRegistry.openCpn() else DefaultCspRegistry.phase6Complete())
             val commands = engine.portray(phase20SyntheticFeatures(), settings, context)
             val stats = renderer.render(commands, settings)
-            status.textContent = "Chart demo: ${commands.size} commands, $stats. Routes: #chart #symbols #lines #patterns #colors #all"
+            status.textContent = "${if (useOpenCpn) "OpenCPN" else "Compat"} chart demo: ${commands.size} commands, $stats. Routes: #chart #symbols #opencpn-symbols #opencpn-colors"
         } else {
             val gallery = S52GalleryBuilder.build(presLib, S52GalleryRequest(section = section))
             val stats = renderer.render(gallery.commands, settings)
-            status.textContent = "${gallery.title}: ${gallery.assetCommandCount} asset commands, ${gallery.totalCommandCount} total commands, $stats. Routes: #chart #symbols #lines #patterns #colors #all"
+            status.textContent = "${if (useOpenCpn) "OpenCPN " else ""}${gallery.title}: ${gallery.assetCommandCount} asset commands, ${gallery.totalCommandCount} total commands, $stats. Routes: #chart #symbols #opencpn-symbols #opencpn-lines #opencpn-patterns #opencpn-colors"
         }
     }
 
