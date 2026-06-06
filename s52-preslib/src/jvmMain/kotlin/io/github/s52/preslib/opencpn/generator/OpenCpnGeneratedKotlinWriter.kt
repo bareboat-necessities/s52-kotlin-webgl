@@ -85,8 +85,8 @@ object OpenCpnGeneratedKotlinWriter {
     }
 
     private fun SourceSymbol.symbolExpr(): String = "SourceSymbol(name = ${name.kt()}, pivotX = ${pivotX.d()}, pivotY = ${pivotY.d()}, width = ${width.d()}, height = ${height.d()}, colorRefs = ${colorRefs.ktList()}, bitmap = ${bitmap.kt()}, vectorHpgl = ${vectorHpgl.ktNullable()})"
-    private fun SourceLineStyle.lineStyleExpr(): String = "SourceLineStyle(name = ${name.kt()}, description = ${description.kt()}, colorRefs = ${colorRefs.ktList()}, bitmap = ${bitmap.kt()}, vectorHpgl = ${vectorHpgl.ktNullable()})"
-    private fun SourcePattern.patternExpr(): String = "SourcePattern(name = ${name.kt()}, description = ${description.kt()}, colorRefs = ${colorRefs.ktList()}, bitmap = ${bitmap.kt()}, vectorHpgl = ${vectorHpgl.ktNullable()})"
+    private fun SourceLineStyle.lineStyleExpr(): String = "SourceLineStyle(name = ${name.kt()}, description = ${description.kt()}, pivotX = ${pivotX.d()}, pivotY = ${pivotY.d()}, width = ${width.d()}, height = ${height.d()}, colorRefs = ${colorRefs.ktList()}, bitmap = ${bitmap.kt()}, vectorHpgl = ${vectorHpgl.ktNullable()})"
+    private fun SourcePattern.patternExpr(): String = "SourcePattern(name = ${name.kt()}, description = ${description.kt()}, pivotX = ${pivotX.d()}, pivotY = ${pivotY.d()}, width = ${width.d()}, height = ${height.d()}, colorRefs = ${colorRefs.ktList()}, bitmap = ${bitmap.kt()}, vectorHpgl = ${vectorHpgl.ktNullable()})"
 
     private fun SourceLookupRecord.lookupExpr(): String {
         val classArg = if (objectClass != null) "objectClass = S57ObjectClass.${objectClass.name}" else "objectClass = null, objectClassKey = S57ObjectClassKey.of(${objectClassKey.acronym.kt()})"

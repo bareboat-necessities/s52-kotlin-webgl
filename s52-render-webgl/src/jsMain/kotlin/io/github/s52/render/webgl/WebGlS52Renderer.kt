@@ -39,8 +39,8 @@ class WebGlS52Renderer(
     private val textureProgram = TextureProgram(gl)
     private val rasterAtlasCache = RasterAtlasCache(gl, onAtlasReady = onResourcesChanged)
     private val areaFillRenderer = AreaFillRenderer(gl, solidProgram)
-    private val areaPatternRenderer = AreaPatternRenderer(gl, solidProgram)
-    private val lineRenderer = LineRenderer(gl, solidProgram)
+    private val areaPatternRenderer = AreaPatternRenderer(gl, solidProgram, textureProgram, rasterAtlasCache, presLib)
+    private val lineRenderer = LineRenderer(gl, solidProgram, presLib)
     private val symbolRenderer = SymbolRenderer(gl, solidProgram, textureProgram, rasterAtlasCache, presLib)
     private val textRenderer = TextRenderer(gl, solidProgram)
 
@@ -71,7 +71,7 @@ class WebGlS52Renderer(
         for (command in commands) {
             val drawCalls = when (command) {
                 is S52DrawCommand.AreaFill -> areaFillRenderer.render(command, projector, colors)
-                is S52DrawCommand.AreaPattern -> areaPatternRenderer.render(command, projector, colors)
+                is S52DrawCommand.AreaPattern -> areaPatternRenderer.render(command, projector, colors, settings.palette)
                 is S52DrawCommand.LineSimple -> lineRenderer.renderSimple(command, projector, colors)
                 is S52DrawCommand.LineComplex -> lineRenderer.renderComplex(command, projector, colors)
                 is S52DrawCommand.PointSymbol -> symbolRenderer.render(command, projector, colors, settings.palette)

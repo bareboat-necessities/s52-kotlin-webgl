@@ -37,6 +37,10 @@ object PresLibPackBuilder {
                     style.name to LineStyleDefinition(
                         name = style.name,
                         description = style.description,
+                        pivotX = style.pivotX,
+                        pivotY = style.pivotY,
+                        width = style.width,
+                        height = style.height,
                         colorRefs = style.colorRefs,
                         bitmap = style.bitmap?.toRasterBitmapDefinition(),
                         vectorHpgl = style.vectorHpgl
@@ -48,6 +52,10 @@ object PresLibPackBuilder {
                     pattern.name to PatternDefinition(
                         name = pattern.name,
                         description = pattern.description,
+                        pivotX = pattern.pivotX,
+                        pivotY = pattern.pivotY,
+                        width = pattern.width,
+                        height = pattern.height,
                         colorRefs = pattern.colorRefs,
                         bitmap = pattern.bitmap?.toRasterBitmapDefinition(),
                         vectorHpgl = pattern.vectorHpgl

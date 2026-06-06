@@ -55,6 +55,10 @@ object OpenCpnPresLibSourceConverter {
     private fun OpenCpnRawAsset.toSourceLineStyle(): SourceLineStyle = SourceLineStyle(
         name = name,
         description = description,
+        pivotX = vector?.pivot?.x ?: bitmap?.pivot?.x ?: 0.0,
+        pivotY = vector?.pivot?.y ?: bitmap?.pivot?.y ?: 0.0,
+        width = vector?.width ?: bitmap?.width?.toDouble() ?: 0.0,
+        height = vector?.height ?: bitmap?.height?.toDouble() ?: 0.0,
         colorRefs = colorRefs,
         bitmap = bitmap?.toSourceBitmapRef(),
         vectorHpgl = vector?.hpgl?.takeIf { it.isNotBlank() }
@@ -63,6 +67,10 @@ object OpenCpnPresLibSourceConverter {
     private fun OpenCpnRawAsset.toSourcePattern(): SourcePattern = SourcePattern(
         name = name,
         description = description,
+        pivotX = vector?.pivot?.x ?: bitmap?.pivot?.x ?: 0.0,
+        pivotY = vector?.pivot?.y ?: bitmap?.pivot?.y ?: 0.0,
+        width = vector?.width ?: bitmap?.width?.toDouble() ?: 0.0,
+        height = vector?.height ?: bitmap?.height?.toDouble() ?: 0.0,
         colorRefs = colorRefs,
         bitmap = bitmap?.toSourceBitmapRef(),
         vectorHpgl = vector?.hpgl?.takeIf { it.isNotBlank() }

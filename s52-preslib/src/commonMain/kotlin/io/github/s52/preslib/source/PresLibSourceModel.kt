@@ -65,6 +65,10 @@ sealed interface SourceVectorCommand {
 data class SourceLineStyle(
     val name: String,
     val description: String = "",
+    val pivotX: Double = 0.0,
+    val pivotY: Double = 0.0,
+    val width: Double = 0.0,
+    val height: Double = 0.0,
     val colorRefs: List<String> = emptyList(),
     val bitmap: SourceBitmapRef? = null,
     val vectorHpgl: String? = null
@@ -73,6 +77,10 @@ data class SourceLineStyle(
 data class SourcePattern(
     val name: String,
     val description: String = "",
+    val pivotX: Double = 0.0,
+    val pivotY: Double = 0.0,
+    val width: Double = 0.0,
+    val height: Double = 0.0,
     val colorRefs: List<String> = emptyList(),
     val bitmap: SourceBitmapRef? = null,
     val vectorHpgl: String? = null

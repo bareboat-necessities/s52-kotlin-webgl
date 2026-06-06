@@ -11,9 +11,21 @@ internal class ColorResolver(
     private val palette: S52Palette
 ) {
     fun resolve(token: String?, fallback: String = "CHBLK"): GlColor {
-        val color = token?.let { presLib.colors.color(palette, it) }
+        val color = token?.let(::resolveOpenCpnToken)
             ?: presLib.colors.color(palette, fallback)
             ?: S52Color(fallback, 0, 0, 0)
         return GlColor(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, 1.0f)
+    }
+
+    private fun resolveOpenCpnToken(token: String): S52Color? {
+        presLib.colors.color(palette, token)?.let { return it }
+        val normalized = token.trim().uppercase()
+        // OpenCPN HPGL color references commonly prefix display-context letters
+        // such as A/D/E/U before the S-52 color token: ACHMGD -> CHMGD,
+        // ADEPSC -> DEPSC, ALANDF -> LANDF, UTRFCF -> TRFCF.
+        if (normalized.length > 1) {
+            presLib.colors.color(palette, normalized.drop(1))?.let { return it }
+        }
+        return null
     }
 }

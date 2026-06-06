@@ -3,6 +3,10 @@ package io.github.s52.preslib
 data class LineStyleDefinition(
     val name: String,
     val description: String = "",
+    val pivotX: Double = 0.0,
+    val pivotY: Double = 0.0,
+    val width: Double = 0.0,
+    val height: Double = 0.0,
     val colorRefs: List<String> = emptyList(),
     val bitmap: RasterBitmapDefinition? = null,
     val vectorHpgl: String? = null
@@ -19,6 +23,10 @@ class LineStyleRegistry(
 data class PatternDefinition(
     val name: String,
     val description: String = "",
+    val pivotX: Double = 0.0,
+    val pivotY: Double = 0.0,
+    val width: Double = 0.0,
+    val height: Double = 0.0,
     val colorRefs: List<String> = emptyList(),
     val bitmap: RasterBitmapDefinition? = null,
     val vectorHpgl: String? = null

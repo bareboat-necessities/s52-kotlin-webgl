@@ -12,12 +12,22 @@ internal data class HpglLineSegment(
     val y2: Double
 )
 
+internal data class HpglBounds(
+    val minX: Double,
+    val minY: Double,
+    val maxX: Double,
+    val maxY: Double
+) {
+    val width: Double get() = maxX - minX
+    val height: Double get() = maxY - minY
+    val centerY: Double get() = (minY + maxY) * 0.5
+}
+
 /**
- * Small HPGL line extractor used as a Phase 30 vector-symbol fallback.
+ * Small HPGL geometry extractor used by the WebGL OpenCPN asset renderers.
  *
- * Full OpenCPN HPGL styling/fill preservation is intentionally left for the
- * later vector renderer. This parser only extracts line geometry from PU/PD and
- * CI/AA enough for vector-only symbols and atlas-load fallback placeholders.
+ * It intentionally extracts geometry only. Styling is resolved at the asset
+ * level from OpenCPN color references until the full styled HPGL renderer lands.
  */
 internal object HpglLineParser {
     fun parseSegments(hpgl: String): List<HpglLineSegment> {
@@ -83,6 +93,21 @@ internal object HpglLineParser {
             }
         }
         return segments
+    }
+
+    fun bounds(segments: List<HpglLineSegment>): HpglBounds? {
+        if (segments.isEmpty()) return null
+        var minX = minOf(segments.first().x1, segments.first().x2)
+        var maxX = maxOf(segments.first().x1, segments.first().x2)
+        var minY = minOf(segments.first().y1, segments.first().y2)
+        var maxY = maxOf(segments.first().y1, segments.first().y2)
+        for (segment in segments) {
+            minX = minOf(minX, segment.x1, segment.x2)
+            maxX = maxOf(maxX, segment.x1, segment.x2)
+            minY = minOf(minY, segment.y1, segment.y2)
+            maxY = maxOf(maxY, segment.y1, segment.y2)
+        }
+        return HpglBounds(minX, minY, maxX, maxY)
     }
 
     private fun appendCircle(out: MutableList<HpglLineSegment>, cx: Double, cy: Double, radius: Double) {

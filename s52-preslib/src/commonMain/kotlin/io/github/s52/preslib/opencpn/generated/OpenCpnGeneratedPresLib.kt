@@ -74,6 +74,10 @@ object OpenCpnGeneratedPresLib {
         SourceLineStyle(
             name = p[0],
             description = p[1],
+            pivotX = p[2].toDouble(),
+            pivotY = p[3].toDouble(),
+            width = p[4].toDouble(),
+            height = p[5].toDouble(),
             colorRefs = p[6].splitList(),
             bitmap = p[7].toBitmapRef(),
             vectorHpgl = p[8].takeIf { it.isNotBlank() }
@@ -85,6 +89,10 @@ object OpenCpnGeneratedPresLib {
         SourcePattern(
             name = p[0],
             description = p[1],
+            pivotX = p[2].toDouble(),
+            pivotY = p[3].toDouble(),
+            width = p[4].toDouble(),
+            height = p[5].toDouble(),
             colorRefs = p[6].splitList(),
             bitmap = p[7].toBitmapRef(),
             vectorHpgl = p[8].takeIf { it.isNotBlank() }
