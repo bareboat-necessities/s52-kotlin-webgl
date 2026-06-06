@@ -94,7 +94,7 @@ class S52Runtime private constructor(
         /** Runtime backed by the generated OpenCPN Presentation Library pack. */
         fun openCpn(): S52Runtime = from(
             presLib = PresLibPack.openCpn(),
-            cspRegistry = DefaultCspRegistry.phase6Complete()
+            cspRegistry = DefaultCspRegistry.openCpn()
         )
 
         /** Build a runtime from explicit Presentation Library and CSP inputs. */

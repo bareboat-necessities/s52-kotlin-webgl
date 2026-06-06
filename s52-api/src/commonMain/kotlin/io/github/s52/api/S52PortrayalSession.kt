@@ -92,7 +92,7 @@ class S52PortrayalSession(
             failOnStaticCompletenessErrors: Boolean = false
         ): S52PortrayalSession = S52PortrayalSession(
             presLib = PresLibPack.openCpn(),
-            cspRegistry = DefaultCspRegistry.phase6Complete(),
+            cspRegistry = DefaultCspRegistry.openCpn(),
             failOnStaticCompletenessErrors = failOnStaticCompletenessErrors
         )
     }

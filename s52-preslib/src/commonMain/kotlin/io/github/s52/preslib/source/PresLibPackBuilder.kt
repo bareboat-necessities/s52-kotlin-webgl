@@ -1,7 +1,9 @@
 package io.github.s52.preslib.source
 
 import io.github.s52.core.instruction.InstructionParser
+import io.github.s52.core.lookup.AttributeFilter
 import io.github.s52.core.lookup.LookupRecord
+import io.github.s52.core.lookup.OpenCpnAttribCodeRuntimeParser
 import io.github.s52.core.lookup.LookupTable
 import io.github.s52.preslib.ColorTables
 import io.github.s52.preslib.LineStyleDefinition
@@ -59,15 +61,28 @@ object PresLibPackBuilder {
         objectClass = objectClass,
         objectClassKey = objectClassKey,
         primitive = primitive,
-        attributeFilter = attributeFilter.toRuntime(),
+        attributeFilter = combinedRuntimeFilter(),
         instructions = InstructionParser.parseSequence(instruction),
         displayCategory = displayCategory,
         viewingGroup = viewingGroup,
         displayPriority = displayPriority,
         overRadar = overRadar,
         minimumDisplayScale = minimumDisplayScale,
-        maximumDisplayScale = maximumDisplayScale
+        maximumDisplayScale = maximumDisplayScale,
+        sourceTableName = sourceTableName,
+        sourceDisplayPriorityLabel = sourceDisplayPriorityLabel,
+        sourceRadarPriority = sourceRadarPriority
     )
+
+    private fun SourceLookupRecord.combinedRuntimeFilter(): AttributeFilter {
+        val explicit = attributeFilter.toRuntime()
+        val openCpn = OpenCpnAttribCodeRuntimeParser.parseAll(rawAttribCodes)
+        return when {
+            explicit === AttributeFilter.Any -> openCpn
+            openCpn === AttributeFilter.Any -> explicit
+            else -> AttributeFilter.All(listOf(explicit, openCpn))
+        }
+    }
 
     private fun SourceSymbol.toSymbolDefinition(): SymbolDefinition = SymbolDefinition(
         name = name,

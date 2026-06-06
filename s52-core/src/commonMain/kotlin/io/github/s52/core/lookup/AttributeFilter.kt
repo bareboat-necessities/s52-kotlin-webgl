@@ -1,6 +1,7 @@
 package io.github.s52.core.lookup
 
 import io.github.s52.catalog.S57Attribute
+import io.github.s52.catalog.S57AttributeKey
 import io.github.s52.core.model.EncFeature
 import io.github.s52.core.model.S57Value
 import kotlin.math.abs
@@ -49,6 +50,71 @@ sealed interface AttributeFilter {
         override val description: String = "${attribute.acronym} in ${expected.sorted()}"
         override val specificity: Int = 20 + expected.size
         override fun matches(feature: EncFeature): Boolean = feature.attributes.ints(attribute).any { it in expected }
+    }
+
+
+    data class KeyExists(val attribute: S57AttributeKey) : AttributeFilter {
+        override val description: String = "${attribute.acronym} exists"
+        override val specificity: Int = 10
+        override fun matches(feature: EncFeature): Boolean = attribute in feature.attributes
+    }
+
+    data class KeyMissing(val attribute: S57AttributeKey) : AttributeFilter {
+        override val description: String = "${attribute.acronym} missing"
+        override val specificity: Int = 10
+        override fun matches(feature: EncFeature): Boolean = attribute !in feature.attributes
+    }
+
+    data class KeyEqualsInt(val attribute: S57AttributeKey, val expected: Int) : AttributeFilter {
+        override val description: String = "${attribute.acronym} == $expected"
+        override val specificity: Int = 20
+        override fun matches(feature: EncFeature): Boolean = feature.attributes.ints(attribute).contains(expected)
+    }
+
+    data class KeyIntIn(val attribute: S57AttributeKey, val expected: Set<Int>) : AttributeFilter {
+        init { require(expected.isNotEmpty()) { "KeyIntIn filter requires at least one expected value" } }
+        override val description: String = "${attribute.acronym} in ${expected.sorted()}"
+        override val specificity: Int = 20 + expected.size
+        override fun matches(feature: EncFeature): Boolean = feature.attributes.ints(attribute).any { it in expected }
+    }
+
+    data class KeyEqualsDecimal(
+        val attribute: S57AttributeKey,
+        val expected: Double,
+        val tolerance: Double = 1.0e-9
+    ) : AttributeFilter {
+        init { require(tolerance >= 0.0) { "Decimal comparison tolerance must be non-negative" } }
+        override val description: String = "${attribute.acronym} == $expected"
+        override val specificity: Int = 20
+        override fun matches(feature: EncFeature): Boolean =
+            feature.attributes.double(attribute)?.let { abs(it - expected) <= tolerance } == true
+    }
+
+    data class KeyDecimalRange(
+        val attribute: S57AttributeKey,
+        val minInclusive: Double? = null,
+        val maxInclusive: Double? = null
+    ) : AttributeFilter {
+        init {
+            require(minInclusive != null || maxInclusive != null) { "KeyDecimalRange requires at least one bound" }
+            require(minInclusive == null || maxInclusive == null || minInclusive <= maxInclusive) {
+                "KeyDecimalRange lower bound must be <= upper bound"
+            }
+        }
+        override val description: String = buildString {
+            append(attribute.acronym)
+            append(" in ")
+            append(minInclusive?.toString() ?: "-∞")
+            append("..")
+            append(maxInclusive?.toString() ?: "+∞")
+        }
+        override val specificity: Int = 20
+        override fun matches(feature: EncFeature): Boolean {
+            val value = feature.attributes.double(attribute) ?: return false
+            if (minInclusive != null && value < minInclusive) return false
+            if (maxInclusive != null && value > maxInclusive) return false
+            return true
+        }
     }
 
     data class EqualsDecimal(
@@ -149,11 +215,19 @@ sealed interface AttributeFilter {
     companion object {
         fun equals(attribute: S57Attribute, expected: Int): AttributeFilter = EqualsInt(attribute, expected)
 
+        fun equals(attribute: S57AttributeKey, expected: Int): AttributeFilter = KeyEqualsInt(attribute, expected)
+
         fun has(attribute: S57Attribute): AttributeFilter = Exists(attribute)
+
+        fun has(attribute: S57AttributeKey): AttributeFilter = KeyExists(attribute)
 
         fun missing(attribute: S57Attribute): AttributeFilter = Missing(attribute)
 
+        fun missing(attribute: S57AttributeKey): AttributeFilter = KeyMissing(attribute)
+
         fun oneOf(attribute: S57Attribute, expected: Set<Int>): AttributeFilter = IntIn(attribute, expected)
+
+        fun oneOf(attribute: S57AttributeKey, expected: Set<Int>): AttributeFilter = KeyIntIn(attribute, expected)
 
         fun range(attribute: S57Attribute, minInclusive: Double? = null, maxInclusive: Double? = null): AttributeFilter =
             DecimalRange(attribute, minInclusive, maxInclusive)

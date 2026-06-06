@@ -449,3 +449,10 @@ tasks.register("phase22Check") {
     description = "Runs Phase 22 OpenCPN chartsymbols import and symbology image export checks."
     dependsOn("phase21Check")
 }
+
+// Phase 29: OpenCPN lookup matching and CSP behavior.
+tasks.register("phase29Check") {
+    group = "verification"
+    description = "Runs OpenCPN lookup table selection, attrib-code matching, and CSP coverage checks."
+    dependsOn(":s52-core:jvmTest", ":s52-preslib:jvmTest", ":s52-csp:jvmTest", ":s52-api:jvmTest")
+}

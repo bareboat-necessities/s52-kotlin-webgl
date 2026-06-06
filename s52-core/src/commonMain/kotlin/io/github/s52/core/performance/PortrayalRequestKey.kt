@@ -1,6 +1,7 @@
 package io.github.s52.core.performance
 
 import io.github.s52.catalog.S57Attribute
+import io.github.s52.catalog.S57AttributeKey
 import io.github.s52.core.geometry.Coordinate
 import io.github.s52.core.geometry.EncGeometry
 import io.github.s52.core.model.EncFeature
@@ -37,15 +38,15 @@ data class PortrayalRequestKey(
 
 private fun EncFeature.stableHash(): Int = hashMany(
     id.hashCode(),
-    objectClass.acronym.hashCode(),
+    objectClassKey.acronym.hashCode(),
     primitive.name.hashCode(),
-    attributes.asMap().stableHash(),
+    attributes.asKeyMap().stableHash(),
     geometry.stableHash(),
     scaleMin ?: 0,
     scaleMax ?: 0
 )
 
-private fun Map<S57Attribute, S57Value>.stableHash(): Int = entries
+private fun Map<S57AttributeKey, S57Value>.stableHash(): Int = entries
     .sortedBy { it.key.acronym }
     .fold(1) { acc, entry ->
         31 * acc + hashMany(entry.key.acronym.hashCode(), entry.value.stableHash())

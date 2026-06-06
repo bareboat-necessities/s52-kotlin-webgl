@@ -11,4 +11,9 @@ object DefaultCspRegistry {
 
     /** Phase 6 registry with all CSPs referenced by the synthetic generated Presentation Library pack. */
     fun phase6Complete(): MapCspRegistry = MapCspRegistry(CspId.completePhase6Procedures())
+
+    /** Phase 29 registry with OpenCPN-numbered CSP names referenced by `chartsymbols.xml`. */
+    fun openCpn(): MapCspRegistry = MapCspRegistry(
+        CspId.completePhase6Procedures() + OpenCpnCspProcedures.procedures()
+    )
 }

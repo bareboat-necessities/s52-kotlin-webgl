@@ -18,13 +18,18 @@ data class LookupRecord(
     val overRadar: Boolean = false,
     val minimumDisplayScale: Double? = null,
     val maximumDisplayScale: Double? = null,
+    val sourceTableName: String? = null,
+    val sourceDisplayPriorityLabel: String? = null,
+    val sourceRadarPriority: String? = null,
     val sourceIndex: Int = 0,
     val objectClassKey: S57ObjectClassKey = objectClass?.toKey()
         ?: error("LookupRecord requires either objectClass or objectClassKey")
 ) {
+    val presentationTable: LookupPresentationTable = LookupPresentationTable.parse(sourceTableName)
+
     init {
         require(objectClass?.supports(primitive) != false) {
-            "Object class ${objectClass.acronym} does not support primitive $primitive"
+            "Object class ${objectClass?.acronym} does not support primitive $primitive"
         }
         require(viewingGroup >= 0) { "Viewing group must be non-negative: $viewingGroup" }
         require(displayPriority >= 0) { "Display priority must be non-negative: $displayPriority" }
