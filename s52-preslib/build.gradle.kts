@@ -56,3 +56,26 @@ tasks.register<JavaExec>("openCpnInventory") {
     })
 }
 
+tasks.register<JavaExec>("generateOpenCpnPresLib") {
+    group = "generation"
+    description = "Regenerates the commonMain OpenCPN Presentation Library pack from s52/opencpn."
+
+    val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
+    dependsOn("jvmMainClasses")
+    classpath = files(jvmCompilation.output.allOutputs, jvmCompilation.runtimeDependencyFiles)
+    mainClass.set("io.github.s52.preslib.opencpn.generator.OpenCpnPresLibGeneratorMain")
+
+    val payloadDir = rootProject.layout.projectDirectory.dir("s52/opencpn")
+    val outputFile = layout.projectDirectory.file("src/commonMain/kotlin/io/github/s52/preslib/opencpn/generated/OpenCpnGeneratedPresLib.kt")
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf(payloadDir.asFile.absolutePath, outputFile.asFile.absolutePath)
+    })
+    inputs.file(payloadDir.file("chartsymbols.xml"))
+    inputs.files(
+        payloadDir.file("rastersymbols-day.png"),
+        payloadDir.file("rastersymbols-dusk.png"),
+        payloadDir.file("rastersymbols-dark.png")
+    )
+    outputs.file(outputFile)
+}
+

@@ -13,6 +13,7 @@ import io.github.s52.preslib.S52Color
 import io.github.s52.preslib.SymbolDefinition
 import io.github.s52.preslib.SymbolRegistry
 import io.github.s52.preslib.VectorCommand
+import io.github.s52.preslib.RasterBitmapDefinition
 
 object PresLibPackBuilder {
     fun build(source: PresLibSourcePack): PresLibPack {
@@ -30,16 +31,33 @@ object PresLibPackBuilder {
                 normalized.symbols.associate { symbol -> symbol.name to symbol.toSymbolDefinition() }
             ),
             lineStyles = LineStyleRegistry(
-                normalized.lineStyles.associate { style -> style.name to LineStyleDefinition(style.name, style.description) }
+                normalized.lineStyles.associate { style ->
+                    style.name to LineStyleDefinition(
+                        name = style.name,
+                        description = style.description,
+                        colorRefs = style.colorRefs,
+                        bitmap = style.bitmap?.toRasterBitmapDefinition(),
+                        vectorHpgl = style.vectorHpgl
+                    )
+                }
             ),
             patterns = PatternRegistry(
-                normalized.patterns.associate { pattern -> pattern.name to PatternDefinition(pattern.name, pattern.description) }
+                normalized.patterns.associate { pattern ->
+                    pattern.name to PatternDefinition(
+                        name = pattern.name,
+                        description = pattern.description,
+                        colorRefs = pattern.colorRefs,
+                        bitmap = pattern.bitmap?.toRasterBitmapDefinition(),
+                        vectorHpgl = pattern.vectorHpgl
+                    )
+                }
             )
         )
     }
 
     private fun SourceLookupRecord.toLookupRecord(): LookupRecord = LookupRecord(
         objectClass = objectClass,
+        objectClassKey = objectClassKey,
         primitive = primitive,
         attributeFilter = attributeFilter.toRuntime(),
         instructions = InstructionParser.parseSequence(instruction),
@@ -57,7 +75,22 @@ object PresLibPackBuilder {
         pivotY = pivotY,
         width = width,
         height = height,
-        commands = commands.map { it.toVectorCommand() }
+        commands = commands.map { it.toVectorCommand() },
+        colorRefs = colorRefs,
+        bitmap = bitmap?.toRasterBitmapDefinition(),
+        vectorHpgl = vectorHpgl
+    )
+
+    private fun SourceBitmapRef.toRasterBitmapDefinition(): RasterBitmapDefinition = RasterBitmapDefinition(
+        atlasFileName = atlasFileName,
+        x = x,
+        y = y,
+        width = width,
+        height = height,
+        pivotX = pivotX,
+        pivotY = pivotY,
+        originX = originX,
+        originY = originY
     )
 
     private fun SourceVectorCommand.toVectorCommand(): VectorCommand = when (this) {

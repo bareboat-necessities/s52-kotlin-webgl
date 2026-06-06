@@ -184,7 +184,7 @@ object StaticCompletenessValidator {
 
         val instructions = mutableListOf<S52Instruction>()
         normalized.lookupRecords.forEachIndexed { row, record ->
-            validateSourceLookupRow(row, record.objectClass.acronym, record.primitive, record.attributeFilter, diagnostics)
+            validateSourceLookupRow(row, record.objectClassKey.acronym, record.primitive, record.attributeFilter, diagnostics)
             try {
                 instructions += InstructionParser.parseSequenceDetailed(record.instruction).ast()
             } catch (t: Throwable) {
@@ -222,8 +222,9 @@ object StaticCompletenessValidator {
         record: LookupRecord,
         diagnostics: MutableList<StaticCompletenessDiagnostic>
     ) {
-        if (record.primitive !in record.objectClass.primitives) {
-            diagnostics += StaticCompletenessDiagnostic.InvalidPrimitive(row, record.objectClass.acronym, record.primitive)
+        val standardClass = record.objectClass
+        if (standardClass != null && record.primitive !in standardClass.primitives) {
+            diagnostics += StaticCompletenessDiagnostic.InvalidPrimitive(row, standardClass.acronym, record.primitive)
         }
     }
 

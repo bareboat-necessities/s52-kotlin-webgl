@@ -2,6 +2,8 @@ package io.github.s52.core.lookup
 
 import io.github.s52.catalog.PrimitiveType
 import io.github.s52.catalog.S57ObjectClass
+import io.github.s52.catalog.S57ObjectClassKey
+import io.github.s52.catalog.toKey
 import io.github.s52.core.model.EncFeature
 import io.github.s52.core.settings.MarinerSettings
 import io.github.s52.core.settings.PortrayalContext
@@ -11,7 +13,7 @@ class LookupTable(
 ) {
     private val indexedRecords: List<IndexedRecord> = records.mapIndexed { index, record -> IndexedRecord(index, record) }
     private val byObjectAndPrimitive: Map<Key, List<IndexedRecord>> = indexedRecords
-        .groupBy { Key(it.record.objectClass, it.record.primitive) }
+        .groupBy { Key(it.record.objectClassKey, it.record.primitive) }
         .mapValues { (_, recordsForKey) ->
             recordsForKey.sortedWith(
                 compareByDescending<IndexedRecord> { it.record.attributeFilter.specificity }
@@ -23,7 +25,10 @@ class LookupTable(
     fun records(): List<LookupRecord> = indexedRecords.map { it.record }
 
     fun candidates(objectClass: S57ObjectClass, primitive: PrimitiveType): List<LookupRecord> =
-        byObjectAndPrimitive[Key(objectClass, primitive)].orEmpty().map { it.record }
+        candidates(objectClass.toKey(), primitive)
+
+    fun candidates(objectClassKey: S57ObjectClassKey, primitive: PrimitiveType): List<LookupRecord> =
+        byObjectAndPrimitive[Key(objectClassKey, primitive)].orEmpty().map { it.record }
 
     fun match(
         feature: EncFeature,
@@ -36,7 +41,7 @@ class LookupTable(
         settings: MarinerSettings,
         context: PortrayalContext
     ): List<LookupMatch> {
-        val key = Key(feature.objectClass, feature.primitive)
+        val key = Key(feature.objectClassKey, feature.primitive)
         return byObjectAndPrimitive[key].orEmpty()
             .asSequence()
             .filter { indexed -> indexed.record.matchesScale(feature, settings, context) }
@@ -51,7 +56,7 @@ class LookupTable(
         settings: MarinerSettings,
         context: PortrayalContext
     ): LookupExplanation {
-        val key = Key(feature.objectClass, feature.primitive)
+        val key = Key(feature.objectClassKey, feature.primitive)
         val candidates = byObjectAndPrimitive[key].orEmpty()
         val rejected = candidates.mapNotNull { indexed ->
             val scaleOk = indexed.record.matchesScale(feature, settings, context)
@@ -86,7 +91,7 @@ class LookupTable(
         return true
     }
 
-    private data class Key(val objectClass: S57ObjectClass, val primitive: PrimitiveType)
+    private data class Key(val objectClass: S57ObjectClassKey, val primitive: PrimitiveType)
     private data class IndexedRecord(val index: Int, val record: LookupRecord)
 }
 

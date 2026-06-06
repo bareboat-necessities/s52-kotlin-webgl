@@ -6,7 +6,22 @@ data class SymbolDefinition(
     val pivotY: Double = 0.0,
     val width: Double = 0.0,
     val height: Double = 0.0,
-    val commands: List<VectorCommand> = emptyList()
+    val commands: List<VectorCommand> = emptyList(),
+    val colorRefs: List<String> = emptyList(),
+    val bitmap: RasterBitmapDefinition? = null,
+    val vectorHpgl: String? = null
+)
+
+data class RasterBitmapDefinition(
+    val atlasFileName: String,
+    val x: Double,
+    val y: Double,
+    val width: Double,
+    val height: Double,
+    val pivotX: Double = 0.0,
+    val pivotY: Double = 0.0,
+    val originX: Double = 0.0,
+    val originY: Double = 0.0
 )
 
 sealed interface VectorCommand {

@@ -87,6 +87,14 @@ class S52PortrayalSession(
             cspRegistry = DefaultCspRegistry.phase6Complete(),
             failOnStaticCompletenessErrors = failOnStaticCompletenessErrors
         )
+
+        fun openCpn(
+            failOnStaticCompletenessErrors: Boolean = false
+        ): S52PortrayalSession = S52PortrayalSession(
+            presLib = PresLibPack.openCpn(),
+            cspRegistry = DefaultCspRegistry.phase6Complete(),
+            failOnStaticCompletenessErrors = failOnStaticCompletenessErrors
+        )
     }
 }
 

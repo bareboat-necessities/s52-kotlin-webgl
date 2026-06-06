@@ -26,6 +26,7 @@ object PresLibKotlinGenerator {
             appendLine("import io.github.s52.catalog.PrimitiveType")
             appendLine("import io.github.s52.catalog.S57Attribute")
             appendLine("import io.github.s52.catalog.S57ObjectClass")
+            appendLine("import io.github.s52.catalog.S57ObjectClassKey")
             appendLine("import io.github.s52.core.settings.DisplayCategory")
             appendLine("import io.github.s52.core.settings.S52Palette")
             appendLine("import io.github.s52.preslib.source.PresLibMetadata")
@@ -92,9 +93,14 @@ object PresLibKotlinGenerator {
             }
             appendLine("        ),")
             appendLine("        lookupRecords = listOf(")
-            normalized.lookupRecords.sortedWith(compareBy({ it.objectClass.name }, { it.primitive.name }, { it.viewingGroup })).forEachIndexed { index, record ->
+            normalized.lookupRecords.sortedWith(compareBy({ it.objectClassKey.acronym }, { it.primitive.name }, { it.viewingGroup })).forEachIndexed { index, record ->
                 appendLine("            SourceLookupRecord(")
-                appendLine("                objectClass = S57ObjectClass.${record.objectClass.name},")
+                if (record.objectClass != null) {
+                    appendLine("                objectClass = S57ObjectClass.${record.objectClass.name},")
+                } else {
+                    appendLine("                objectClass = null,")
+                    appendLine("                objectClassKey = S57ObjectClassKey.of(${record.objectClassKey.acronym.kt()}),")
+                }
                 appendLine("                primitive = PrimitiveType.${record.primitive.name},")
                 appendLine("                instruction = ${record.instruction.kt()},")
                 appendLine("                displayCategory = DisplayCategory.${record.displayCategory.name},")
@@ -124,6 +130,7 @@ object PresLibKotlinGenerator {
                 '\n' -> append("\\n")
                 '\r' -> append("\\r")
                 '\t' -> append("\\t")
+                '$' -> { append('\\'); append('$') }
                 else -> append(ch)
             }
         }

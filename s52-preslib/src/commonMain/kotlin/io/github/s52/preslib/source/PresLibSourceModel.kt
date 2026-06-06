@@ -3,6 +3,8 @@ package io.github.s52.preslib.source
 import io.github.s52.catalog.PrimitiveType
 import io.github.s52.catalog.S57Attribute
 import io.github.s52.catalog.S57ObjectClass
+import io.github.s52.catalog.S57ObjectClassKey
+import io.github.s52.catalog.toKey
 import io.github.s52.core.lookup.AttributeFilter
 import io.github.s52.core.settings.DisplayCategory
 import io.github.s52.core.settings.S52Palette
@@ -48,7 +50,10 @@ data class SourceSymbol(
     val pivotY: Double = 0.0,
     val width: Double = 0.0,
     val height: Double = 0.0,
-    val commands: List<SourceVectorCommand> = emptyList()
+    val commands: List<SourceVectorCommand> = emptyList(),
+    val colorRefs: List<String> = emptyList(),
+    val bitmap: SourceBitmapRef? = null,
+    val vectorHpgl: String? = null
 )
 
 sealed interface SourceVectorCommand {
@@ -59,16 +64,34 @@ sealed interface SourceVectorCommand {
 
 data class SourceLineStyle(
     val name: String,
-    val description: String = ""
+    val description: String = "",
+    val colorRefs: List<String> = emptyList(),
+    val bitmap: SourceBitmapRef? = null,
+    val vectorHpgl: String? = null
 )
 
 data class SourcePattern(
     val name: String,
-    val description: String = ""
+    val description: String = "",
+    val colorRefs: List<String> = emptyList(),
+    val bitmap: SourceBitmapRef? = null,
+    val vectorHpgl: String? = null
+)
+
+data class SourceBitmapRef(
+    val atlasFileName: String = "rastersymbols-day.png",
+    val x: Double,
+    val y: Double,
+    val width: Double,
+    val height: Double,
+    val pivotX: Double = 0.0,
+    val pivotY: Double = 0.0,
+    val originX: Double = 0.0,
+    val originY: Double = 0.0
 )
 
 data class SourceLookupRecord(
-    val objectClass: S57ObjectClass,
+    val objectClass: S57ObjectClass? = null,
     val primitive: PrimitiveType,
     val instruction: String,
     val displayCategory: DisplayCategory,
@@ -77,7 +100,13 @@ data class SourceLookupRecord(
     val overRadar: Boolean = false,
     val attributeFilter: SourceAttributeFilter = SourceAttributeFilter.Any,
     val minimumDisplayScale: Double? = null,
-    val maximumDisplayScale: Double? = null
+    val maximumDisplayScale: Double? = null,
+    val objectClassKey: S57ObjectClassKey = objectClass?.toKey()
+        ?: error("SourceLookupRecord requires either objectClass or objectClassKey"),
+    val sourceTableName: String? = null,
+    val sourceDisplayPriorityLabel: String? = null,
+    val sourceRadarPriority: String? = null,
+    val rawAttribCodes: List<String> = emptyList()
 )
 
 /** Structural, generator-friendly lookup filter model. */

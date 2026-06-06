@@ -2,7 +2,10 @@ package io.github.s52.preslib
 
 data class LineStyleDefinition(
     val name: String,
-    val description: String = ""
+    val description: String = "",
+    val colorRefs: List<String> = emptyList(),
+    val bitmap: RasterBitmapDefinition? = null,
+    val vectorHpgl: String? = null
 )
 
 class LineStyleRegistry(
@@ -15,7 +18,10 @@ class LineStyleRegistry(
 
 data class PatternDefinition(
     val name: String,
-    val description: String = ""
+    val description: String = "",
+    val colorRefs: List<String> = emptyList(),
+    val bitmap: RasterBitmapDefinition? = null,
+    val vectorHpgl: String? = null
 )
 
 class PatternRegistry(

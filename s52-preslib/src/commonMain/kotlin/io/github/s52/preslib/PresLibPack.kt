@@ -21,5 +21,12 @@ data class PresLibPack(
         fun phase2Synthetic(): PresLibPack = io.github.s52.preslib.generated.GeneratedPhase2PresLib.pack()
 
         fun s52LibCompat(): PresLibPack = io.github.s52.preslib.s52lib.S52LibCompatPresLib.pack()
+
+        /**
+         * Runtime pack generated from the corrected OpenCPN portrayal payload
+         * under `s52/opencpn`. Phase 28C exposes the complete imported data;
+         * later phases upgrade lookup filtering and WebGL rendering semantics.
+         */
+        fun openCpn(): PresLibPack = io.github.s52.preslib.opencpn.generated.OpenCpnGeneratedPresLib.pack()
     }
 }

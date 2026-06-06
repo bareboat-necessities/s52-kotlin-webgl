@@ -28,6 +28,12 @@ object S52 {
     /** Build the Phase 20 session facade using the s52lib-compatible synthetic pack. */
     fun s52LibCompat(): S52PortrayalSession = S52PortrayalSession.s52LibCompat()
 
+    /** Build a runtime backed by the generated OpenCPN Presentation Library pack. */
+    fun openCpnRuntime(): S52Runtime = S52Runtime.openCpn()
+
+    /** Build a session facade backed by the generated OpenCPN Presentation Library pack. */
+    fun openCpn(): S52PortrayalSession = S52PortrayalSession.openCpn()
+
     /** Stable default mariner settings used by examples and tests. */
     fun defaultSettings(
         displayCategory: DisplayCategory = DisplayCategory.Standard,
