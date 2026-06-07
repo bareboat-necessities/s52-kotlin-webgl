@@ -6,6 +6,7 @@ import io.github.s52.preslib.source.PresLibMetadata
 import io.github.s52.preslib.source.PresLibSourcePack
 import io.github.s52.preslib.source.SourceColor
 import io.github.s52.preslib.source.SourceColorTable
+import io.github.s52.preslib.source.SourceBitmapRef
 import io.github.s52.preslib.source.SourceLineStyle
 import io.github.s52.preslib.source.SourcePattern
 import io.github.s52.preslib.source.SourceSymbol
@@ -108,6 +109,7 @@ object OpenCpnChartSymbolsImporter {
         root.getElementsByTagName("line-style").asElements().mapNotNull { line ->
             val name = line.childText("name") ?: line.getAttribute("name").takeIf { it.isNotBlank() } ?: return@mapNotNull null
             val vector = line.childElement("vector")
+            val bitmap = parseBitmap(line.childElement("bitmap"))
             val hpgl = vector?.childText("HPGL") ?: line.childText("HPGL").orEmpty()
             OpenCpnRenderableAsset(
                 name = name.take(8),
@@ -117,9 +119,10 @@ object OpenCpnChartSymbolsImporter {
                 hpgl = hpgl,
                 width = vector?.getAttribute("width")?.toDoubleOrNull() ?: 64.0,
                 height = vector?.getAttribute("height")?.toDoubleOrNull() ?: 16.0,
-                pivotX = vector?.childElement("pivot")?.getAttribute("x")?.toDoubleOrNull() ?: 0.0,
-                pivotY = vector?.childElement("pivot")?.getAttribute("y")?.toDoubleOrNull() ?: 0.0,
-                commands = parseHpglAsSourceCommands(hpgl)
+                pivotX = vector?.childElement("pivot")?.getAttribute("x")?.toDoubleOrNull() ?: bitmap?.pivotX ?: 0.0,
+                pivotY = vector?.childElement("pivot")?.getAttribute("y")?.toDoubleOrNull() ?: bitmap?.pivotY ?: 0.0,
+                commands = parseHpglAsSourceCommands(hpgl),
+                bitmap = bitmap
             )
         }
 
@@ -127,6 +130,7 @@ object OpenCpnChartSymbolsImporter {
         root.getElementsByTagName("pattern").asElements().mapNotNull { pattern ->
             val name = pattern.childText("name") ?: pattern.getAttribute("name").takeIf { it.isNotBlank() } ?: return@mapNotNull null
             val vector = pattern.childElement("vector")
+            val bitmap = parseBitmap(pattern.childElement("bitmap"))
             val hpgl = vector?.childText("HPGL") ?: pattern.childText("HPGL").orEmpty()
             OpenCpnRenderableAsset(
                 name = name.take(8),
@@ -134,11 +138,12 @@ object OpenCpnChartSymbolsImporter {
                 description = pattern.childText("description").orEmpty(),
                 colorRefs = pattern.colorRefs(),
                 hpgl = hpgl,
-                width = vector?.getAttribute("width")?.toDoubleOrNull() ?: 32.0,
-                height = vector?.getAttribute("height")?.toDoubleOrNull() ?: 32.0,
-                pivotX = vector?.childElement("pivot")?.getAttribute("x")?.toDoubleOrNull() ?: 0.0,
-                pivotY = vector?.childElement("pivot")?.getAttribute("y")?.toDoubleOrNull() ?: 0.0,
-                commands = parseHpglAsSourceCommands(hpgl)
+                width = vector?.getAttribute("width")?.toDoubleOrNull() ?: bitmap?.width ?: 32.0,
+                height = vector?.getAttribute("height")?.toDoubleOrNull() ?: bitmap?.height ?: 32.0,
+                pivotX = vector?.childElement("pivot")?.getAttribute("x")?.toDoubleOrNull() ?: bitmap?.pivotX ?: 0.0,
+                pivotY = vector?.childElement("pivot")?.getAttribute("y")?.toDoubleOrNull() ?: bitmap?.pivotY ?: 0.0,
+                commands = parseHpglAsSourceCommands(hpgl),
+                bitmap = bitmap
             )
         }
 
@@ -146,8 +151,13 @@ object OpenCpnChartSymbolsImporter {
         root.getElementsByTagName("symbol").asElements().mapNotNull { symbol ->
             val name = symbol.childText("name") ?: symbol.getAttribute("name").takeIf { it.isNotBlank() } ?: return@mapNotNull null
             val vector = symbol.childElement("vector")
+            val bitmap = parseBitmap(symbol.childElement("bitmap"))
             val hpgl = vector?.childText("HPGL") ?: symbol.childText("HPGL").orEmpty()
-            val commands = parseHpglAsSourceCommands(hpgl).ifEmpty { fallbackSymbolCommands(name) }
+            val parsedCommands = parseHpglAsSourceCommands(hpgl)
+            // Do not fabricate polygon/triangle commands for bitmap-backed OpenCPN symbols.
+            // SVG/browser exporters can render these from rastersymbols-*.png; fake vectors made
+            // every bitmap-only symbol look like a triangle or random polygon.
+            val commands = if (parsedCommands.isEmpty() && bitmap == null) fallbackSymbolCommands(name) else parsedCommands
             val bounds = bounds(commands)
             OpenCpnRenderableAsset(
                 name = name.take(8),
@@ -155,11 +165,12 @@ object OpenCpnChartSymbolsImporter {
                 description = symbol.childText("description").orEmpty(),
                 colorRefs = symbol.colorRefs(),
                 hpgl = hpgl,
-                width = vector?.getAttribute("width")?.toDoubleOrNull() ?: max(1.0, bounds.maxX - bounds.minX),
-                height = vector?.getAttribute("height")?.toDoubleOrNull() ?: max(1.0, bounds.maxY - bounds.minY),
-                pivotX = vector?.childElement("pivot")?.getAttribute("x")?.toDoubleOrNull() ?: (bounds.minX + bounds.maxX) / 2.0,
-                pivotY = vector?.childElement("pivot")?.getAttribute("y")?.toDoubleOrNull() ?: (bounds.minY + bounds.maxY) / 2.0,
-                commands = commands
+                width = vector?.getAttribute("width")?.toDoubleOrNull() ?: bitmap?.width ?: max(1.0, bounds.maxX - bounds.minX),
+                height = vector?.getAttribute("height")?.toDoubleOrNull() ?: bitmap?.height ?: max(1.0, bounds.maxY - bounds.minY),
+                pivotX = vector?.childElement("pivot")?.getAttribute("x")?.toDoubleOrNull() ?: bitmap?.pivotX ?: (bounds.minX + bounds.maxX) / 2.0,
+                pivotY = vector?.childElement("pivot")?.getAttribute("y")?.toDoubleOrNull() ?: bitmap?.pivotY ?: (bounds.minY + bounds.maxY) / 2.0,
+                commands = commands,
+                bitmap = bitmap
             )
         }
 
@@ -190,8 +201,8 @@ object OpenCpnChartSymbolsImporter {
             ),
             colorTables = colorTables,
             symbols = symbols.map { it.toSourceSymbol() }.sortedBy { it.name },
-            lineStyles = if (lineStyles.isEmpty()) fallback.lineStyles else lineStyles.map { SourceLineStyle(it.name, it.description) }.sortedBy { it.name },
-            patterns = if (patterns.isEmpty()) fallback.patterns else patterns.map { SourcePattern(it.name, it.description) }.sortedBy { it.name }
+            lineStyles = if (lineStyles.isEmpty()) fallback.lineStyles else lineStyles.map { it.toSourceLineStyle() }.sortedBy { it.name },
+            patterns = if (patterns.isEmpty()) fallback.patterns else patterns.map { it.toSourcePattern() }.sortedBy { it.name }
         )
     }
 
@@ -201,8 +212,67 @@ object OpenCpnChartSymbolsImporter {
         pivotY = pivotY,
         width = width,
         height = height,
-        commands = commands
+        commands = commands,
+        colorRefs = colorRefs,
+        bitmap = bitmap?.toSourceBitmapRef(),
+        vectorHpgl = hpgl.takeIf { it.isNotBlank() }
     )
+
+    private fun OpenCpnRenderableAsset.toSourceLineStyle(): SourceLineStyle = SourceLineStyle(
+        name = name,
+        description = description,
+        pivotX = pivotX,
+        pivotY = pivotY,
+        width = width,
+        height = height,
+        colorRefs = colorRefs,
+        bitmap = bitmap?.toSourceBitmapRef(),
+        vectorHpgl = hpgl.takeIf { it.isNotBlank() }
+    )
+
+    private fun OpenCpnRenderableAsset.toSourcePattern(): SourcePattern = SourcePattern(
+        name = name,
+        description = description,
+        pivotX = pivotX,
+        pivotY = pivotY,
+        width = width,
+        height = height,
+        colorRefs = colorRefs,
+        bitmap = bitmap?.toSourceBitmapRef(),
+        vectorHpgl = hpgl.takeIf { it.isNotBlank() }
+    )
+
+    private fun OpenCpnBitmapRef.toSourceBitmapRef(): SourceBitmapRef = SourceBitmapRef(
+        atlasFileName = atlasFileName,
+        x = x,
+        y = y,
+        width = width,
+        height = height,
+        pivotX = pivotX,
+        pivotY = pivotY,
+        originX = originX,
+        originY = originY
+    )
+
+    private fun parseBitmap(bitmap: Element?): OpenCpnBitmapRef? {
+        if (bitmap == null) return null
+        val width = bitmap.getAttribute("width").toDoubleOrNull() ?: return null
+        val height = bitmap.getAttribute("height").toDoubleOrNull() ?: return null
+        val pivot = bitmap.childElement("pivot")
+        val origin = bitmap.childElement("origin")
+        val location = bitmap.childElement("graphics-location") ?: return null
+        return OpenCpnBitmapRef(
+            atlasFileName = "rastersymbols-day.png",
+            x = location.getAttribute("x").toDoubleOrNull() ?: return null,
+            y = location.getAttribute("y").toDoubleOrNull() ?: return null,
+            width = width,
+            height = height,
+            pivotX = pivot?.getAttribute("x")?.toDoubleOrNull() ?: 0.0,
+            pivotY = pivot?.getAttribute("y")?.toDoubleOrNull() ?: 0.0,
+            originX = origin?.getAttribute("x")?.toDoubleOrNull() ?: 0.0,
+            originY = origin?.getAttribute("y")?.toDoubleOrNull() ?: 0.0
+        )
+    }
 
     private fun Element.colorRefs(): List<String> = descendantElements("color-ref")
         .flatMap { parseColorRefs(it.textContent) }
@@ -551,7 +621,20 @@ data class OpenCpnRenderableAsset(
     val height: Double,
     val pivotX: Double,
     val pivotY: Double,
-    val commands: List<SourceVectorCommand>
+    val commands: List<SourceVectorCommand>,
+    val bitmap: OpenCpnBitmapRef? = null
+)
+
+data class OpenCpnBitmapRef(
+    val atlasFileName: String = "rastersymbols-day.png",
+    val x: Double,
+    val y: Double,
+    val width: Double,
+    val height: Double,
+    val pivotX: Double = 0.0,
+    val pivotY: Double = 0.0,
+    val originX: Double = 0.0,
+    val originY: Double = 0.0
 )
 
 enum class OpenCpnAssetKind {
