@@ -13,8 +13,16 @@ import io.github.s52.preslib.opencpn.OpenCpnRenderablePack
 import io.github.s52.preslib.source.PresLibPackBuilder
 import io.github.s52.preslib.source.PresLibSourcePack
 import io.github.s52.preslib.source.SourceColor
+import io.github.s52.preslib.source.SourceVectorCommand
+import java.awt.BasicStroke
+import java.awt.Color
+import java.awt.Graphics2D
+import java.awt.RenderingHints
+import java.awt.image.BufferedImage
+import java.io.ByteArrayOutputStream
 import java.io.File
-import java.nio.file.Files
+import java.util.Base64
+import javax.imageio.ImageIO
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.ceil
@@ -104,12 +112,14 @@ object S52SymbologyImageExporter {
         val patternDir = outputDirectory.resolve("patterns").also { it.mkdirs() }
         val colorDir = outputDirectory.resolve("colors").also { it.mkdirs() }
 
-        for (symbol in renderable.symbols) files += writeText(symbolDir.resolve("${safeFileName(symbol.name)}.svg"), renderOpenCpnAssetSvg(symbol, colorMap))
+        val atlasImages = loadOpenCpnRasterAtlases(assetDirectory)
+
+        for (symbol in renderable.symbols) files += writeText(symbolDir.resolve("${safeFileName(symbol.name)}.svg"), renderOpenCpnAssetSvg(symbol, colorMap, atlasImages.day))
         for (line in renderable.lineStyles) files += writeText(lineDir.resolve("${safeFileName(line.name)}.svg"), renderOpenCpnLineStyleSvg(line, colorMap))
         for (pattern in renderable.patterns) files += writeText(patternDir.resolve("${safeFileName(pattern.name)}.svg"), renderOpenCpnAssetSvg(pattern, colorMap))
         for (color in colors) files += writeText(colorDir.resolve("${safeFileName(color.token)}.svg"), renderColorSvg(color.token, color.r, color.g, color.b))
 
-        val atlasFiles = copyOpenCpnRasterAtlases(assetDirectory, outputDirectory)
+        val atlasFiles = writeRenderedSymbolAtlases(outputDirectory, renderable.symbols, atlasImages)
 
         files += writeText(outputDirectory.resolve("index.html"), renderIndexHtml(sourcePack.metadata.name, sourcePack.metadata.edition, renderable.symbols.map { it.name }, renderable.lineStyles.map { it.name }, renderable.patterns.map { it.name }, colors.map { it.token }, atlasFiles.map { it.name }))
         files += writeText(outputDirectory.resolve("manifest.properties"), manifest(sourcePack.metadata.name, sourcePack.metadata.edition, sourcePack.metadata.sourceDescription, sourcePack.metadata.generatedBy, renderable.symbols.size, renderable.lineStyles.size, renderable.patterns.size, colors.size, files.size + atlasFiles.size + 1, atlasFiles.map { it.name }))
@@ -121,13 +131,33 @@ object S52SymbologyImageExporter {
         System.getProperty("opencpn.chartsymbols")?.takeIf { it.isNotBlank() }?.let(::File)
             ?: System.getenv("OPENCPN_CHARTSYMBOLS_XML_FILE")?.takeIf { it.isNotBlank() }?.let(::File)
 
-    private fun renderOpenCpnAssetSvg(asset: OpenCpnRenderableAsset, colors: Map<String, SourceColor>): String {
-        val rendered = HpglSvgRenderer(asset, colors).render()
+    private fun renderOpenCpnAssetSvg(asset: OpenCpnRenderableAsset, colors: Map<String, SourceColor>, dayAtlas: BufferedImage? = null): String {
         val title = when (asset.kind) {
             OpenCpnAssetKind.Symbol -> "Symbol"
             OpenCpnAssetKind.LineStyle -> "Line style"
             OpenCpnAssetKind.Pattern -> "Pattern"
         }
+        val bitmap = asset.bitmap
+        if (bitmap != null && dayAtlas != null) {
+            val crop = cropBitmap(dayAtlas, bitmap)
+            if (crop != null) {
+                val width = max(32, bitmap.width + 16)
+                val height = max(32, bitmap.height + 24)
+                val x = (width - bitmap.width) / 2
+                val y = (height - bitmap.height) / 2
+                return """
+                    |<svg xmlns="http://www.w3.org/2000/svg" width="$width" height="$height" viewBox="0 0 $width $height" role="img" aria-label="${xml(asset.name)}">
+                    |  <title>${xml(asset.name)} $title</title>
+                    |  <desc>OpenCPN bitmap cell x=${bitmap.x}, y=${bitmap.y}, width=${bitmap.width}, height=${bitmap.height}</desc>
+                    |  <rect width="100%" height="100%" fill="white"/>
+                    |  <image x="$x" y="$y" width="${bitmap.width}" height="${bitmap.height}" preserveAspectRatio="none" href="${pngDataUri(crop)}"/>
+                    |  <text x="4" y="${height - 4}" font-family="monospace" font-size="8" fill="#333333">${xml(asset.name)} $title</text>
+                    |</svg>
+                """.trimMargin()
+            }
+        }
+
+        val rendered = HpglSvgRenderer(asset, colors).render()
         return """
             |<svg xmlns="http://www.w3.org/2000/svg" width="${rendered.width}" height="${rendered.height}" viewBox="0 0 ${rendered.width} ${rendered.height}" overflow="visible" shape-rendering="geometricPrecision" role="img" aria-label="${xml(asset.name)}">
             |  <title>${xml(asset.name)} $title</title>
@@ -270,25 +300,143 @@ object S52SymbologyImageExporter {
         appendLine("</div></div>")
     }
 
-    private fun copyOpenCpnRasterAtlases(assetDirectory: File?, outputDirectory: File): List<File> {
-        if (assetDirectory == null || !assetDirectory.isDirectory) return emptyList()
-        val requested = listOf(
-            "rastersymbols-day.png" to "symbol-atlas-day.png",
-            "rastersymbols-dusk.png" to "symbol-atlas-dusk.png",
-            "rastersymbols-dark.png" to "symbol-atlas-dark.png"
+    private fun loadOpenCpnRasterAtlases(assetDirectory: File?): OpenCpnRasterAtlases {
+        fun read(name: String): BufferedImage? {
+            val file = assetDirectory?.resolve(name)
+            return if (file != null && file.isFile) ImageIO.read(file) else null
+        }
+        return OpenCpnRasterAtlases(
+            day = read("rastersymbols-day.png"),
+            dusk = read("rastersymbols-dusk.png"),
+            dark = read("rastersymbols-dark.png")
         )
-        val copied = mutableListOf<File>()
-        for ((sourceName, targetName) in requested) {
-            val source = assetDirectory.resolve(sourceName)
-            if (source.isFile) {
-                val target = outputDirectory.resolve(targetName)
-                target.parentFile?.mkdirs()
-                Files.copy(source.toPath(), target.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING)
-                copied += target
+    }
+
+    private fun writeRenderedSymbolAtlases(outputDirectory: File, symbols: List<OpenCpnRenderableAsset>, atlases: OpenCpnRasterAtlases): List<File> {
+        val outputs = listOf(
+            RenderedPaletteAtlas("symbol-atlas-day.png", Color(255, 255, 255), atlases.day),
+            RenderedPaletteAtlas("symbol-atlas-dusk.png", Color(58, 58, 68), atlases.dusk ?: atlases.day),
+            RenderedPaletteAtlas("symbol-atlas-dark.png", Color(8, 12, 18), atlases.dark ?: atlases.day)
+        )
+        return outputs.map { spec ->
+            val out = outputDirectory.resolve(spec.fileName)
+            renderSymbolContactSheetPng(symbols, spec.background, spec.sourceRaster, out)
+            out
+        }
+    }
+
+    private fun renderSymbolContactSheetPng(symbols: List<OpenCpnRenderableAsset>, background: Color, rasterSheet: BufferedImage?, output: File) {
+        val width = 2560
+        val height = 1440
+        val cell = 48
+        val cols = width / cell
+        val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
+        val g = image.createGraphics()
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR)
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+        g.color = background
+        g.fillRect(0, 0, width, height)
+        for ((index, symbol) in symbols.withIndex()) {
+            val col = index % cols
+            val row = index / cols
+            val x = col * cell
+            val y = row * cell
+            if (y >= height) break
+            g.color = Color(background.red, background.green, background.blue, 255)
+            g.fillRect(x, y, cell, cell)
+            drawRenderedSymbolCell(g, symbol, rasterSheet, x, y, cell)
+        }
+        g.dispose()
+        output.parentFile?.mkdirs()
+        ImageIO.write(image, "png", output)
+    }
+
+    private fun drawRenderedSymbolCell(g: Graphics2D, symbol: OpenCpnRenderableAsset, rasterSheet: BufferedImage?, x: Int, y: Int, cell: Int) {
+        val bitmap = symbol.bitmap
+        if (bitmap != null && rasterSheet != null) {
+            val crop = cropBitmap(rasterSheet, bitmap)
+            if (crop != null) {
+                val scale = min((cell - 8).toDouble() / bitmap.width, (cell - 8).toDouble() / bitmap.height).coerceAtMost(2.0)
+                val w = max(1, kotlin.math.round(bitmap.width * scale).toInt())
+                val h = max(1, kotlin.math.round(bitmap.height * scale).toInt())
+                g.drawImage(crop, x + (cell - w) / 2, y + (cell - h) / 2, w, h, null)
+                return
             }
         }
-        return copied
+        if (symbol.commands.isNotEmpty()) {
+            drawVectorSymbolCell(g, symbol.commands, x, y, cell)
+        } else {
+            g.color = Color(160, 160, 160, 180)
+            g.stroke = BasicStroke(1f)
+            g.drawLine(x + 16, y + 16, x + cell - 16, y + cell - 16)
+            g.drawLine(x + cell - 16, y + 16, x + 16, y + cell - 16)
+        }
     }
+
+    private fun drawVectorSymbolCell(g: Graphics2D, commands: List<SourceVectorCommand>, x: Int, y: Int, cell: Int) {
+        val xs = commands.flatMap {
+            when (it) {
+                is SourceVectorCommand.MoveTo -> listOf(it.x)
+                is SourceVectorCommand.LineTo -> listOf(it.x)
+                SourceVectorCommand.ClosePath -> emptyList()
+            }
+        }
+        val ys = commands.flatMap {
+            when (it) {
+                is SourceVectorCommand.MoveTo -> listOf(it.y)
+                is SourceVectorCommand.LineTo -> listOf(it.y)
+                SourceVectorCommand.ClosePath -> emptyList()
+            }
+        }
+        if (xs.isEmpty() || ys.isEmpty()) return
+        val minX = xs.minOrNull() ?: return
+        val maxX = xs.maxOrNull() ?: return
+        val minY = ys.minOrNull() ?: return
+        val maxY = ys.maxOrNull() ?: return
+        val spanX = max(1.0, maxX - minX)
+        val spanY = max(1.0, maxY - minY)
+        val scale = min((cell - 10).toDouble() / spanX, (cell - 10).toDouble() / spanY)
+        fun tx(v: Double) = x + 5 + ((v - minX) * scale).toInt()
+        fun ty(v: Double) = y + 5 + ((v - minY) * scale).toInt()
+        g.color = Color.BLACK
+        g.stroke = BasicStroke(1.2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+        var cx = 0
+        var cy = 0
+        for (command in commands) {
+            when (command) {
+                is SourceVectorCommand.MoveTo -> {
+                    cx = tx(command.x)
+                    cy = ty(command.y)
+                }
+                is SourceVectorCommand.LineTo -> {
+                    val nx = tx(command.x)
+                    val ny = ty(command.y)
+                    g.drawLine(cx, cy, nx, ny)
+                    cx = nx
+                    cy = ny
+                }
+                SourceVectorCommand.ClosePath -> Unit
+            }
+        }
+    }
+
+    private fun cropBitmap(sheet: BufferedImage, bitmap: io.github.s52.preslib.opencpn.OpenCpnBitmapRef): BufferedImage? {
+        if (bitmap.x < 0 || bitmap.y < 0 || bitmap.width <= 0 || bitmap.height <= 0) return null
+        if (bitmap.x + bitmap.width > sheet.width || bitmap.y + bitmap.height > sheet.height) return null
+        val crop = BufferedImage(bitmap.width, bitmap.height, BufferedImage.TYPE_INT_ARGB)
+        val g = crop.createGraphics()
+        g.drawImage(sheet, 0, 0, bitmap.width, bitmap.height, bitmap.x, bitmap.y, bitmap.x + bitmap.width, bitmap.y + bitmap.height, null)
+        g.dispose()
+        return crop
+    }
+
+    private fun pngDataUri(image: BufferedImage): String {
+        val out = ByteArrayOutputStream()
+        ImageIO.write(image, "png", out)
+        return "data:image/png;base64," + Base64.getEncoder().encodeToString(out.toByteArray())
+    }
+
+
 
     private fun List<VectorCommand>.toSvgPath(offsetX: Double, offsetY: Double): String = buildString {
         for (command in this@toSvgPath) {
@@ -574,6 +722,9 @@ object S52SymbologyImageExporter {
         }
     }
 }
+
+private data class OpenCpnRasterAtlases(val day: BufferedImage?, val dusk: BufferedImage?, val dark: BufferedImage?)
+private data class RenderedPaletteAtlas(val fileName: String, val background: Color, val sourceRaster: BufferedImage?)
 
 private data class HpglToken(val code: String, val args: String)
 

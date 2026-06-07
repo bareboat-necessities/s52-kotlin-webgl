@@ -59,20 +59,33 @@ class S52SymbologyImageExporterTest {
 
 
     @Test
-    fun exporterCopiesDayDuskDarkPngAtlasesWhenPresentBesideChartsymbolsXml() {
+    fun exporterGeneratesRenderedDayDuskDarkSymbolContactSheetsWhenAtlasesArePresent() {
         val dir = File("build/test-opencpn-symbology-atlases")
         val inputDir = File("build/test-opencpn-with-atlases").also { it.deleteRecursively(); it.mkdirs() }
-        val chartsymbols = inputDir.resolve("chartsymbols.xml").also { it.writeText(fixtureFile().readText()) }
+        val chartsymbols = inputDir.resolve("chartsymbols.xml").also { it.writeText(bitmapFixtureXml()) }
         writeDummyPng(inputDir.resolve("rastersymbols-day.png"), Color(240, 220, 200))
         writeDummyPng(inputDir.resolve("rastersymbols-dusk.png"), Color(120, 100, 160))
         writeDummyPng(inputDir.resolve("rastersymbols-dark.png"), Color(40, 50, 70))
 
         val report = S52SymbologyImageExporter.exportImportedOpenCpn(dir, chartsymbols)
         assertTrue(report.fileCount > 0)
-        assertTrue(dir.resolve("symbol-atlas-day.png").isFile)
-        assertTrue(dir.resolve("symbol-atlas-dusk.png").isFile)
-        assertTrue(dir.resolve("symbol-atlas-dark.png").isFile)
-        assertEquals(12, ImageIO.read(dir.resolve("symbol-atlas-day.png")).width)
+        val dayAtlas = ImageIO.read(dir.resolve("symbol-atlas-day.png"))
+        val duskAtlas = ImageIO.read(dir.resolve("symbol-atlas-dusk.png"))
+        val darkAtlas = ImageIO.read(dir.resolve("symbol-atlas-dark.png"))
+        assertEquals(2560, dayAtlas.width)
+        assertEquals(1440, dayAtlas.height)
+        assertEquals(2560, duskAtlas.width)
+        assertEquals(1440, darkAtlas.height)
+        assertTrue(hasNonBackgroundPixel(dayAtlas, Color.WHITE))
+        assertTrue(hasNonBackgroundPixel(duskAtlas, Color(58, 58, 68)))
+        assertTrue(hasNonBackgroundPixel(darkAtlas, Color(8, 12, 18)))
+
+        val bitmapSymbolSvg = dir.resolve("symbols/SYM000.svg").readText()
+        assertTrue("data:image/png;base64," in bitmapSymbolSvg)
+        assertTrue("OpenCPN bitmap cell" in bitmapSymbolSvg)
+        assertTrue("M 0 -8 L 8 8 L -8 8 Z" !in bitmapSymbolSvg)
+        assertTrue("<circle" !in bitmapSymbolSvg)
+
         val manifest = dir.resolve("manifest.properties").readText()
         assertTrue("pngSymbolAtlases=3" in manifest)
         assertTrue("pngSymbolAtlasFiles=symbol-atlas-day.png,symbol-atlas-dusk.png,symbol-atlas-dark.png" in manifest)
@@ -111,6 +124,33 @@ class S52SymbologyImageExporterTest {
         g.dispose()
         file.parentFile?.mkdirs()
         ImageIO.write(image, "png", file)
+    }
+
+
+    private fun bitmapFixtureXml(): String {
+        val marker = "<color-ref>ACHBLKBCHREDCCHGRN</color-ref>"
+        val bitmap = """
+          <bitmap width="12" height="10">
+            <distance min="0" max="0"/>
+            <pivot x="6" y="5"/>
+            <origin x="0" y="0"/>
+            <graphics-location x="0" y="0"/>
+          </bitmap>
+        """.trimIndent()
+        return fixtureFile().readText().replaceFirst(marker, "$bitmap\n  $marker")
+    }
+
+    private fun hasNonBackgroundPixel(image: BufferedImage, background: Color): Boolean {
+        val bg = background.rgb and 0x00ffffff
+        for (y in 0 until image.height step 8) {
+            for (x in 0 until image.width step 8) {
+                val argb = image.getRGB(x, y)
+                val alpha = (argb ushr 24) and 0xff
+                val rgb = argb and 0x00ffffff
+                if (alpha > 0 && rgb != bg) return true
+            }
+        }
+        return false
     }
 
     private fun fixtureFile(): File = File(requireNotNull(javaClass.getResource("/opencpn/chartsymbols-fixture.xml")).toURI())
