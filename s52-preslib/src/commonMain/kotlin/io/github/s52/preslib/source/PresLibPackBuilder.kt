@@ -1,21 +1,22 @@
 package io.github.s52.preslib.source
 
 import io.github.s52.core.instruction.InstructionParser
+import io.github.s52.core.instruction.S52Instruction
 import io.github.s52.core.lookup.AttributeFilter
 import io.github.s52.core.lookup.LookupRecord
-import io.github.s52.core.lookup.OpenCpnAttribCodeRuntimeParser
 import io.github.s52.core.lookup.LookupTable
+import io.github.s52.core.lookup.OpenCpnAttribCodeRuntimeParser
 import io.github.s52.preslib.ColorTables
 import io.github.s52.preslib.LineStyleDefinition
 import io.github.s52.preslib.LineStyleRegistry
 import io.github.s52.preslib.PatternDefinition
 import io.github.s52.preslib.PatternRegistry
 import io.github.s52.preslib.PresLibPack
+import io.github.s52.preslib.RasterBitmapDefinition
 import io.github.s52.preslib.S52Color
 import io.github.s52.preslib.SymbolDefinition
 import io.github.s52.preslib.SymbolRegistry
 import io.github.s52.preslib.VectorCommand
-import io.github.s52.preslib.RasterBitmapDefinition
 
 object PresLibPackBuilder {
     fun build(source: PresLibSourcePack): PresLibPack {
@@ -66,11 +67,23 @@ object PresLibPackBuilder {
     }
 
     private fun SourceLookupRecord.toLookupRecord(): LookupRecord = LookupRecord(
-        objectClass = objectClass,
+        /*
+         * OpenCPN chartsymbols.xml contains many valid lookup rows whose object
+         * acronym is a known S-57 class, but whose lookup primitive differs from
+         * the small starter enum catalogue in s52-catalog.
+         *
+         * Example: FERYRT / Area and RECTRC / Area appear in OpenCPN lookup
+         * tables, while the starter enum marks those classes as Line-only.
+         *
+         * For generated OpenCPN packs, objectClassKey is authoritative. Passing
+         * the enum objectClass through in those cases trips LookupRecord's
+         * compatibility guard and prevents the entire pack from loading.
+         */
+        objectClass = objectClass?.takeIf { it.supports(primitive) },
         objectClassKey = objectClassKey,
         primitive = primitive,
         attributeFilter = combinedRuntimeFilter(),
-        instructions = InstructionParser.parseSequence(instruction),
+        instructions = parseInstructionsLenient(instruction),
         displayCategory = displayCategory,
         viewingGroup = viewingGroup,
         displayPriority = displayPriority,
@@ -89,6 +102,33 @@ object PresLibPackBuilder {
             explicit === AttributeFilter.Any -> openCpn
             openCpn === AttributeFilter.Any -> explicit
             else -> AttributeFilter.All(listOf(explicit, openCpn))
+        }
+    }
+
+    private fun parseInstructionsLenient(source: String): List<S52Instruction> {
+        if (source.isBlank()) return emptyList()
+
+        return try {
+            InstructionParser.parseSequence(source)
+        } catch (_: IllegalArgumentException) {
+            /*
+             * Keep OpenCPN pack construction resilient. A single unusual
+             * presentation instruction should not make diagnostics or unrelated
+             * lookup rows fail to load. Try to keep all parseable segments.
+             */
+            source.split(';')
+                .mapNotNull { segment ->
+                    val trimmed = segment.trim()
+                    if (trimmed.isEmpty()) {
+                        null
+                    } else {
+                        try {
+                            InstructionParser.parseOne(trimmed)
+                        } catch (_: IllegalArgumentException) {
+                            null
+                        }
+                    }
+                }
         }
     }
 
