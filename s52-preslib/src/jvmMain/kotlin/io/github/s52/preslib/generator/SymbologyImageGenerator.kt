@@ -3,17 +3,32 @@ package io.github.s52.preslib.generator
 import io.github.s52.preslib.LineStyleDefinition
 import io.github.s52.preslib.PatternDefinition
 import io.github.s52.preslib.PresLibPack
+import io.github.s52.preslib.RasterBitmapDefinition
 import io.github.s52.preslib.SymbolDefinition
 import io.github.s52.preslib.VectorCommand
+import java.awt.image.BufferedImage
+import java.io.ByteArrayOutputStream
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.Base64
+import javax.imageio.ImageIO
+import kotlin.io.path.isDirectory
+import kotlin.io.path.isRegularFile
 import kotlin.io.path.writeText
 import kotlin.math.ceil
 import kotlin.math.max
+import kotlin.math.min
 
 /**
- * Generates browsable SVG image artifacts for every symbol, line style, and pattern in the bundled
- * synthetic Presentation Library pack.
+ * Generates browsable SVG image artifacts for symbols, line styles, and patterns.
+ *
+ * The original Phase 2 generator was vector-only and always drew a red pivot dot.
+ * That is fine for tiny synthetic line art, but it is wrong for OpenCPN where most
+ * symbols are bitmap cells in rastersymbols-*.png and have no vector commands.
+ * When those bitmap symbols were rendered by this generator they appeared as
+ * nothing but the red pivot dot.  The generator now embeds cropped raster cells
+ * when [RasterBitmapDefinition] metadata is available and never uses the pivot
+ * marker as a bitmap fallback.
  */
 object SymbologyImageGenerator {
     private const val CARD_WIDTH = 176
@@ -28,18 +43,18 @@ object SymbologyImageGenerator {
     }
 
     fun generate(outputDir: Path, pack: PresLibPack = PresLibPack.phase2Synthetic()) {
+        val rasterAtlases = RasterAtlasStore.locate()
         val symbolsDir = outputDir.resolve("symbols")
         val lineStylesDir = outputDir.resolve("line-styles")
         val patternsDir = outputDir.resolve("patterns")
         listOf(outputDir, symbolsDir, lineStylesDir, patternsDir).forEach(Files::createDirectories)
 
-        val symbolNames = pack.symbols.names().sorted()
+        val symbolEntries = uniqueSymbolEntries(pack.symbols.all())
         val lineStyleNames = pack.lineStyles.names().sorted()
         val patternNames = pack.patterns.names().sorted()
 
-        symbolNames.forEach { name ->
-            val symbol = pack.symbols.require(name)
-            symbolsDir.resolve("${name.s52FileName()}.svg").writeText(symbolSvg(symbol, title = name))
+        symbolEntries.forEach { entry ->
+            symbolsDir.resolve("${entry.fileStem}.svg").writeText(symbolSvg(entry.symbol, title = entry.title, rasterAtlases = rasterAtlases))
         }
         lineStyleNames.forEach { name ->
             val lineStyle = pack.lineStyles.find(name) ?: LineStyleDefinition(name)
@@ -52,32 +67,35 @@ object SymbologyImageGenerator {
 
         outputDir.resolve("all-symbology.svg").writeText(
             contactSheetSvg(
-                symbols = symbolNames.map { pack.symbols.require(it) },
+                symbols = symbolEntries,
                 lineStyles = lineStyleNames.map { pack.lineStyles.find(it) ?: LineStyleDefinition(it) },
-                patterns = patternNames.map { pack.patterns.find(it) ?: PatternDefinition(it) }
+                patterns = patternNames.map { pack.patterns.find(it) ?: PatternDefinition(it) },
+                rasterAtlases = rasterAtlases
             )
         )
         outputDir.resolve("manifest.txt").writeText(
             buildString {
-                appendLine("S-52 synthetic symbology image artifact")
-                appendLine("Symbols: ${symbolNames.size}")
-                symbolNames.forEach { appendLine("  symbols/${it.s52FileName()}.svg") }
+                appendLine("S-52 symbology image artifact")
+                appendLine("Symbols: ${symbolEntries.size}")
+                symbolEntries.forEach { appendLine("  symbols/${it.fileStem}.svg") }
                 appendLine("Line styles: ${lineStyleNames.size}")
                 lineStyleNames.forEach { appendLine("  line-styles/${it.s52FileName()}.svg") }
                 appendLine("Patterns: ${patternNames.size}")
                 patternNames.forEach { appendLine("  patterns/${it.s52FileName()}.svg") }
                 appendLine("Contact sheet: all-symbology.svg")
+                appendLine("Bitmap atlases embedded: ${rasterAtlases.names().sorted().joinToString(",")}")
             }
         )
     }
 
     private fun contactSheetSvg(
-        symbols: List<SymbolDefinition>,
+        symbols: List<SymbolEntry>,
         lineStyles: List<LineStyleDefinition>,
-        patterns: List<PatternDefinition>
+        patterns: List<PatternDefinition>,
+        rasterAtlases: RasterAtlasStore
     ): String {
         val cards = buildList {
-            addAll(symbols.map { cardSvg("Symbol", it.name, symbolPreview(it, x = 28.0, y = 30.0, scale = 4.0)) })
+            addAll(symbols.map { cardSvg("Symbol", it.title, symbolPreview(it.symbol, x = 28.0, y = 30.0, scale = 4.0, rasterAtlases = rasterAtlases)) })
             addAll(lineStyles.map { cardSvg("Line style", it.name, lineStylePreview(it, x = 20, y = 58, width = 136)) })
             addAll(patterns.map { cardSvg("Pattern", it.name, patternPreview(it, x = 44, y = 28, size = 88)) })
         }
@@ -100,27 +118,70 @@ object SymbologyImageGenerator {
         $preview
     """.trimIndent()
 
-    private fun symbolSvg(symbol: SymbolDefinition, title: String): String = svgDocument(
+    private fun symbolSvg(symbol: SymbolDefinition, title: String, rasterAtlases: RasterAtlasStore): String = svgDocument(
         width = 128,
         height = 128,
         body = """
             <rect width="128" height="128" fill="#ffffff" />
             <text x="8" y="118" font-size="10" font-family="monospace" fill="#57606a">${title.escapeXml()}</text>
-            ${symbolPreview(symbol, x = 24.0, y = 16.0, scale = 5.0)}
+            ${symbolPreview(symbol, x = 24.0, y = 16.0, scale = 5.0, rasterAtlases = rasterAtlases)}
         """.trimIndent()
     )
 
-    private fun symbolPreview(symbol: SymbolDefinition, x: Double, y: Double, scale: Double): String {
+    private fun symbolPreview(
+        symbol: SymbolDefinition,
+        x: Double,
+        y: Double,
+        scale: Double,
+        rasterAtlases: RasterAtlasStore
+    ): String {
+        val bitmap = symbol.bitmap
+        val dataUri = bitmap?.let { rasterAtlases.dataUri(it) }
+        if (bitmap != null && dataUri != null) {
+            val fitScale = min(scale, min(76.0 / bitmap.width.coerceAtLeast(1.0), 76.0 / bitmap.height.coerceAtLeast(1.0)))
+            val tx = x + SYMBOL_VIEWBOX_PADDING
+            val ty = y + SYMBOL_VIEWBOX_PADDING
+            return """
+                <g transform="translate($tx $ty) scale($fitScale)">
+                    <image href="$dataUri" xlink:href="$dataUri" x="0" y="0" width="${bitmap.width}" height="${bitmap.height}" image-rendering="pixelated" />
+                </g>
+            """.trimIndent()
+        }
+
+        if (bitmap != null) {
+            return missingBitmapPreview(symbol.name, bitmap, x, y)
+        }
+
         val path = symbol.commands.toSvgPath()
+        if (path.isBlank()) {
+            return missingVectorPreview(symbol.name, x, y)
+        }
+
         val translateX = x + SYMBOL_VIEWBOX_PADDING
         val translateY = y + SYMBOL_VIEWBOX_PADDING
         return """
             <g transform="translate($translateX $translateY) scale($scale)" fill="none" stroke="#111827" stroke-width="0.45" stroke-linecap="round" stroke-linejoin="round">
                 <path d="${path.escapeXml()}" />
-                <circle cx="${symbol.pivotX}" cy="${symbol.pivotY}" r="0.7" fill="#d1242f" stroke="none" />
             </g>
         """.trimIndent()
     }
+
+    private fun missingBitmapPreview(name: String, bitmap: RasterBitmapDefinition, x: Double, y: Double): String = """
+        <g transform="translate(${x + SYMBOL_VIEWBOX_PADDING} ${y + SYMBOL_VIEWBOX_PADDING})">
+            <rect x="0" y="0" width="72" height="54" rx="4" fill="#fff7ed" stroke="#f97316" stroke-width="1" />
+            <text x="6" y="20" font-size="8" font-family="monospace" fill="#9a3412">bitmap</text>
+            <text x="6" y="34" font-size="8" font-family="monospace" fill="#9a3412">atlas missing</text>
+            <text x="6" y="48" font-size="7" font-family="monospace" fill="#9a3412">${bitmap.atlasFileName.escapeXml()}</text>
+        </g>
+    """.trimIndent()
+
+    private fun missingVectorPreview(name: String, x: Double, y: Double): String = """
+        <g transform="translate(${x + SYMBOL_VIEWBOX_PADDING} ${y + SYMBOL_VIEWBOX_PADDING})">
+            <rect x="0" y="0" width="72" height="54" rx="4" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1" />
+            <text x="6" y="24" font-size="8" font-family="monospace" fill="#57606a">no preview</text>
+            <text x="6" y="38" font-size="7" font-family="monospace" fill="#57606a">${name.take(8).escapeXml()}</text>
+        </g>
+    """.trimIndent()
 
     private fun lineStyleSvg(lineStyle: LineStyleDefinition): String = svgDocument(
         width = 320,
@@ -186,8 +247,20 @@ object SymbologyImageGenerator {
         }
     }
 
+    private fun uniqueSymbolEntries(symbols: List<SymbolDefinition>): List<SymbolEntry> {
+        val seen = mutableMapOf<String, Int>()
+        return symbols.map { symbol ->
+            val key = symbol.name.uppercase()
+            val ordinal = (seen[key] ?: 0) + 1
+            seen[key] = ordinal
+            val title = if (ordinal == 1) symbol.name else "${symbol.name}#$ordinal"
+            val fileStem = if (ordinal == 1) symbol.name.s52FileName() else "${symbol.name.s52FileName()}-$ordinal"
+            SymbolEntry(title = title, fileStem = fileStem, symbol = symbol)
+        }
+    }
+
     private fun svgDocument(width: Int, height: Int, body: String): String = """
-        <svg xmlns="http://www.w3.org/2000/svg" width="$width" height="$height" viewBox="0 0 $width $height" role="img">
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="$width" height="$height" viewBox="0 0 $width $height" role="img">
         $body
         </svg>
     """.trimIndent() + "\n"
@@ -206,6 +279,70 @@ object SymbologyImageGenerator {
                     else -> char
                 }
             )
+        }
+    }
+
+    private data class SymbolEntry(
+        val title: String,
+        val fileStem: String,
+        val symbol: SymbolDefinition
+    )
+
+    private class RasterAtlasStore private constructor(private val images: Map<String, BufferedImage>) {
+        fun names(): Set<String> = images.keys
+
+        fun dataUri(bitmap: RasterBitmapDefinition): String? {
+            val atlas = images[bitmap.atlasFileName] ?: return null
+            val x = bitmap.x.toInt().coerceIn(0, atlas.width - 1)
+            val y = bitmap.y.toInt().coerceIn(0, atlas.height - 1)
+            val w = ceil(bitmap.width).toInt().coerceAtLeast(1).coerceAtMost(atlas.width - x)
+            val h = ceil(bitmap.height).toInt().coerceAtLeast(1).coerceAtMost(atlas.height - y)
+            if (w <= 0 || h <= 0) return null
+            val crop = atlas.getSubimage(x, y, w, h)
+            val output = ByteArrayOutputStream()
+            ImageIO.write(crop, "png", output)
+            return "data:image/png;base64," + Base64.getEncoder().encodeToString(output.toByteArray())
+        }
+
+        companion object {
+            fun locate(): RasterAtlasStore {
+                val directory = locateOpenCpnDirectory()
+                val images = if (directory == null) {
+                    emptyMap()
+                } else {
+                    listOf("rastersymbols-day.png", "rastersymbols-dusk.png", "rastersymbols-dark.png")
+                        .mapNotNull { name ->
+                            val file = directory.resolve(name)
+                            if (!file.isRegularFile()) {
+                                null
+                            } else {
+                                runCatching { ImageIO.read(file.toFile()) }
+                                    .getOrNull()
+                                    ?.let { image -> name to image }
+                            }
+                        }
+                        .toMap()
+                }
+                return RasterAtlasStore(images)
+            }
+
+            private fun locateOpenCpnDirectory(): Path? {
+                val explicit = System.getProperty("opencpn.assets")
+                    ?: System.getenv("OPENCPN_ASSETS_DIR")
+                if (!explicit.isNullOrBlank()) {
+                    val dir = Path.of(explicit).toAbsolutePath().normalize()
+                    if (dir.isDirectory()) return dir
+                }
+
+                val start = Path.of(System.getProperty("user.dir")).toAbsolutePath().normalize()
+                generateSequence(start) { it.parent }.forEach { dir ->
+                    val candidate = dir.resolve("s52/opencpn")
+                    if (candidate.resolve("rastersymbols-day.png").isRegularFile()) return candidate
+                    val sibling = dir.resolve("../s52/opencpn").normalize()
+                    if (sibling.resolve("rastersymbols-day.png").isRegularFile()) return sibling
+                }
+                return null
+            }
         }
     }
 }
