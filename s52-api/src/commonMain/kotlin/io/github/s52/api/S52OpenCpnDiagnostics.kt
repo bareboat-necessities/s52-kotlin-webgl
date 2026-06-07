@@ -59,9 +59,9 @@ data class OpenCpnDiagnosticsReport(
         appendLine("patterns: raster=$rasterPatternCount vector=$vectorPatternCount")
         appendLine("atlases=${knownRasterAtlases.sorted().joinToString(",")}")
         appendLine("colorsPerPalette=${colorsPerPalette.entries.sortedBy { it.key.name }.joinToString { it.key.name + "=" + it.value }}")
-        appendLine("presentationTables=${presentationTableCounts.toSortedMap().entries.joinToString { it.key + "=" + it.value }}")
-        appendLine("primitives=${primitiveCounts.toSortedMap().entries.joinToString { it.key + "=" + it.value }}")
-        appendLine("displayCategories=${displayCategoryCounts.toSortedMap().entries.joinToString { it.key + "=" + it.value }}")
+        appendLine("presentationTables=${presentationTableCounts.describeCounts()}")
+        appendLine("primitives=${primitiveCounts.describeCounts()}")
+        appendLine("displayCategories=${displayCategoryCounts.describeCounts()}")
         appendLine("unresolvedSymbols=${unresolvedSymbols.describe(maxItems)}")
         appendLine("unresolvedLineStyles=${unresolvedLineStyles.describe(maxItems)}")
         appendLine("unresolvedPatterns=${unresolvedPatterns.describe(maxItems)}")
@@ -76,6 +76,10 @@ data class OpenCpnDiagnosticsReport(
         val suffix = if (sorted.size > maxItems) " ... +${sorted.size - maxItems}" else ""
         return sorted.take(maxItems).joinToString(",") + suffix
     }
+
+    private fun Map<String, Int>.describeCounts(): String = entries
+        .sortedBy { it.key }
+        .joinToString { it.key + "=" + it.value }
 }
 
 object S52OpenCpnDiagnostics {
