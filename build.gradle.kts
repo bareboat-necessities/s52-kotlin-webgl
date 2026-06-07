@@ -389,7 +389,7 @@ tasks.register("phase21SymbologyImagesAudit") {
         val manifest = out.resolve("manifest.properties").readText()
         check("edition=opencpn-chartsymbols-imported" in manifest) { "Exporter must use an imported real OpenCPN chartsymbols.xml pack, not the fallback compatibility or synthetic pack." }
         check("synthetic=false" in manifest) { "Generated image artifact must be marked non-synthetic." }
-        check("pngSymbolAtlases=3" in manifest) { "Generated image artifact must record the 3 OpenCPN PNG symbol atlases." }
+        check("pngSymbolAtlases=3" in manifest) { "Generated image artifact must record the 3 bundled OpenCPN PNG symbol atlases." }
         val symbolCount = manifest.lineSequence().firstOrNull { it.startsWith("symbols=") }?.substringAfter("=")?.toIntOrNull() ?: 0
         check(symbolCount >= 50) { "Imported pack has too few symbols ($symbolCount); this is probably not the full OpenCPN chartsymbols.xml." }
     }

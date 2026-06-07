@@ -24,11 +24,12 @@ jobs:
         with:
           gradle-version: 8.14.5
 
-      - name: Get OpenCPN chartsymbols.xml
+      - name: Validate bundled OpenCPN portrayal assets
         run: |
-          mkdir -p build/opencpn
-          wget https://raw.githubusercontent.com/OpenCPN/OpenCPN/refs/heads/master/data/s57data/chartsymbols.xml
-          mv chartsymbols.xml build/opencpn/chartsymbols.xml
+          test -f s52/opencpn/chartsymbols.xml
+          test -f s52/opencpn/rastersymbols-day.png
+          test -f s52/opencpn/rastersymbols-dusk.png
+          test -f s52/opencpn/rastersymbols-dark.png
 
       # Historical readiness-test compatibility markers.
       # phase15Check phase16Check phase17Check phase18Check phase19Check phase20Check phase21Check phase22Check
@@ -36,7 +37,7 @@ jobs:
 
       - name: Build, test, and generate OpenCPN symbology images
         env:
-          OPENCPN_CHARTSYMBOLS_XML_FILE: ${{ github.workspace }}/build/opencpn/chartsymbols.xml
+          OPENCPN_CHARTSYMBOLS_XML_FILE: ${{ github.workspace }}/s52/opencpn/chartsymbols.xml
         run: gradle --no-daemon phase22Check
 
       - name: Build source archive

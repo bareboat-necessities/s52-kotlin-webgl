@@ -39,10 +39,12 @@ tasks.register<JavaExec>("exportOpenCpnSymbologyImages") {
 
     doFirst {
         val outputDir = rootProject.layout.buildDirectory.dir("s52-symbology-images").get().asFile.absolutePath
+        val bundledPlib = rootProject.layout.projectDirectory.file("s52/opencpn/chartsymbols.xml").asFile
         val plibPath = providers.gradleProperty("opencpn.chartsymbols")
             .orElse(providers.environmentVariable("OPENCPN_CHARTSYMBOLS_XML_FILE"))
             .orNull
-            ?: error("Missing real OpenCPN chartsymbols.xml payload. Set -Popencpn.chartsymbols=/path/to/chartsymbols.xml or OPENCPN_CHARTSYMBOLS_XML_FILE.")
+            ?: bundledPlib.takeIf { it.isFile }?.absolutePath
+            ?: error("Missing real OpenCPN chartsymbols.xml payload. Set -Popencpn.chartsymbols=/path/to/chartsymbols.xml, OPENCPN_CHARTSYMBOLS_XML_FILE, or commit s52/opencpn/chartsymbols.xml.")
         args(outputDir, plibPath)
     }
 }

@@ -62,8 +62,7 @@ class S52SymbologyImageExporterTest {
     fun exporterCopiesDayDuskDarkPngAtlasesWhenPresentBesideChartsymbolsXml() {
         val dir = File("build/test-opencpn-symbology-atlases")
         val inputDir = File("build/test-opencpn-with-atlases").also { it.deleteRecursively(); it.mkdirs() }
-        val xml = fixtureFile().readText()
-        val chartsymbols = inputDir.resolve("chartsymbols.xml").also { it.writeText(xml) }
+        val chartsymbols = inputDir.resolve("chartsymbols.xml").also { it.writeText(fixtureFile().readText()) }
         writeDummyPng(inputDir.resolve("rastersymbols-day.png"), Color(240, 220, 200))
         writeDummyPng(inputDir.resolve("rastersymbols-dusk.png"), Color(120, 100, 160))
         writeDummyPng(inputDir.resolve("rastersymbols-dark.png"), Color(40, 50, 70))
