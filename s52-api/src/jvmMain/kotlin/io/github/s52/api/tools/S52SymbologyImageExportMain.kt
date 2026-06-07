@@ -7,18 +7,14 @@ import io.github.s52.preslib.S52Color
 import io.github.s52.preslib.SymbolDefinition
 import io.github.s52.preslib.VectorCommand
 import io.github.s52.preslib.opencpn.OpenCpnAssetKind
-import io.github.s52.preslib.opencpn.OpenCpnBitmapRef
 import io.github.s52.preslib.opencpn.OpenCpnChartSymbolsImporter
 import io.github.s52.preslib.opencpn.OpenCpnRenderableAsset
 import io.github.s52.preslib.opencpn.OpenCpnRenderablePack
 import io.github.s52.preslib.source.PresLibPackBuilder
 import io.github.s52.preslib.source.PresLibSourcePack
 import io.github.s52.preslib.source.SourceColor
-import java.io.ByteArrayOutputStream
 import java.io.File
-import java.awt.image.BufferedImage
-import java.util.Base64
-import javax.imageio.ImageIO
+import java.nio.file.Files
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.ceil
@@ -53,10 +49,7 @@ object S52SymbologyImageExporter {
             "Imported OpenCPN symbol count is too small (${renderable.symbols.size}). " +
                 "This usually means a wrong or truncated chartsymbols.xml input was supplied."
         }
-        val rasterAtlases = loadOpenCpnRasterAtlases(chartsymbolsFile.parentFile)
-        val report = exportRenderableOpenCpn(outputDirectory, renderable, rasterAtlases)
-        val copiedAtlases = copyOpenCpnRasterAtlases(chartsymbolsFile.parentFile, outputDirectory)
-        return report.copy(fileCount = report.fileCount + copiedAtlases)
+        return exportRenderableOpenCpn(outputDirectory, renderable, chartsymbolsFile.parentFile)
     }
 
     fun exportSourcePack(outputDirectory: File, sourcePack: PresLibSourcePack): SymbologyImageExportReport {
@@ -93,11 +86,7 @@ object S52SymbologyImageExporter {
         return SymbologyImageExportReport("source-pack", outputDirectory, symbols.size, lineStyles.size, patterns.size, colors.size, files.size)
     }
 
-    private fun exportRenderableOpenCpn(
-        outputDirectory: File,
-        renderable: OpenCpnRenderablePack,
-        rasterAtlases: Map<String, BufferedImage> = emptyMap()
-    ): SymbologyImageExportReport {
+    private fun exportRenderableOpenCpn(outputDirectory: File, renderable: OpenCpnRenderablePack, assetDirectory: File? = null): SymbologyImageExportReport {
         val sourcePack = renderable.sourcePack
         val colorMap = renderable.colorsByPalette[S52Palette.DayBright]
             .orEmpty()
@@ -115,62 +104,24 @@ object S52SymbologyImageExporter {
         val patternDir = outputDirectory.resolve("patterns").also { it.mkdirs() }
         val colorDir = outputDirectory.resolve("colors").also { it.mkdirs() }
 
-        for (symbol in renderable.symbols) files += writeText(symbolDir.resolve("${safeFileName(symbol.name)}.svg"), renderOpenCpnAssetSvg(symbol, colorMap, rasterAtlases))
+        for (symbol in renderable.symbols) files += writeText(symbolDir.resolve("${safeFileName(symbol.name)}.svg"), renderOpenCpnAssetSvg(symbol, colorMap))
         for (line in renderable.lineStyles) files += writeText(lineDir.resolve("${safeFileName(line.name)}.svg"), renderOpenCpnLineStyleSvg(line, colorMap))
-        for (pattern in renderable.patterns) files += writeText(patternDir.resolve("${safeFileName(pattern.name)}.svg"), renderOpenCpnAssetSvg(pattern, colorMap, rasterAtlases))
+        for (pattern in renderable.patterns) files += writeText(patternDir.resolve("${safeFileName(pattern.name)}.svg"), renderOpenCpnAssetSvg(pattern, colorMap))
         for (color in colors) files += writeText(colorDir.resolve("${safeFileName(color.token)}.svg"), renderColorSvg(color.token, color.r, color.g, color.b))
 
-        files += writeText(outputDirectory.resolve("index.html"), renderIndexHtml(sourcePack.metadata.name, sourcePack.metadata.edition, renderable.symbols.map { it.name }, renderable.lineStyles.map { it.name }, renderable.patterns.map { it.name }, colors.map { it.token }))
-        files += writeText(outputDirectory.resolve("manifest.properties"), manifest(sourcePack.metadata.name, sourcePack.metadata.edition, sourcePack.metadata.sourceDescription, sourcePack.metadata.generatedBy, renderable.symbols.size, renderable.lineStyles.size, renderable.patterns.size, colors.size, files.size + 1))
+        val atlasFiles = copyOpenCpnRasterAtlases(assetDirectory, outputDirectory)
 
-        return SymbologyImageExportReport("opencpn-chartsymbols", outputDirectory, renderable.symbols.size, renderable.lineStyles.size, renderable.patterns.size, colors.size, files.size)
+        files += writeText(outputDirectory.resolve("index.html"), renderIndexHtml(sourcePack.metadata.name, sourcePack.metadata.edition, renderable.symbols.map { it.name }, renderable.lineStyles.map { it.name }, renderable.patterns.map { it.name }, colors.map { it.token }, atlasFiles.map { it.name }))
+        files += writeText(outputDirectory.resolve("manifest.properties"), manifest(sourcePack.metadata.name, sourcePack.metadata.edition, sourcePack.metadata.sourceDescription, sourcePack.metadata.generatedBy, renderable.symbols.size, renderable.lineStyles.size, renderable.patterns.size, colors.size, files.size + atlasFiles.size + 1, atlasFiles.map { it.name }))
+
+        return SymbologyImageExportReport("opencpn-chartsymbols", outputDirectory, renderable.symbols.size, renderable.lineStyles.size, renderable.patterns.size, colors.size, files.size + atlasFiles.size)
     }
 
     private fun configuredChartsymbolsFile(): File? =
         System.getProperty("opencpn.chartsymbols")?.takeIf { it.isNotBlank() }?.let(::File)
             ?: System.getenv("OPENCPN_CHARTSYMBOLS_XML_FILE")?.takeIf { it.isNotBlank() }?.let(::File)
 
-    private fun loadOpenCpnRasterAtlases(sourceDirectory: File?): Map<String, BufferedImage> {
-        if (sourceDirectory == null || !sourceDirectory.isDirectory) return emptyMap()
-        return listOf("rastersymbols-day.png", "rastersymbols-dusk.png", "rastersymbols-dark.png")
-            .mapNotNull { name ->
-                val file = sourceDirectory.resolve(name)
-                if (!file.isFile) {
-                    null
-                } else {
-                    runCatching { ImageIO.read(file) }
-                        .getOrNull()
-                        ?.let { image -> name to image }
-                }
-            }
-            .toMap()
-    }
-
-    private fun copyOpenCpnRasterAtlases(sourceDirectory: File?, outputDirectory: File): Int {
-        if (sourceDirectory == null || !sourceDirectory.isDirectory) return 0
-        var copied = 0
-        for (name in listOf("rastersymbols-day.png", "rastersymbols-dusk.png", "rastersymbols-dark.png")) {
-            val source = sourceDirectory.resolve(name)
-            if (source.isFile) {
-                source.copyTo(outputDirectory.resolve(name), overwrite = true)
-                copied++
-            }
-        }
-        return copied
-    }
-
-    private fun renderOpenCpnAssetSvg(
-        asset: OpenCpnRenderableAsset,
-        colors: Map<String, SourceColor>,
-        rasterAtlases: Map<String, BufferedImage>
-    ): String {
-        asset.bitmap?.let { bitmap ->
-            // OpenCPN symbols are normally bitmap-backed. Rendering bitmap-only assets
-            // through HPGL fallback made the generated SVG gallery show triangles for
-            // almost every symbol. Prefer the atlas cell when bitmap metadata exists.
-            return renderOpenCpnBitmapAssetSvg(asset, bitmap, rasterAtlases)
-        }
-
+    private fun renderOpenCpnAssetSvg(asset: OpenCpnRenderableAsset, colors: Map<String, SourceColor>): String {
         val rendered = HpglSvgRenderer(asset, colors).render()
         val title = when (asset.kind) {
             OpenCpnAssetKind.Symbol -> "Symbol"
@@ -188,58 +139,6 @@ object S52SymbologyImageExporter {
             |  <text x="4" y="${rendered.height - 4}" font-family="monospace" font-size="8" fill="#333333">${xml(asset.name)} $title</text>
             |</svg>
         """.trimMargin()
-    }
-
-    private fun renderOpenCpnBitmapAssetSvg(
-        asset: OpenCpnRenderableAsset,
-        bitmap: OpenCpnBitmapRef,
-        rasterAtlases: Map<String, BufferedImage>
-    ): String {
-        val title = when (asset.kind) {
-            OpenCpnAssetKind.Symbol -> "Symbol bitmap"
-            OpenCpnAssetKind.LineStyle -> "Line-style bitmap"
-            OpenCpnAssetKind.Pattern -> "Pattern bitmap"
-        }
-        val maxPreview = if (asset.kind == OpenCpnAssetKind.Pattern) 96.0 else 88.0
-        val scale = min(6.0, max(1.0, maxPreview / max(bitmap.width, bitmap.height)))
-        val pad = 12.0
-        val labelHeight = 18.0
-        val width = ceil(bitmap.width * scale + pad * 2.0)
-        val height = ceil(bitmap.height * scale + pad * 2.0 + labelHeight)
-        val embeddedCell = encodeBitmapCellDataUri(bitmap, rasterAtlases)
-        val imageElement = if (embeddedCell != null) {
-            """<image href="${xml(embeddedCell)}" x="0" y="0" width="${bitmap.width}" height="${bitmap.height}" image-rendering="pixelated"/>"""
-        } else {
-            val clipId = "clip-${safeFileName(asset.name)}"
-            val atlasHref = "../${bitmap.atlasFileName}"
-            """<defs><clipPath id="$clipId"><rect x="0" y="0" width="${bitmap.width}" height="${bitmap.height}"/></clipPath></defs>
-            |    <image href="${xml(atlasHref)}" x="${-bitmap.x}" y="${-bitmap.y}" width="1500" height="1200" clip-path="url(#$clipId)" image-rendering="pixelated"/>""".trimMargin()
-        }
-        return """
-            |<svg xmlns="http://www.w3.org/2000/svg" width="$width" height="$height" viewBox="0 0 $width $height" overflow="visible" shape-rendering="geometricPrecision" role="img" aria-label="${xml(asset.name)}">
-            |  <title>${xml(asset.name)} $title</title>
-            |  <desc>atlas=${xml(bitmap.atlasFileName)} x=${bitmap.x} y=${bitmap.y} width=${bitmap.width} height=${bitmap.height} pivot=${bitmap.pivotX},${bitmap.pivotY}; embedded=${embeddedCell != null}</desc>
-            |  <rect width="100%" height="100%" fill="white"/>
-            |  <g transform="translate($pad $pad) scale($scale)">
-            |    $imageElement
-            |    <rect x="0" y="0" width="${bitmap.width}" height="${bitmap.height}" fill="none" stroke="#D0D0D0" stroke-width="${1.0 / scale}"/>
-            |  </g>
-            |  <text x="4" y="${height - 4}" font-family="monospace" font-size="8" fill="#333333">${xml(asset.name)} $title</text>
-            |</svg>
-        """.trimMargin()
-    }
-
-    private fun encodeBitmapCellDataUri(bitmap: OpenCpnBitmapRef, rasterAtlases: Map<String, BufferedImage>): String? {
-        val atlas = rasterAtlases[bitmap.atlasFileName] ?: return null
-        val x = bitmap.x.toInt().coerceIn(0, atlas.width - 1)
-        val y = bitmap.y.toInt().coerceIn(0, atlas.height - 1)
-        val w = ceil(bitmap.width).toInt().coerceAtLeast(1).coerceAtMost(atlas.width - x)
-        val h = ceil(bitmap.height).toInt().coerceAtLeast(1).coerceAtMost(atlas.height - y)
-        if (w <= 0 || h <= 0) return null
-        val crop = atlas.getSubimage(x, y, w, h)
-        val out = ByteArrayOutputStream()
-        ImageIO.write(crop, "png", out)
-        return "data:image/png;base64," + Base64.getEncoder().encodeToString(out.toByteArray())
     }
 
     private fun renderOpenCpnLineStyleSvg(asset: OpenCpnRenderableAsset, colors: Map<String, SourceColor>): String {
@@ -311,7 +210,7 @@ object S52SymbologyImageExporter {
         """.trimMargin()
     }
 
-    private fun manifest(name: String, edition: String, sourceDescription: String, generatedBy: String, symbols: Int, lines: Int, patterns: Int, colors: Int, imageFiles: Int): String = buildString {
+    private fun manifest(name: String, edition: String, sourceDescription: String, generatedBy: String, symbols: Int, lines: Int, patterns: Int, colors: Int, imageFiles: Int, pngAtlases: List<String> = emptyList()): String = buildString {
         appendLine("name=$name")
         appendLine("edition=$edition")
         appendLine("sourceDescription=$sourceDescription")
@@ -330,15 +229,18 @@ object S52SymbologyImageExporter {
             appendLine("svgPenLetterColorAware=true")
             appendLine("svgColorRefDiagnostics=true")
             appendLine("svgCompactColorRefAware=true")
+        appendLine("pngSymbolAtlases=${pngAtlases.size}")
+        if (pngAtlases.isNotEmpty()) appendLine("pngSymbolAtlasFiles=${pngAtlases.joinToString(",")}")
     }
 
-    private fun renderIndexHtml(metadataName: String, metadataEdition: String, symbols: List<String>, lineStyles: List<String>, patterns: List<String>, colors: List<String>): String = buildString {
+    private fun renderIndexHtml(metadataName: String, metadataEdition: String, symbols: List<String>, lineStyles: List<String>, patterns: List<String>, colors: List<String>, pngAtlases: List<String> = emptyList()): String = buildString {
         appendLine("<!doctype html>")
         appendLine("<html lang=\"en\"><head><meta charset=\"utf-8\"/><title>S-52 symbology images</title>")
         appendLine("<style>body{font-family:system-ui,sans-serif;margin:24px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}img{max-width:100%;border:1px solid #ddd;background:white}.section{margin-top:32px}</style>")
         appendLine("</head><body>")
         appendLine("<h1>S-52 symbology images</h1>")
         appendLine("<p>Pack: ${xml(metadataName)} / ${xml(metadataEdition)}</p>")
+        if (pngAtlases.isNotEmpty()) appendAtlasSection(pngAtlases)
         appendGallerySection("Symbols", "symbols", symbols)
         appendGallerySection("Line styles", "lines", lineStyles)
         appendGallerySection("Patterns", "patterns", patterns)
@@ -353,6 +255,35 @@ object S52SymbologyImageExporter {
             appendLine("<figure><img src=\"${xml(path)}\" alt=\"${xml(name)}\"/><figcaption>${xml(name)}</figcaption></figure>")
         }
         appendLine("</div></div>")
+    }
+
+
+    private fun StringBuilder.appendAtlasSection(pngAtlases: List<String>) {
+        appendLine("<div class="section"><h2>PNG symbol atlases (${pngAtlases.size})</h2><div class="grid">")
+        for (fileName in pngAtlases) {
+            appendLine("<figure><a href="${xml(fileName)}"><img src="${xml(fileName)}" alt="${xml(fileName)}"/></a><figcaption>${xml(fileName)}</figcaption></figure>")
+        }
+        appendLine("</div></div>")
+    }
+
+    private fun copyOpenCpnRasterAtlases(assetDirectory: File?, outputDirectory: File): List<File> {
+        if (assetDirectory == null || !assetDirectory.isDirectory) return emptyList()
+        val requested = listOf(
+            "rastersymbols-day.png" to "symbol-atlas-day.png",
+            "rastersymbols-dusk.png" to "symbol-atlas-dusk.png",
+            "rastersymbols-dark.png" to "symbol-atlas-dark.png"
+        )
+        val copied = mutableListOf<File>()
+        for ((sourceName, targetName) in requested) {
+            val source = assetDirectory.resolve(sourceName)
+            if (source.isFile) {
+                val target = outputDirectory.resolve(targetName)
+                target.parentFile?.mkdirs()
+                Files.copy(source.toPath(), target.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING)
+                copied += target
+            }
+        }
+        return copied
     }
 
     private fun List<VectorCommand>.toSvgPath(offsetX: Double, offsetY: Double): String = buildString {

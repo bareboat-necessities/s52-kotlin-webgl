@@ -378,6 +378,9 @@ tasks.register("phase21SymbologyImagesAudit") {
         val out = layout.buildDirectory.dir("s52-symbology-images").get().asFile
         check(out.resolve("index.html").isFile) { "Missing generated symbology index.html" }
         check(out.resolve("manifest.properties").isFile) { "Missing generated symbology manifest.properties" }
+        check(out.resolve("symbol-atlas-day.png").isFile) { "Missing generated day PNG symbol atlas" }
+        check(out.resolve("symbol-atlas-dusk.png").isFile) { "Missing generated dusk PNG symbol atlas" }
+        check(out.resolve("symbol-atlas-dark.png").isFile) { "Missing generated dark PNG symbol atlas" }
         check(out.resolve("symbols").listFiles().orEmpty().isNotEmpty()) { "No generated symbol SVGs found" }
         check(out.resolve("lines").listFiles().orEmpty().isNotEmpty()) { "No generated line-style SVGs found" }
         check(out.resolve("patterns").listFiles().orEmpty().isNotEmpty()) { "No generated pattern SVGs found" }
@@ -386,6 +389,7 @@ tasks.register("phase21SymbologyImagesAudit") {
         val manifest = out.resolve("manifest.properties").readText()
         check("edition=opencpn-chartsymbols-imported" in manifest) { "Exporter must use an imported real OpenCPN chartsymbols.xml pack, not the fallback compatibility or synthetic pack." }
         check("synthetic=false" in manifest) { "Generated image artifact must be marked non-synthetic." }
+        check("pngSymbolAtlases=3" in manifest) { "Generated image artifact must record the 3 OpenCPN PNG symbol atlases." }
         val symbolCount = manifest.lineSequence().firstOrNull { it.startsWith("symbols=") }?.substringAfter("=")?.toIntOrNull() ?: 0
         check(symbolCount >= 50) { "Imported pack has too few symbols ($symbolCount); this is probably not the full OpenCPN chartsymbols.xml." }
     }
@@ -448,18 +452,4 @@ tasks.register("phase22Check") {
     group = "verification"
     description = "Runs Phase 22 OpenCPN chartsymbols import and symbology image export checks."
     dependsOn("phase21Check")
-}
-
-// Phase 29: OpenCPN lookup matching and CSP behavior.
-tasks.register("phase29Check") {
-    group = "verification"
-    description = "Runs OpenCPN lookup table selection, attrib-code matching, and CSP coverage checks."
-    dependsOn(":s52-core:jvmTest", ":s52-preslib:jvmTest", ":s52-csp:jvmTest", ":s52-api:jvmTest")
-}
-
-// Phase 32: OpenCPN diagnostics, demo routes, and validation smoke tests.
-tasks.register("phase32Check") {
-    group = "verification"
-    description = "Runs OpenCPN diagnostics and representative validation checks."
-    dependsOn("phase29Check", ":s52-api:jvmTest", ":s52-tests:jvmTest", ":demo:build")
 }

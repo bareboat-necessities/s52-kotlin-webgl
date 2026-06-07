@@ -6,7 +6,6 @@ import io.github.s52.preslib.source.PresLibMetadata
 import io.github.s52.preslib.source.PresLibSourcePack
 import io.github.s52.preslib.source.SourceColor
 import io.github.s52.preslib.source.SourceColorTable
-import io.github.s52.preslib.source.SourceBitmapRef
 import io.github.s52.preslib.source.SourceLineStyle
 import io.github.s52.preslib.source.SourcePattern
 import io.github.s52.preslib.source.SourceSymbol
@@ -109,7 +108,7 @@ object OpenCpnChartSymbolsImporter {
         root.getElementsByTagName("line-style").asElements().mapNotNull { line ->
             val name = line.childText("name") ?: line.getAttribute("name").takeIf { it.isNotBlank() } ?: return@mapNotNull null
             val vector = line.childElement("vector")
-            val bitmap = parseBitmap(line.childElement("bitmap"))
+            val bitmap = line.parseBitmapRef()
             val hpgl = vector?.childText("HPGL") ?: line.childText("HPGL").orEmpty()
             OpenCpnRenderableAsset(
                 name = name.take(8),
@@ -117,8 +116,8 @@ object OpenCpnChartSymbolsImporter {
                 description = line.childText("description").orEmpty(),
                 colorRefs = line.colorRefs(),
                 hpgl = hpgl,
-                width = vector?.getAttribute("width")?.toDoubleOrNull() ?: 64.0,
-                height = vector?.getAttribute("height")?.toDoubleOrNull() ?: 16.0,
+                width = vector?.getAttribute("width")?.toDoubleOrNull() ?: bitmap?.width ?: 64.0,
+                height = vector?.getAttribute("height")?.toDoubleOrNull() ?: bitmap?.height ?: 16.0,
                 pivotX = vector?.childElement("pivot")?.getAttribute("x")?.toDoubleOrNull() ?: bitmap?.pivotX ?: 0.0,
                 pivotY = vector?.childElement("pivot")?.getAttribute("y")?.toDoubleOrNull() ?: bitmap?.pivotY ?: 0.0,
                 commands = parseHpglAsSourceCommands(hpgl),
@@ -130,7 +129,7 @@ object OpenCpnChartSymbolsImporter {
         root.getElementsByTagName("pattern").asElements().mapNotNull { pattern ->
             val name = pattern.childText("name") ?: pattern.getAttribute("name").takeIf { it.isNotBlank() } ?: return@mapNotNull null
             val vector = pattern.childElement("vector")
-            val bitmap = parseBitmap(pattern.childElement("bitmap"))
+            val bitmap = pattern.parseBitmapRef()
             val hpgl = vector?.childText("HPGL") ?: pattern.childText("HPGL").orEmpty()
             OpenCpnRenderableAsset(
                 name = name.take(8),
@@ -151,13 +150,10 @@ object OpenCpnChartSymbolsImporter {
         root.getElementsByTagName("symbol").asElements().mapNotNull { symbol ->
             val name = symbol.childText("name") ?: symbol.getAttribute("name").takeIf { it.isNotBlank() } ?: return@mapNotNull null
             val vector = symbol.childElement("vector")
-            val bitmap = parseBitmap(symbol.childElement("bitmap"))
+            val bitmap = symbol.parseBitmapRef()
             val hpgl = vector?.childText("HPGL") ?: symbol.childText("HPGL").orEmpty()
             val parsedCommands = parseHpglAsSourceCommands(hpgl)
-            // Do not fabricate polygon/triangle commands for bitmap-backed OpenCPN symbols.
-            // SVG/browser exporters can render these from rastersymbols-*.png; fake vectors made
-            // every bitmap-only symbol look like a triangle or random polygon.
-            val commands = if (parsedCommands.isEmpty() && bitmap == null) fallbackSymbolCommands(name) else parsedCommands
+            val commands = if (bitmap != null) parsedCommands else parsedCommands.ifEmpty { fallbackSymbolCommands(name) }
             val bounds = bounds(commands)
             OpenCpnRenderableAsset(
                 name = name.take(8),
@@ -201,8 +197,38 @@ object OpenCpnChartSymbolsImporter {
             ),
             colorTables = colorTables,
             symbols = symbols.map { it.toSourceSymbol() }.sortedBy { it.name },
-            lineStyles = if (lineStyles.isEmpty()) fallback.lineStyles else lineStyles.map { it.toSourceLineStyle() }.sortedBy { it.name },
-            patterns = if (patterns.isEmpty()) fallback.patterns else patterns.map { it.toSourcePattern() }.sortedBy { it.name }
+            lineStyles = if (lineStyles.isEmpty()) fallback.lineStyles else lineStyles.map { SourceLineStyle(it.name, it.description) }.sortedBy { it.name },
+            patterns = if (patterns.isEmpty()) fallback.patterns else patterns.map { SourcePattern(it.name, it.description) }.sortedBy { it.name }
+        )
+    }
+
+    private fun Element.parseBitmapRef(): OpenCpnBitmapRef? {
+        val bitmap = childElement("bitmap") ?: return null
+        val location = bitmap.childElement("graphics-location") ?: bitmap.childElement("location")
+        val width = bitmap.getAttribute("width").toDoubleOrNull()
+            ?: bitmap.getAttribute("w").toDoubleOrNull()
+            ?: return null
+        val height = bitmap.getAttribute("height").toDoubleOrNull()
+            ?: bitmap.getAttribute("h").toDoubleOrNull()
+            ?: return null
+        val x = location?.getAttribute("x")?.toDoubleOrNull()
+            ?: bitmap.getAttribute("x").toDoubleOrNull()
+            ?: 0.0
+        val y = location?.getAttribute("y")?.toDoubleOrNull()
+            ?: bitmap.getAttribute("y").toDoubleOrNull()
+            ?: 0.0
+        val pivot = bitmap.childElement("pivot")
+        val origin = bitmap.childElement("origin")
+        return OpenCpnBitmapRef(
+            atlasFileName = bitmap.getAttribute("file").ifBlank { bitmap.getAttribute("graphics-file") }.ifBlank { bitmap.getAttribute("atlas") }.ifBlank { "rastersymbols-day.png" },
+            x = x,
+            y = y,
+            width = width,
+            height = height,
+            pivotX = pivot?.getAttribute("x")?.toDoubleOrNull() ?: 0.0,
+            pivotY = pivot?.getAttribute("y")?.toDoubleOrNull() ?: 0.0,
+            originX = origin?.getAttribute("x")?.toDoubleOrNull() ?: 0.0,
+            originY = origin?.getAttribute("y")?.toDoubleOrNull() ?: 0.0
         )
     }
 
@@ -212,67 +238,8 @@ object OpenCpnChartSymbolsImporter {
         pivotY = pivotY,
         width = width,
         height = height,
-        commands = commands,
-        colorRefs = colorRefs,
-        bitmap = bitmap?.toSourceBitmapRef(),
-        vectorHpgl = hpgl.takeIf { it.isNotBlank() }
+        commands = commands
     )
-
-    private fun OpenCpnRenderableAsset.toSourceLineStyle(): SourceLineStyle = SourceLineStyle(
-        name = name,
-        description = description,
-        pivotX = pivotX,
-        pivotY = pivotY,
-        width = width,
-        height = height,
-        colorRefs = colorRefs,
-        bitmap = bitmap?.toSourceBitmapRef(),
-        vectorHpgl = hpgl.takeIf { it.isNotBlank() }
-    )
-
-    private fun OpenCpnRenderableAsset.toSourcePattern(): SourcePattern = SourcePattern(
-        name = name,
-        description = description,
-        pivotX = pivotX,
-        pivotY = pivotY,
-        width = width,
-        height = height,
-        colorRefs = colorRefs,
-        bitmap = bitmap?.toSourceBitmapRef(),
-        vectorHpgl = hpgl.takeIf { it.isNotBlank() }
-    )
-
-    private fun OpenCpnBitmapRef.toSourceBitmapRef(): SourceBitmapRef = SourceBitmapRef(
-        atlasFileName = atlasFileName,
-        x = x,
-        y = y,
-        width = width,
-        height = height,
-        pivotX = pivotX,
-        pivotY = pivotY,
-        originX = originX,
-        originY = originY
-    )
-
-    private fun parseBitmap(bitmap: Element?): OpenCpnBitmapRef? {
-        if (bitmap == null) return null
-        val width = bitmap.getAttribute("width").toDoubleOrNull() ?: return null
-        val height = bitmap.getAttribute("height").toDoubleOrNull() ?: return null
-        val pivot = bitmap.childElement("pivot")
-        val origin = bitmap.childElement("origin")
-        val location = bitmap.childElement("graphics-location") ?: return null
-        return OpenCpnBitmapRef(
-            atlasFileName = "rastersymbols-day.png",
-            x = location.getAttribute("x").toDoubleOrNull() ?: return null,
-            y = location.getAttribute("y").toDoubleOrNull() ?: return null,
-            width = width,
-            height = height,
-            pivotX = pivot?.getAttribute("x")?.toDoubleOrNull() ?: 0.0,
-            pivotY = pivot?.getAttribute("y")?.toDoubleOrNull() ?: 0.0,
-            originX = origin?.getAttribute("x")?.toDoubleOrNull() ?: 0.0,
-            originY = origin?.getAttribute("y")?.toDoubleOrNull() ?: 0.0
-        )
-    }
 
     private fun Element.colorRefs(): List<String> = descendantElements("color-ref")
         .flatMap { parseColorRefs(it.textContent) }
@@ -626,15 +593,15 @@ data class OpenCpnRenderableAsset(
 )
 
 data class OpenCpnBitmapRef(
-    val atlasFileName: String = "rastersymbols-day.png",
+    val atlasFileName: String,
     val x: Double,
     val y: Double,
     val width: Double,
     val height: Double,
-    val pivotX: Double = 0.0,
-    val pivotY: Double = 0.0,
-    val originX: Double = 0.0,
-    val originY: Double = 0.0
+    val pivotX: Double,
+    val pivotY: Double,
+    val originX: Double,
+    val originY: Double
 )
 
 enum class OpenCpnAssetKind {

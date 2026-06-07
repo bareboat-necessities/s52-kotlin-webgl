@@ -143,7 +143,7 @@ object SymbologyImageGenerator {
             val ty = y + SYMBOL_VIEWBOX_PADDING
             return """
                 <g transform="translate($tx $ty) scale($fitScale)">
-                    <image href="$dataUri" xlink:href="$dataUri" x="0" y="0" width="${bitmap.width}" height="${bitmap.height}" image-rendering="pixelated" />
+                    <image href="$dataUri" xlink:href="$dataUri" x="0" y="0" width="${bitmap.width}" height="${bitmap.height}" preserveAspectRatio="none" image-rendering="pixelated" />
                 </g>
             """.trimIndent()
         }
