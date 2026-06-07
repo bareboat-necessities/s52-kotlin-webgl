@@ -259,9 +259,9 @@ object S52SymbologyImageExporter {
 
 
     private fun StringBuilder.appendAtlasSection(pngAtlases: List<String>) {
-        appendLine("<div class="section"><h2>PNG symbol atlases (${pngAtlases.size})</h2><div class="grid">")
+        appendLine("<div class=\"section\"><h2>PNG symbol atlases (${pngAtlases.size})</h2><div class=\"grid\">")
         for (fileName in pngAtlases) {
-            appendLine("<figure><a href="${xml(fileName)}"><img src="${xml(fileName)}" alt="${xml(fileName)}"/></a><figcaption>${xml(fileName)}</figcaption></figure>")
+            appendLine("<figure><a href=\"${xml(fileName)}\"><img src=\"${xml(fileName)}\" alt=\"${xml(fileName)}\"/></a><figcaption>${xml(fileName)}</figcaption></figure>")
         }
         appendLine("</div></div>")
     }
