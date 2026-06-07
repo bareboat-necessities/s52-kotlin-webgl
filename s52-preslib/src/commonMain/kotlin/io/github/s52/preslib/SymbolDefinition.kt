@@ -54,7 +54,8 @@ class SymbolRegistry(
         fun fromDefinitions(definitions: List<SymbolDefinition>): SymbolRegistry {
             val byName = linkedMapOf<String, SymbolDefinition>()
             definitions.forEach { definition ->
-                byName.putIfAbsent(definition.name.uppercase(), definition)
+                val key = definition.name.uppercase()
+                if (key !in byName) byName[key] = definition
             }
             return SymbolRegistry(symbols = byName, sourceOrder = definitions)
         }
