@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
   release-archive:
     runs-on: ubuntu-latest
@@ -40,8 +43,8 @@ jobs:
           OPENCPN_CHARTSYMBOLS_XML_FILE: ${{ github.workspace }}/s52/opencpn/chartsymbols.xml
         run: gradle --no-daemon phase22Check
 
-      - name: Build source archive
-        run: gradle --no-daemon phase22SourceArchive
+      - name: Build source archive and release artifacts
+        run: gradle --no-daemon phase22SourceArchive releaseArtifacts
 
       - name: Upload generated OpenCPN symbology images
         uses: actions/upload-artifact@v4
@@ -54,4 +57,27 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: s52-kotlin-webgl-source
-          path: build/distributions/*.zip
+          path: build/distributions/*source*.zip
+          if-no-files-found: error
+
+      - name: Upload built library JARs
+        uses: actions/upload-artifact@v4
+        with:
+          name: s52-kotlin-webgl-jars
+          path: build/release-artifacts/jars
+          if-no-files-found: error
+
+      - name: Upload release Maven repository
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-maven
+          path: build/release-maven
+          if-no-files-found: error
+
+      - name: Publish GitHub Release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            build/distributions/*source*.zip
+            build/distributions/*release-maven*.zip
+            build/release-artifacts/jars/**/*.jar
