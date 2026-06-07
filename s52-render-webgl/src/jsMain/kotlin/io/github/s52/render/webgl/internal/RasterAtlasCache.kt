@@ -93,7 +93,7 @@ internal class RasterAtlasCache(
                 callbacks.forEach { it() }
                 null
             }
-            image.onerror = { _ ->
+            image.onerror = { _, _, _, _, _ ->
                 failed = true
                 null
             }

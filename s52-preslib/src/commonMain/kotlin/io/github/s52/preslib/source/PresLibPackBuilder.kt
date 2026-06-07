@@ -1,21 +1,22 @@
 package io.github.s52.preslib.source
 
 import io.github.s52.core.instruction.InstructionParser
+import io.github.s52.core.instruction.S52Instruction
 import io.github.s52.core.lookup.AttributeFilter
 import io.github.s52.core.lookup.LookupRecord
-import io.github.s52.core.lookup.OpenCpnAttribCodeRuntimeParser
 import io.github.s52.core.lookup.LookupTable
+import io.github.s52.core.lookup.OpenCpnAttribCodeRuntimeParser
 import io.github.s52.preslib.ColorTables
 import io.github.s52.preslib.LineStyleDefinition
 import io.github.s52.preslib.LineStyleRegistry
 import io.github.s52.preslib.PatternDefinition
 import io.github.s52.preslib.PatternRegistry
 import io.github.s52.preslib.PresLibPack
+import io.github.s52.preslib.RasterBitmapDefinition
 import io.github.s52.preslib.S52Color
 import io.github.s52.preslib.SymbolDefinition
 import io.github.s52.preslib.SymbolRegistry
 import io.github.s52.preslib.VectorCommand
-import io.github.s52.preslib.RasterBitmapDefinition
 
 object PresLibPackBuilder {
     fun build(source: PresLibSourcePack): PresLibPack {
@@ -29,8 +30,8 @@ object PresLibPackBuilder {
                     }
                 }
             ),
-            symbols = SymbolRegistry(
-                normalized.symbols.associate { symbol -> symbol.name to symbol.toSymbolDefinition() }
+            symbols = SymbolRegistry.fromDefinitions(
+                normalized.symbols.map { symbol -> symbol.toSymbolDefinition() }
             ),
             lineStyles = LineStyleRegistry(
                 normalized.lineStyles.associate { style ->
@@ -66,11 +67,18 @@ object PresLibPackBuilder {
     }
 
     private fun SourceLookupRecord.toLookupRecord(): LookupRecord = LookupRecord(
-        objectClass = objectClass,
+        /*
+         * The starter S57ObjectClass enum only covers a subset of the full
+         * OpenCPN lookup table semantics. Some OpenCPN rows use a valid object
+         * acronym with a primitive not listed on the enum entry. In those cases
+         * objectClassKey is still the authoritative OpenCPN class key, so avoid
+         * tripping LookupRecord's enum compatibility guard.
+         */
+        objectClass = objectClass?.takeIf { it.supports(primitive) },
         objectClassKey = objectClassKey,
         primitive = primitive,
         attributeFilter = combinedRuntimeFilter(),
-        instructions = InstructionParser.parseSequence(instruction),
+        instructions = parseInstructionsLenient(instruction),
         displayCategory = displayCategory,
         viewingGroup = viewingGroup,
         displayPriority = displayPriority,
@@ -89,6 +97,27 @@ object PresLibPackBuilder {
             explicit === AttributeFilter.Any -> openCpn
             openCpn === AttributeFilter.Any -> explicit
             else -> AttributeFilter.All(listOf(explicit, openCpn))
+        }
+    }
+
+    private fun parseInstructionsLenient(source: String): List<S52Instruction> {
+        if (source.isBlank()) return emptyList()
+        return try {
+            InstructionParser.parseSequence(source)
+        } catch (_: IllegalArgumentException) {
+            source.split(';')
+                .mapNotNull { segment ->
+                    val trimmed = segment.trim()
+                    if (trimmed.isEmpty()) {
+                        null
+                    } else {
+                        try {
+                            InstructionParser.parseOne(trimmed)
+                        } catch (_: IllegalArgumentException) {
+                            null
+                        }
+                    }
+                }
         }
     }
 

@@ -31,7 +31,8 @@ sealed interface VectorCommand {
 }
 
 class SymbolRegistry(
-    private val symbols: Map<String, SymbolDefinition>
+    private val symbols: Map<String, SymbolDefinition>,
+    private val sourceOrder: List<SymbolDefinition> = symbols.values.sortedBy { it.name }
 ) {
     fun find(name: String): SymbolDefinition? = symbols[name.uppercase()]
 
@@ -40,5 +41,22 @@ class SymbolRegistry(
 
     fun names(): Set<String> = symbols.keys
 
-    fun all(): List<SymbolDefinition> = symbols.values.sortedBy { it.name }
+    /**
+     * Returns source-order symbol records, not just unique lookup keys.
+     *
+     * OpenCPN chartsymbols.xml intentionally contains duplicate symbol names in
+     * the source payload. Runtime lookup still uses the unique-name map, but
+     * inventory/diagnostics/tests need the complete source record count.
+     */
+    fun all(): List<SymbolDefinition> = sourceOrder
+
+    companion object {
+        fun fromDefinitions(definitions: List<SymbolDefinition>): SymbolRegistry {
+            val byName = linkedMapOf<String, SymbolDefinition>()
+            definitions.forEach { definition ->
+                byName.putIfAbsent(definition.name.uppercase(), definition)
+            }
+            return SymbolRegistry(symbols = byName, sourceOrder = definitions)
+        }
+    }
 }

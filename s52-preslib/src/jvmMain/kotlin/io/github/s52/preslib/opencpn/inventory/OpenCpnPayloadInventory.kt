@@ -19,32 +19,32 @@ object OpenCpnPayloadInventoryReader {
     )
 
     fun read(directory: File): OpenCpnPayloadInventory {
-        require(directory.isDirectory) { "OpenCPN payload directory does not exist: ${directory.absolutePath}" }
+        val resolvedDirectory = resolvePayloadDirectory(directory)
 
         val files = RequiredFiles.map { fileName ->
-            val file = directory.resolve(fileName)
+            val file = resolvedDirectory.resolve(fileName)
             OpenCpnPayloadFile(fileName, if (file.isFile) file.length() else 0L, file.isFile)
         }
         val warnings = mutableListOf<String>()
         val missing = files.filterNot { it.exists }.map { it.fileName }
 
-        val chartSymbols = directory.resolve("chartsymbols.xml").takeIf { it.isFile }?.let { file ->
+        val chartSymbols = resolvedDirectory.resolve("chartsymbols.xml").takeIf { it.isFile }?.let { file ->
             runCatching { OpenCpnChartSymbolsRawParser.parseFile(file) }
                 .onFailure { warnings += "chartsymbols.xml parse failed: ${it.message}" }
                 .getOrNull()
         }
 
-        val csvCatalog = runCatching { OpenCpnCsvCatalogParser.parseDirectory(directory) }
+        val csvCatalog = runCatching { OpenCpnCsvCatalogParser.parseDirectory(resolvedDirectory) }
             .onFailure { warnings += "CSV catalog parse failed: ${it.message}" }
             .getOrElse { OpenCpnCsvCatalogSummary() }
 
         val atlases = listOf("rastersymbols-day.png", "rastersymbols-dusk.png", "rastersymbols-dark.png")
-            .mapNotNull { fileName -> readRasterAtlas(directory.resolve(fileName), warnings) }
+            .mapNotNull { fileName -> readRasterAtlas(resolvedDirectory.resolve(fileName), warnings) }
 
         val lookupDiagnostics = chartSymbols?.let { OpenCpnLookupRawParser.diagnostics(it, csvCatalog) }
 
         return OpenCpnPayloadInventory(
-            directory = directory,
+            directory = resolvedDirectory,
             files = files,
             chartSymbols = chartSymbols,
             csvCatalog = csvCatalog,
@@ -52,6 +52,30 @@ object OpenCpnPayloadInventoryReader {
             diagnostics = OpenCpnInventoryDiagnostics(missingRequiredFiles = missing, parseWarnings = warnings),
             lookupDiagnostics = lookupDiagnostics
         )
+    }
+
+    private fun resolvePayloadDirectory(requested: File): File {
+        val attempts = linkedSetOf<File>()
+        fun add(file: File) {
+            attempts += file.absoluteFile.toPath().normalize().toFile()
+        }
+
+        add(requested)
+        add(File("s52/opencpn"))
+        add(File("../s52/opencpn"))
+        add(File("../../s52/opencpn"))
+
+        var cursor: File? = File(System.getProperty("user.dir")).absoluteFile
+        while (cursor != null) {
+            add(File(cursor, "s52/opencpn"))
+            cursor = cursor.parentFile
+        }
+
+        return attempts.firstOrNull { it.isDirectory && it.resolve("chartsymbols.xml").isFile }
+            ?: throw IllegalArgumentException(
+                "OpenCPN payload directory does not exist or is missing chartsymbols.xml. Tried: " +
+                    attempts.joinToString { it.absolutePath }
+            )
     }
 
     private fun readRasterAtlas(file: File, warnings: MutableList<String>): OpenCpnRasterAtlas? {
