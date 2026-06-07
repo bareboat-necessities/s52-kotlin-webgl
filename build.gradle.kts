@@ -1,3 +1,8 @@
+import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.tasks.Sync
+import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.tasks.bundling.Zip
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform) apply false
 }
@@ -5,6 +10,30 @@ plugins {
 allprojects {
     group = "io.github.s52"
     version = "0.1.0-SNAPSHOT"
+}
+
+val releaseLibraryProjects = setOf(
+    "s52-api",
+    "s52-catalog",
+    "s52-core",
+    "s52-csp",
+    "s52-preslib",
+    "s52-render-webgl"
+)
+
+subprojects {
+    if (name in releaseLibraryProjects) {
+        pluginManager.apply("maven-publish")
+
+        extensions.configure<PublishingExtension>("publishing") {
+            repositories {
+                maven {
+                    name = "releaseMaven"
+                    url = rootProject.layout.buildDirectory.dir("release-maven").get().asFile.toURI()
+                }
+            }
+        }
+    }
 }
 
 tasks.register("phase0Check") {
@@ -121,7 +150,7 @@ tasks.register("phase15ReleaseAudit") {
     }
 }
 
-tasks.register<org.gradle.api.tasks.bundling.Zip>("phase15SourceArchive") {
+tasks.register<Zip>("phase15SourceArchive") {
     group = "distribution"
     description = "Builds a source archive for Phase 15 release handoff."
     archiveBaseName.set("s52-kotlin-webgl")
@@ -162,7 +191,7 @@ tasks.register("phase16ApiAudit") {
     }
 }
 
-tasks.register<org.gradle.api.tasks.bundling.Zip>("phase16SourceArchive") {
+tasks.register<Zip>("phase16SourceArchive") {
     group = "distribution"
     description = "Builds a source archive for Phase 16 release handoff."
     archiveBaseName.set("s52-kotlin-webgl")
@@ -204,7 +233,7 @@ tasks.register("phase17DiagnosticsAudit") {
     }
 }
 
-tasks.register<org.gradle.api.tasks.bundling.Zip>("phase17SourceArchive") {
+tasks.register<Zip>("phase17SourceArchive") {
     group = "distribution"
     description = "Builds a source archive for Phase 17 release handoff."
     archiveBaseName.set("s52-kotlin-webgl")
@@ -246,7 +275,7 @@ tasks.register("phase18ProfilesAudit") {
     }
 }
 
-tasks.register<org.gradle.api.tasks.bundling.Zip>("phase18SourceArchive") {
+tasks.register<Zip>("phase18SourceArchive") {
     group = "distribution"
     description = "Builds a source archive for Phase 18 release handoff."
     archiveBaseName.set("s52-kotlin-webgl")
@@ -288,7 +317,7 @@ tasks.register("phase19ArtifactsAudit") {
     }
 }
 
-tasks.register<org.gradle.api.tasks.bundling.Zip>("phase19SourceArchive") {
+tasks.register<Zip>("phase19SourceArchive") {
     group = "distribution"
     description = "Builds a source archive for Phase 19 release handoff."
     archiveBaseName.set("s52-kotlin-webgl")
@@ -330,7 +359,7 @@ tasks.register("phase20GalleryAudit") {
     }
 }
 
-tasks.register<org.gradle.api.tasks.bundling.Zip>("phase20SourceArchive") {
+tasks.register<Zip>("phase20SourceArchive") {
     group = "distribution"
     description = "Builds a source archive for Phase 20 release handoff."
     archiveBaseName.set("s52-kotlin-webgl")
@@ -413,7 +442,7 @@ tasks.register("phase22RealSymbologyImportAudit") {
     }
 }
 
-tasks.register<org.gradle.api.tasks.bundling.Zip>("phase21SourceArchive") {
+tasks.register<Zip>("phase21SourceArchive") {
     group = "distribution"
     description = "Builds a source archive for Phase 21 release handoff."
     archiveBaseName.set("s52-kotlin-webgl")
@@ -434,7 +463,7 @@ tasks.register("phase21Check") {
     dependsOn("phase20Check", "phase21SymbologyImagesAudit", "phase22RealSymbologyImportAudit", ":s52-api:jvmTest", ":s52-tests:jvmTest")
 }
 
-tasks.register<org.gradle.api.tasks.bundling.Zip>("phase22SourceArchive") {
+tasks.register<Zip>("phase22SourceArchive") {
     group = "distribution"
     description = "Builds a source archive for Phase 22 real symbology import handoff."
     archiveBaseName.set("s52-kotlin-webgl")
@@ -452,4 +481,39 @@ tasks.register("phase22Check") {
     group = "verification"
     description = "Runs Phase 22 OpenCPN chartsymbols import and symbology image export checks."
     dependsOn("phase21Check")
+}
+
+tasks.register<Sync>("releaseBuiltJars") {
+    group = "distribution"
+    description = "Collects built library JARs for GitHub release upload."
+    into(layout.buildDirectory.dir("release-artifacts/jars"))
+
+    releaseLibraryProjects.forEach { projectName ->
+        val libraryProject = project(":$projectName")
+        from(libraryProject.tasks.withType<Jar>()) {
+            into(projectName)
+        }
+    }
+}
+
+tasks.register("releaseMavenRepository") {
+    group = "publishing"
+    description = "Publishes library modules into build/release-maven using standard Maven repository layout."
+    dependsOn(releaseLibraryProjects.map { ":$it:publishAllPublicationsToReleaseMavenRepository" })
+}
+
+tasks.register<Zip>("releaseMavenRepositoryArchive") {
+    group = "distribution"
+    description = "Archives build/release-maven so it can be attached to a GitHub Release while preserving Maven repository layout."
+    dependsOn("releaseMavenRepository")
+    archiveBaseName.set("s52-kotlin-webgl-release-maven")
+    archiveVersion.set(project.version.toString())
+    destinationDirectory.set(layout.buildDirectory.dir("distributions"))
+    from(layout.buildDirectory.dir("release-maven"))
+}
+
+tasks.register("releaseArtifacts") {
+    group = "distribution"
+    description = "Builds all release upload areas, including raw JAR artifacts and the local Maven repository layout."
+    dependsOn("releaseBuiltJars", "releaseMavenRepository", "releaseMavenRepositoryArchive")
 }
