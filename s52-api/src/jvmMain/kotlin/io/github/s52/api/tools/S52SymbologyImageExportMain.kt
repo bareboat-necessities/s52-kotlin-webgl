@@ -7,7 +7,6 @@ import io.github.s52.preslib.S52Color
 import io.github.s52.preslib.SymbolDefinition
 import io.github.s52.preslib.VectorCommand
 import io.github.s52.preslib.opencpn.OpenCpnAssetKind
-import io.github.s52.preslib.opencpn.OpenCpnBitmapRef
 import io.github.s52.preslib.opencpn.OpenCpnChartSymbolsImporter
 import io.github.s52.preslib.opencpn.OpenCpnRenderableAsset
 import io.github.s52.preslib.opencpn.OpenCpnRenderablePack
@@ -49,9 +48,7 @@ object S52SymbologyImageExporter {
             "Imported OpenCPN symbol count is too small (${renderable.symbols.size}). " +
                 "This usually means a wrong or truncated chartsymbols.xml input was supplied."
         }
-        val report = exportRenderableOpenCpn(outputDirectory, renderable)
-        val copiedAtlases = copyOpenCpnRasterAtlases(chartsymbolsFile.parentFile, outputDirectory)
-        return report.copy(fileCount = report.fileCount + copiedAtlases)
+        return exportRenderableOpenCpn(outputDirectory, renderable)
     }
 
     fun exportSourcePack(outputDirectory: File, sourcePack: PresLibSourcePack): SymbologyImageExportReport {
@@ -121,27 +118,7 @@ object S52SymbologyImageExporter {
         System.getProperty("opencpn.chartsymbols")?.takeIf { it.isNotBlank() }?.let(::File)
             ?: System.getenv("OPENCPN_CHARTSYMBOLS_XML_FILE")?.takeIf { it.isNotBlank() }?.let(::File)
 
-    private fun copyOpenCpnRasterAtlases(sourceDirectory: File?, outputDirectory: File): Int {
-        if (sourceDirectory == null || !sourceDirectory.isDirectory) return 0
-        var copied = 0
-        for (name in listOf("rastersymbols-day.png", "rastersymbols-dusk.png", "rastersymbols-dark.png")) {
-            val source = sourceDirectory.resolve(name)
-            if (source.isFile) {
-                source.copyTo(outputDirectory.resolve(name), overwrite = true)
-                copied++
-            }
-        }
-        return copied
-    }
-
     private fun renderOpenCpnAssetSvg(asset: OpenCpnRenderableAsset, colors: Map<String, SourceColor>): String {
-        asset.bitmap?.let { bitmap ->
-            // OpenCPN symbols are normally bitmap-backed. Rendering bitmap-only assets
-            // through HPGL fallback made the generated SVG gallery show triangles for
-            // almost every symbol. Prefer the atlas cell when bitmap metadata exists.
-            return renderOpenCpnBitmapAssetSvg(asset, bitmap)
-        }
-
         val rendered = HpglSvgRenderer(asset, colors).render()
         val title = when (asset.kind) {
             OpenCpnAssetKind.Symbol -> "Symbol"
@@ -157,36 +134,6 @@ object S52SymbologyImageExporter {
             |${rendered.elements.joinToString("\n") { "    $it" }}
             |  </g>
             |  <text x="4" y="${rendered.height - 4}" font-family="monospace" font-size="8" fill="#333333">${xml(asset.name)} $title</text>
-            |</svg>
-        """.trimMargin()
-    }
-
-    private fun renderOpenCpnBitmapAssetSvg(asset: OpenCpnRenderableAsset, bitmap: OpenCpnBitmapRef): String {
-        val title = when (asset.kind) {
-            OpenCpnAssetKind.Symbol -> "Symbol bitmap"
-            OpenCpnAssetKind.LineStyle -> "Line-style bitmap"
-            OpenCpnAssetKind.Pattern -> "Pattern bitmap"
-        }
-        val maxPreview = if (asset.kind == OpenCpnAssetKind.Pattern) 96.0 else 88.0
-        val scale = min(6.0, max(1.0, maxPreview / max(bitmap.width, bitmap.height)))
-        val pad = 12.0
-        val labelHeight = 18.0
-        val width = ceil(bitmap.width * scale + pad * 2.0)
-        val height = ceil(bitmap.height * scale + pad * 2.0 + labelHeight)
-        val clipId = "clip-${safeFileName(asset.name)}"
-        val atlasHref = "../${bitmap.atlasFileName}"
-        return """
-            |<svg xmlns="http://www.w3.org/2000/svg" width="$width" height="$height" viewBox="0 0 $width $height" overflow="visible" shape-rendering="geometricPrecision" role="img" aria-label="${xml(asset.name)}">
-            |  <title>${xml(asset.name)} $title</title>
-            |  <desc>atlas=${xml(bitmap.atlasFileName)} x=${bitmap.x} y=${bitmap.y} width=${bitmap.width} height=${bitmap.height} pivot=${bitmap.pivotX},${bitmap.pivotY}</desc>
-            |  <rect width="100%" height="100%" fill="white"/>
-            |  <defs><clipPath id="$clipId"><rect x="0" y="0" width="${bitmap.width}" height="${bitmap.height}"/></clipPath></defs>
-            |  <g transform="translate($pad $pad) scale($scale)">
-            |    <image href="${xml(atlasHref)}" x="${-bitmap.x}" y="${-bitmap.y}" width="1500" height="1200" clip-path="url(#$clipId)" image-rendering="pixelated"/>
-            |    <rect x="0" y="0" width="${bitmap.width}" height="${bitmap.height}" fill="none" stroke="#D0D0D0" stroke-width="${1.0 / scale}"/>
-            |    <circle cx="${bitmap.pivotX}" cy="${bitmap.pivotY}" r="${max(0.8, 1.6 / scale)}" fill="#D1242F" stroke="white" stroke-width="${0.5 / scale}"/>
-            |  </g>
-            |  <text x="4" y="${height - 4}" font-family="monospace" font-size="8" fill="#333333">${xml(asset.name)} $title</text>
             |</svg>
         """.trimMargin()
     }
