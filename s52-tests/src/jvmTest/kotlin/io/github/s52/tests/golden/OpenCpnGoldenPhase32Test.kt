@@ -11,7 +11,6 @@ import io.github.s52.core.model.EncFeature
 import io.github.s52.core.model.S57Attributes
 import io.github.s52.core.model.S57Value
 import io.github.s52.core.settings.BoundaryStyle
-import io.github.s52.core.settings.DisplayCategory
 import io.github.s52.core.settings.MarinerSettings
 import io.github.s52.core.settings.PortrayalContext
 import io.github.s52.core.settings.SymbolStyle
@@ -22,11 +21,7 @@ class OpenCpnGoldenPhase32Test {
     @Test
     fun representativeOpenCpnFeaturesProduceStableCommands() {
         val runtime = S52.openCpnRuntime()
-        val settings = MarinerSettings(
-            displayCategory = DisplayCategory.Other,
-            symbolStyle = SymbolStyle.Simplified,
-            boundaryStyle = BoundaryStyle.Plain
-        )
+        val settings = MarinerSettings(symbolStyle = SymbolStyle.Simplified, boundaryStyle = BoundaryStyle.Plain)
         val context = PortrayalContext(compilationScale = 50_000.0, displayScale = 50_000.0)
         val commands = runtime.portray(representativeFeatures(), settings, context)
 
