@@ -7,9 +7,18 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform) apply false
 }
 
+val defaultProjectVersion = "0.1.0-SNAPSHOT"
+val releaseLabelVersion: String? = providers.gradleProperty("releaseLabel")
+    .orElse(providers.environmentVariable("S52_RELEASE_LABEL"))
+    .orElse(providers.environmentVariable("GITHUB_REF_NAME"))
+    .orNull
+    ?.removePrefix("refs/tags/")
+    ?.removePrefix("v")
+    ?.takeIf { it.isNotBlank() }
+
 allprojects {
     group = "io.github.s52"
-    version = "0.1.0-SNAPSHOT"
+    version = releaseLabelVersion ?: defaultProjectVersion
 }
 
 val releaseLibraryProjects = setOf(
