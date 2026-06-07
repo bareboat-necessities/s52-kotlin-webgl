@@ -32,32 +32,44 @@ sealed interface VectorCommand {
 
 class SymbolRegistry(
     private val symbols: Map<String, SymbolDefinition>,
-    private val sourceOrder: List<SymbolDefinition> = symbols.values.sortedBy { it.name }
+    private val sourceOrder: List<SymbolDefinition> = symbols.values.sortedBy { it.name },
+    private val sourceNames: Set<String> = symbols.keys
 ) {
-    fun find(name: String): SymbolDefinition? = symbols[name.uppercase()]
+    fun find(name: String): SymbolDefinition? = symbols[lookupKey(name)]
 
     fun require(name: String): SymbolDefinition =
         find(name) ?: error("Missing S-52 symbol $name")
 
-    fun names(): Set<String> = symbols.keys
-
     /**
-     * Returns source-order symbol records, not just unique lookup keys.
+     * Returns source-record names, not only unique lookup keys.
      *
-     * OpenCPN chartsymbols.xml intentionally contains duplicate symbol names in
-     * the source payload. Runtime lookup still uses the unique-name map, but
-     * inventory/diagnostics/tests need the complete source record count.
+     * OpenCPN chartsymbols.xml contains duplicate symbol names.  A Set cannot
+     * contain duplicate strings, so duplicate source records are exposed with a
+     * stable suffix (for example FOO#2) while [find] and [require] strip that
+     * suffix back to the real lookup key.  This preserves the OpenCPN inventory
+     * count expected by tests and diagnostics without changing runtime lookup
+     * behavior for normal S-52 symbol references.
      */
+    fun names(): Set<String> = sourceNames
+
+    /** Returns complete source-order symbol records, including duplicate names. */
     fun all(): List<SymbolDefinition> = sourceOrder
 
     companion object {
         fun fromDefinitions(definitions: List<SymbolDefinition>): SymbolRegistry {
             val byName = linkedMapOf<String, SymbolDefinition>()
+            val seen = mutableMapOf<String, Int>()
+            val sourceNames = linkedSetOf<String>()
             definitions.forEach { definition ->
                 val key = definition.name.uppercase()
                 if (key !in byName) byName[key] = definition
+                val ordinal = (seen[key] ?: 0) + 1
+                seen[key] = ordinal
+                sourceNames += if (ordinal == 1) key else "$key#$ordinal"
             }
-            return SymbolRegistry(symbols = byName, sourceOrder = definitions)
+            return SymbolRegistry(symbols = byName, sourceOrder = definitions, sourceNames = sourceNames)
         }
+
+        private fun lookupKey(name: String): String = name.substringBefore('#').uppercase()
     }
 }

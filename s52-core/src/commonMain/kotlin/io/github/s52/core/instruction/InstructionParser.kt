@@ -91,10 +91,16 @@ object InstructionParser {
             name = requiredArg(kind, args, 0, sourceRange),
             parameters = args.drop(1)
         )
-        InstructionKind.CS -> S52Instruction.Conditional(
-            cspName = requiredArg(kind, args, 0, sourceRange),
-            parameters = args.drop(1)
-        )
+        InstructionKind.CS -> {
+            val raw = requiredArg(kind, args, 0, sourceRange)
+            val split = raw.indexOf(';')
+            val cspName = if (split >= 0) raw.substring(0, split).trim() else raw.trim()
+            val extra = if (split >= 0) listOf(raw.substring(split + 1).trim()).filter { it.isNotEmpty() } else emptyList()
+            S52Instruction.Conditional(
+                cspName = cspName,
+                parameters = extra + args.drop(1)
+            )
+        }
         InstructionKind.LS -> S52Instruction.SimpleLine(
             style = requiredArg(kind, args, 0, sourceRange),
             width = optionalPositiveDouble(args.getOrNull(1), default = 1.0, kind = kind, sourceRange = sourceRange),
