@@ -44,7 +44,7 @@ jobs:
         run: gradle --no-daemon phase22Check
 
       - name: Build source archive and release artifacts
-        run: gradle --no-daemon phase22SourceArchive releaseArtifacts
+        run: gradle --no-daemon -PreleaseLabel="${GITHUB_REF_NAME}" phase22SourceArchive releaseArtifacts
 
       - name: Upload generated OpenCPN symbology images
         uses: actions/upload-artifact@v4
