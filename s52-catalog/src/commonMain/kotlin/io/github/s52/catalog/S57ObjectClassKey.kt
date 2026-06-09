@@ -7,9 +7,11 @@ package io.github.s52.catalog
  * OpenCPN's portrayal XML includes pseudo/mariner object names such as
  * `$AREAS`, `$LINES`, `OWNSHP`, `VESSEL`, and `NOTMRK`. Keeping the raw
  * acronym lets those lookup rows survive import before the runtime catalogue is
- * fully widened.
+ * fully widened. This is intentionally not a data class: the constructor is
+ * private, and generated public copy methods on private data-class constructors
+ * are a Kotlin 2.5 migration warning source.
  */
-data class S57ObjectClassKey private constructor(
+class S57ObjectClassKey private constructor(
     val acronym: String,
     val standard: S57ObjectClass?
 ) {
@@ -18,6 +20,11 @@ data class S57ObjectClassKey private constructor(
     }
 
     val isStandard: Boolean get() = standard != null
+
+    override fun equals(other: Any?): Boolean =
+        this === other || (other is S57ObjectClassKey && acronym == other.acronym && standard == other.standard)
+
+    override fun hashCode(): Int = 31 * acronym.hashCode() + (standard?.hashCode() ?: 0)
 
     override fun toString(): String = acronym
 
