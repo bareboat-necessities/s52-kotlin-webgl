@@ -9,17 +9,26 @@ Phase 22 switches the real symbology export path from the earlier placeholder/li
 - exports all imported symbols, line styles, patterns, and colors as SVG images
 - exports three PNG symbol atlases for day, dusk, and dark modes
 - fails the build if the imported symbol count is suspiciously small
+- fails CI if `kotlin-js-store/yarn.lock` changes during `phase22Check`
 - changes the project license to **GPL-2.0-or-later** for OpenCPN compatibility
 
 ## Clean-check command
 
-The supported clean-checkout command is the same command used by CI:
+The supported clean-checkout command is the same guard used by CI:
+
+```bash
+bash scripts/phase22-clean-check.sh
+```
+
+The guard validates bundled OpenCPN inputs, runs `gradle --no-daemon phase22Check`, and compares the committed Kotlin/JS Yarn lock before and after the Gradle run.
+
+No external `OPENCPN_CHARTSYMBOLS_XML_FILE` is required for the default check path because the repository contains the OpenCPN inputs used by Phase 22.
+
+For a direct Gradle run without the extra preflight and lock-mutation guard:
 
 ```bash
 gradle --no-daemon phase22Check
 ```
-
-No external `OPENCPN_CHARTSYMBOLS_XML_FILE` is required for the default check path because the repository contains the OpenCPN inputs used by Phase 22.
 
 ## Optional external input override
 
