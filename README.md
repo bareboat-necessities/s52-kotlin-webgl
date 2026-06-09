@@ -58,6 +58,12 @@ To build the release handoff archive:
 gradle phase22SourceArchive
 ```
 
+To build the generated symbology ZIP locally:
+
+```bash
+gradle --no-daemon criticalSymbologyImagesArchive
+```
+
 ## Modules
 
 ```text
@@ -106,7 +112,7 @@ export OPENCPN_CHARTSYMBOLS_XML_FILE=/path/to/chartsymbols.xml
 gradle --no-daemon criticalCheck
 ```
 
-The generated GitHub Actions artifact is `opencpn-symbology-images`. It contains:
+The generated GitHub Actions artifact is `opencpn-symbology-images-directory`. The generated GitHub Release asset is a ZIP named like `s52-kotlin-webgl-<version>-critical.zip`. It contains `s52-symbology-images/` with:
 
 - `index.html`
 - `manifest.properties`
