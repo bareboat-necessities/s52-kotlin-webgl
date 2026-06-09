@@ -48,7 +48,7 @@ internal class AreaPatternRenderer(
         val bitmap = pattern.bitmap ?: return 0
         val polygon = command.geometry as? EncGeometry.Polygon ?: return 0
         val atlas = rasterAtlases.textureFor(palette, bitmap.atlasFileName) ?: return 0
-        val vertices = bitmapTileVertices(polygon.outer, projector, bitmap, atlas.width, atlas.height)
+        val vertices = bitmapTileVertices(polygon, projector, bitmap, atlas.width, atlas.height)
         if (vertices.isEmpty()) return 0
         return textureProgram.drawTriangles(atlas.texture, vertices, alpha = 1.0f)
     }
@@ -65,22 +65,21 @@ internal class AreaPatternRenderer(
         val bounds = HpglLineParser.bounds(segments) ?: return 0
         if (segments.isEmpty()) return 0
 
-        val vertices = vectorTileVertices(polygon.outer, projector, pattern, segments, bounds)
+        val vertices = vectorTileVertices(polygon, projector, pattern, segments, bounds)
         if (vertices.isEmpty()) return 0
         gl.lineWidth(1.0f)
         return solidProgram.draw(WebGLRenderingContext.LINES, vertices, colors.resolve(pattern.colorRefs.firstOrNull(), fallback = "CHMGD"))
     }
 
     private fun bitmapTileVertices(
-        ring: List<Coordinate>,
+        polygon: EncGeometry.Polygon,
         projector: GeometryProjector,
         bitmap: RasterBitmapDefinition,
         atlasWidth: Int,
         atlasHeight: Int
     ): FloatArray {
-        if (ring.size < 3) return FloatArray(0)
-        val projected = ring.map(projector::project)
-        val bounds = ClipBounds.of(projected) ?: return FloatArray(0)
+        val projected = ProjectedPolygonClip.from(polygon, projector) ?: return FloatArray(0)
+        val bounds = ClipBounds.of(projected.allPoints) ?: return FloatArray(0)
         val sx = projector.pixelToClipX(1.0).toDouble()
         val sy = projector.pixelToClipY(1.0).toDouble()
         val tileWClip = (bitmap.width * sx).toFloat().coerceAtLeast((8.0 * sx).toFloat())
@@ -101,7 +100,7 @@ internal class AreaPatternRenderer(
             while (xLeft <= bounds.maxX + tileWClip && col < MAX_TILE_COLS) {
                 val cx = xLeft + tileWClip * 0.5f
                 val cy = yTop - tileHClip * 0.5f
-                if (pointInPolygon(cx, cy, projected)) {
+                if (projected.contains(cx, cy)) {
                     val x0 = xLeft
                     val x1 = xLeft + tileWClip
                     val y0 = yTop
@@ -123,15 +122,14 @@ internal class AreaPatternRenderer(
     }
 
     private fun vectorTileVertices(
-        ring: List<Coordinate>,
+        polygon: EncGeometry.Polygon,
         projector: GeometryProjector,
         pattern: PatternDefinition,
         hpglSegments: List<HpglLineSegment>,
         bounds: HpglBounds
     ): FloatArray {
-        if (ring.size < 3) return FloatArray(0)
-        val projected = ring.map(projector::project)
-        val clipBounds = ClipBounds.of(projected) ?: return FloatArray(0)
+        val projected = ProjectedPolygonClip.from(polygon, projector) ?: return FloatArray(0)
+        val clipBounds = ClipBounds.of(projected.allPoints) ?: return FloatArray(0)
         val sx = projector.pixelToClipX(1.0).toDouble()
         val sy = projector.pixelToClipY(1.0).toDouble()
         if (sx <= 0.0 || sy <= 0.0) return FloatArray(0)
@@ -150,7 +148,7 @@ internal class AreaPatternRenderer(
             var xCenter = clipBounds.minX + tileWClip * 0.5f
             var col = 0
             while (xCenter <= clipBounds.maxX + tileWClip && col < MAX_TILE_COLS) {
-                if (pointInPolygon(xCenter, yCenter, projected)) {
+                if (projected.contains(xCenter, yCenter)) {
                     appendPatternTile(
                         out = floats,
                         hpglSegments = hpglSegments,
@@ -234,7 +232,7 @@ internal class AreaPatternRenderer(
         for (i in 1..count) {
             val t = i.toDouble() / (count + 1)
             val a = projector.project(Coordinate(minLon, minLat + (maxLat - minLat) * t))
-            val b = projector.project(Coordinate(maxLon, minLat + (maxLat - minLat) * t))
+            val b = projector.project(Coordinate(maxLon, minLat))
             floats.add(a.x); floats.add(a.y)
             floats.add(b.x); floats.add(b.y)
         }
@@ -258,20 +256,6 @@ internal class AreaPatternRenderer(
                 return ClipBounds(minX, maxX, minY, maxY)
             }
         }
-    }
-
-    private fun pointInPolygon(x: Float, y: Float, ring: List<ClipPoint>): Boolean {
-        var inside = false
-        var j = ring.lastIndex
-        for (i in ring.indices) {
-            val pi = ring[i]
-            val pj = ring[j]
-            val crosses = ((pi.y > y) != (pj.y > y)) &&
-                (x < (pj.x - pi.x) * (y - pi.y) / ((pj.y - pi.y).takeIf { it != 0f } ?: 1.0e-9f) + pi.x)
-            if (crosses) inside = !inside
-            j = i
-        }
-        return inside
     }
 
     private companion object {
