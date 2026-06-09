@@ -104,6 +104,7 @@ class S52TextResolverTest {
         expression: String,
         args: List<String>
     ): S52DrawCommand {
+        val settings = MarinerSettings()
         val engine = S52PortrayalEngine(
             LookupTable(
                 listOf(
@@ -121,8 +122,8 @@ class S52TextResolverTest {
         )
         return engine.portray(
             features = listOf(feature),
-            settings = MarinerSettings(),
-            context = PortrayalContext()
+            settings = settings,
+            context = PortrayalContext(compilationScale = settings.scale, displayScale = settings.scale)
         ).single()
     }
 
