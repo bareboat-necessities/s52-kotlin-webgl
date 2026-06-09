@@ -26,11 +26,11 @@ jobs:
           gradle-version: 8.14.5
 
       # Historical readiness-test compatibility markers.
-      # phase15Check phase16Check phase17Check phase18Check phase19Check phase20Check phase21Check phase22Check
+      # phase15Check phase16Check phase17Check phase18Check phase19Check phase20Check phase21Check criticalCheck
       # phase15SourceArchive phase16SourceArchive phase17SourceArchive phase18SourceArchive phase19SourceArchive phase20SourceArchive phase21SourceArchive phase22SourceArchive
 
-      - name: Validate clean Phase 22 build, inputs, and lock state
-        run: bash scripts/phase22-clean-check.sh
+      - name: Validate critical build, inputs, and lock state
+        run: bash scripts/critical-clean-check.sh
 
       - name: Upload generated OpenCPN symbology images
         uses: actions/upload-artifact@v4
