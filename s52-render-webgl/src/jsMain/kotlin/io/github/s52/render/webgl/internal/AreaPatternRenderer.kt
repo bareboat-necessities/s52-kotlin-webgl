@@ -231,8 +231,9 @@ internal class AreaPatternRenderer(
         val floats = ArrayList<Float>(count * 4)
         for (i in 1..count) {
             val t = i.toDouble() / (count + 1)
-            val a = projector.project(Coordinate(minLon, minLat + (maxLat - minLat) * t))
-            val b = projector.project(Coordinate(maxLon, minLat))
+            val y = minLat + (maxLat - minLat) * t
+            val a = projector.project(Coordinate(minLon, y))
+            val b = projector.project(Coordinate(maxLon, y))
             floats.add(a.x); floats.add(a.y)
             floats.add(b.x); floats.add(b.y)
         }
