@@ -474,9 +474,9 @@ tasks.register("phase21Check") {
 
 tasks.register<Zip>("sourceArchive") {
     group = "distribution"
-    description = "Builds a source archive for Phase 22 real symbology import handoff."
+    description = "Builds a source archive for OpenCPN real symbology import handoff."
     archiveBaseName.set("s52-kotlin-webgl")
-    archiveClassifier.set("phase22-source")
+    archiveClassifier.set("symbology-source")
     archiveVersion.set(project.version.toString())
     from(layout.projectDirectory) {
         exclude(".git/**")
