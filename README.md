@@ -30,6 +30,7 @@ Phase 22 is the current full-check baseline:
 - Phase 21 JVM image export remains as a compatibility alias.
 - Phase 22 imports bundled OpenCPN `chartsymbols.xml` plus the three bundled raster-symbol PNG atlases and generates `opencpn-symbology-images`.
 - CI runs `gradle --no-daemon phase22Check` from a clean checkout without requiring an external `OPENCPN_CHARTSYMBOLS_XML_FILE`.
+- Kotlin 2.5 readiness notes are tracked in `docs/KOTLIN_25_READINESS.md`.
 
 The default browser demo uses the s52lib-compatible pack. Phase 22 export/import tooling uses the bundled OpenCPN symbology inputs for repeatable CI checks.
 
@@ -66,19 +67,19 @@ demo              Kotlin/JS browser demo
 
 Official IHO Presentation Library assets should be treated as external input unless redistribution rights are clear. Phase 2 provides the generator/builder/validation structure so a developer can provide local standards-derived assets and generate runtime tables without committing restricted source material.
 
+OpenCPN-derived symbology import and bundled OpenCPN symbology inputs require the project’s GPL-2.0-or-later licensing boundary.
+
 ## Next step
 
 Use the Phase 16 facade, Phase 17 diagnostic bundle, Phase 18 profile presets, and Phase 19 artifact bundles as the stable downstream integration/support boundary, then continue with broader performance work and official Presentation Library import tooling when ready.
-
 
 ## Browser gallery
 
 Run `gradle :demo:jsBrowserDevelopmentRun` and open `#symbols`, `#lines`, `#patterns`, `#colors`, or `#all` to render the loaded S-52 library assets in browser.
 
-
 ## Phase 22 OpenCPN symbology import
 
-Use OpenCPN `chartsymbols.xml` as the real scalable symbology source. The clean-check path uses the bundled copy and validates that the XML, raster atlases, and committed Kotlin/JS Yarn lock are present before export.
+Use bundled OpenCPN `chartsymbols.xml` as the real scalable symbology source. The clean-check path validates that the XML, raster atlases, and committed Kotlin/JS Yarn lock are present before export.
 
 ```bash
 gradle --no-daemon phase22Check
@@ -97,19 +98,28 @@ export OPENCPN_CHARTSYMBOLS_XML_FILE=/path/to/chartsymbols.xml
 gradle --no-daemon phase22Check
 ```
 
-The generated GitHub Actions artifact is `opencpn-symbology-images`.
+The generated GitHub Actions artifact is `opencpn-symbology-images`. It contains:
+
+- `index.html`
+- `manifest.properties`
+- per-symbol SVG files under `symbols/`
+- per-line-style SVG files under `lines/`
+- per-pattern SVG files under `patterns/`
+- color swatch SVG files under `colors/`
+- `symbol-atlas-day.png`
+- `symbol-atlas-dusk.png`
+- `symbol-atlas-dark.png`
 
 License note: Phase 22 changes this project to **GPL-2.0-or-later** for compatibility with the OpenCPN symbology import path.
 
+## Kotlin 2.5 readiness
+
+Project-owned Kotlin sources should not use `data class ... private constructor(...)` patterns. Those keys are regular classes with explicit equality now, and the JVM test suite includes a guard for that migration-warning pattern. See `docs/KOTLIN_25_READINESS.md`.
 
 ## Historical phase compatibility
 
-The latest full check is `phase22Check`, but the project intentionally keeps the
-older readiness markers visible for downstream CI and release-audit tests:
-`phase15Check`, `phase16Check`, `phase17Check`, `phase18Check`, and
-`phase19Check`.
+The latest full check is `phase22Check`, but the project intentionally keeps the older readiness markers visible for downstream CI and release-audit tests: `phase15Check`, `phase16Check`, `phase17Check`, `phase18Check`, and `phase19Check`.
 
-The Phase 18 profile API remains available through `S52ProfileCatalog`, and the
-Phase 19 artifact API remains available through `S52ArtifactBundle`.
+The Phase 18 profile API remains available through `S52ProfileCatalog`, and the Phase 19 artifact API remains available through `S52ArtifactBundle`.
 
 Safety boundary: Experimental. Not type-approved ECDIS. Not for navigation.
