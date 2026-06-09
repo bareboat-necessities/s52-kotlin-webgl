@@ -1,8 +1,8 @@
-# Phase 22 — OpenCPN vector symbology import
+# Critical check — OpenCPN vector symbology import
 
-Phase 22 switches the real symbology export path from the earlier placeholder/libS52-compatible subset to an OpenCPN-compatible `chartsymbols.xml` importer plus the bundled raster-symbol atlases.
+The critical check exercises the real symbology export path through an OpenCPN-compatible `chartsymbols.xml` importer plus the bundled raster-symbol atlases.
 
-## What this phase does
+## What this check does
 
 - imports scalable/vector symbology from bundled `s52/opencpn/chartsymbols.xml` clean-check payload
 - accepts a full upstream OpenCPN `chartsymbols.xml` through the optional override path
@@ -10,25 +10,25 @@ Phase 22 switches the real symbology export path from the earlier placeholder/li
 - exports all imported symbols, line styles, patterns, and colors as SVG images
 - exports three PNG symbol atlases for day, dusk, and dark modes
 - fails the build if the imported symbol count is suspiciously small
-- fails CI if `kotlin-js-store/yarn.lock` changes during `phase22Check`
-- changes the project license to **GPL-2.0-or-later** for OpenCPN compatibility
+- fails CI if `kotlin-js-store/yarn.lock` changes during `criticalCheck`
+- keeps the OpenCPN-compatible symbology path under the project’s **GPL-2.0-or-later** compatibility boundary
 
 ## Clean-check command
 
 The supported clean-checkout command is the same guard used by CI:
 
 ```bash
-bash scripts/phase22-clean-check.sh
+bash scripts/critical-clean-check.sh
 ```
 
-The guard validates bundled OpenCPN-compatible inputs, runs `gradle --no-daemon phase22Check`, and compares the committed Kotlin/JS Yarn lock before and after the Gradle run.
+The guard validates bundled OpenCPN-compatible inputs, runs `gradle --no-daemon criticalCheck`, and compares the committed Kotlin/JS Yarn lock before and after the Gradle run.
 
-No external `OPENCPN_CHARTSYMBOLS_XML_FILE` is required for the default check path because the repository contains the clean-check payload used by Phase 22.
+No external `OPENCPN_CHARTSYMBOLS_XML_FILE` is required for the default check path because the repository contains the clean-check payload used by the critical check.
 
 For a direct Gradle run without the extra preflight and lock-mutation guard:
 
 ```bash
-gradle --no-daemon phase22Check
+gradle --no-daemon criticalCheck
 ```
 
 ## Optional external input override
@@ -36,14 +36,14 @@ gradle --no-daemon phase22Check
 To test against a full upstream OpenCPN `chartsymbols.xml`, use either:
 
 ```bash
-gradle --no-daemon phase22Check -Popencpn.chartsymbols=/path/to/chartsymbols.xml
+gradle --no-daemon criticalCheck -Popencpn.chartsymbols=/path/to/chartsymbols.xml
 ```
 
 or:
 
 ```bash
 export OPENCPN_CHARTSYMBOLS_XML_FILE=/path/to/chartsymbols.xml
-gradle --no-daemon phase22Check
+gradle --no-daemon criticalCheck
 ```
 
 ## Generated artifacts
