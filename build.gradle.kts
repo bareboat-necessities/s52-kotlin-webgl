@@ -492,6 +492,18 @@ tasks.register("criticalCheck") {
     dependsOn("phase21Check")
 }
 
+tasks.register<Zip>("criticalSymbologyImagesArchive") {
+    group = "distribution"
+    description = "Archives generated critical symbology SVGs, PNG atlases, manifest, and browser index."
+    dependsOn("criticalCheck")
+    archiveBaseName.set("s52-kotlin-webgl-symbology-images")
+    archiveClassifier.set("critical")
+    archiveVersion.set(project.version.toString())
+    from(layout.buildDirectory.dir("s52-symbology-images")) {
+        into("s52-symbology-images")
+    }
+}
+
 tasks.register<Sync>("releaseBuiltJars") {
     group = "distribution"
     description = "Collects built library JARs for GitHub release upload."
