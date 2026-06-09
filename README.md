@@ -29,7 +29,7 @@ Phase 22 is the current full-check baseline:
 - Phase 20 s52lib-compatible pack and browser gallery routes remain available.
 - Phase 21 JVM image export remains as a compatibility alias.
 - Phase 22 imports bundled OpenCPN `chartsymbols.xml` plus the three bundled raster-symbol PNG atlases and generates `opencpn-symbology-images`.
-- CI runs `gradle --no-daemon phase22Check` from a clean checkout without requiring an external `OPENCPN_CHARTSYMBOLS_XML_FILE`.
+- CI runs `scripts/phase22-clean-check.sh` from a clean checkout; the script validates bundled inputs, runs `gradle --no-daemon phase22Check`, and fails if `kotlin-js-store/yarn.lock` changes.
 - Kotlin 2.5 readiness notes are tracked in `docs/KOTLIN_25_READINESS.md`.
 
 The default browser demo uses the s52lib-compatible pack. Phase 22 export/import tooling uses the bundled OpenCPN symbology inputs for repeatable CI checks.
@@ -38,11 +38,19 @@ The default browser demo uses the s52lib-compatible pack. Phase 22 export/import
 
 This project is configured for Gradle 8.14.5 and Kotlin 2.3.21.
 
+Use the same clean-check guard that CI uses:
+
+```bash
+bash scripts/phase22-clean-check.sh
+```
+
+For a direct Gradle run without the extra preflight and lock-mutation guard:
+
 ```bash
 gradle --no-daemon phase22Check
 ```
 
-The CI workflow installs Gradle and Java 21, then runs the same task from a clean checkout.
+The CI workflow installs Gradle and Java 21, then runs the clean-check guard from a clean checkout.
 
 To build the release handoff archive:
 
@@ -82,7 +90,7 @@ Run `gradle :demo:jsBrowserDevelopmentRun` and open `#symbols`, `#lines`, `#patt
 Use bundled OpenCPN `chartsymbols.xml` as the real scalable symbology source. The clean-check path validates that the XML, raster atlases, and committed Kotlin/JS Yarn lock are present before export.
 
 ```bash
-gradle --no-daemon phase22Check
+bash scripts/phase22-clean-check.sh
 ```
 
 To test against a different OpenCPN `chartsymbols.xml`:
