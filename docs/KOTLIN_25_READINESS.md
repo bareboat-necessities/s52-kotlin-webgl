@@ -24,7 +24,7 @@ Do not introduce project-owned `data class ... private constructor(...)` key/val
 Run the normal full check with warnings visible:
 
 ```bash
-gradle --no-daemon phase22Check
+gradle --no-daemon criticalCheck
 ```
 
 Before any Kotlin upgrade, also grep for the pattern:
