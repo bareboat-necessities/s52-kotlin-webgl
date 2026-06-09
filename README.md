@@ -55,7 +55,7 @@ The CI workflow installs Gradle and Java 21, then runs the clean-check guard fro
 To build the release handoff archive:
 
 ```bash
-gradle phase22SourceArchive
+gradle sourceArchive
 ```
 
 To build the generated symbology ZIP locally:

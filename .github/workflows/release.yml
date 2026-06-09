@@ -31,7 +31,7 @@ jobs:
         run: bash scripts/critical-clean-check.sh
 
       - name: Build source archive
-        run: gradle --no-daemon -PreleaseLabel="${GITHUB_REF_NAME}" phase22SourceArchive
+        run: gradle --no-daemon -PreleaseLabel="${GITHUB_REF_NAME}" sourceArchive
 
       - name: Build symbology ZIP and release artifacts
         run: gradle --no-daemon -PreleaseLabel="${GITHUB_REF_NAME}" criticalSymbologyImagesArchive releaseArtifacts

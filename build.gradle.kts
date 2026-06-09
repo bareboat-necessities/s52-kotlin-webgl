@@ -472,7 +472,7 @@ tasks.register("phase21Check") {
     dependsOn("phase20Check", "phase21SymbologyImagesAudit", "phase22RealSymbologyImportAudit", ":s52-api:jvmTest", ":s52-tests:jvmTest")
 }
 
-tasks.register<Zip>("phase22SourceArchive") {
+tasks.register<Zip>("sourceArchive") {
     group = "distribution"
     description = "Builds a source archive for Phase 22 real symbology import handoff."
     archiveBaseName.set("s52-kotlin-webgl")
