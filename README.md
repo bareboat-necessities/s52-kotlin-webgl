@@ -18,9 +18,9 @@ Optional WebGL2 renderer
 
 Experimental. Not type-approved ECDIS. Not for navigation.
 
-## Phase 22 status
+## Critical check status
 
-Phase 22 is the current full-check baseline:
+`criticalCheck` is the current full-check baseline:
 
 - Phase 16 `s52-api` remains the stable consumer-facing facade.
 - Phase 17 diagnostic bundles remain the support and CI handoff format.
@@ -28,11 +28,11 @@ Phase 22 is the current full-check baseline:
 - Phase 19 portable text artifact bundles remain available through `S52ArtifactBundle`, `S52ArtifactExporter`, and `S52PortrayalSession.artifactBundle(...)`.
 - Phase 20 s52lib-compatible pack and browser gallery routes remain available.
 - Phase 21 JVM image export remains as a compatibility alias.
-- Phase 22 imports a bundled OpenCPN-compatible `chartsymbols.xml` clean-check payload plus the three bundled raster-symbol PNG atlases and generates `opencpn-symbology-images`.
-- CI runs `scripts/phase22-clean-check.sh` from a clean checkout; the script validates bundled inputs, runs `gradle --no-daemon phase22Check`, and fails if `kotlin-js-store/yarn.lock` changes.
+- The critical check imports a bundled OpenCPN-compatible `chartsymbols.xml` clean-check payload plus the three bundled raster-symbol PNG atlases and generates `opencpn-symbology-images`.
+- CI runs `scripts/critical-clean-check.sh` from a clean checkout; the script validates bundled inputs, runs `gradle --no-daemon criticalCheck`, and fails if `kotlin-js-store/yarn.lock` changes.
 - Kotlin 2.5 readiness notes are tracked in `docs/KOTLIN_25_READINESS.md`.
 
-The default browser demo uses the s52lib-compatible pack. Phase 22 export/import tooling uses the bundled OpenCPN-compatible clean-check payload for repeatable CI checks. Use the external override path below to test against a full upstream OpenCPN `chartsymbols.xml` file.
+The default browser demo uses the s52lib-compatible pack. The critical export/import tooling uses the bundled OpenCPN-compatible clean-check payload for repeatable CI checks. Use the external override path below to test against a full upstream OpenCPN `chartsymbols.xml` file.
 
 ## Build
 
@@ -41,13 +41,13 @@ This project is configured for Gradle 8.14.5 and Kotlin 2.3.21.
 Use the same clean-check guard that CI uses:
 
 ```bash
-bash scripts/phase22-clean-check.sh
+bash scripts/critical-clean-check.sh
 ```
 
 For a direct Gradle run without the extra preflight and lock-mutation guard:
 
 ```bash
-gradle --no-daemon phase22Check
+gradle --no-daemon criticalCheck
 ```
 
 The CI workflow installs Gradle and Java 21, then runs the clean-check guard from a clean checkout.
@@ -85,25 +85,25 @@ Use the Phase 16 facade, Phase 17 diagnostic bundle, Phase 18 profile presets, a
 
 Run `gradle :demo:jsBrowserDevelopmentRun` and open `#symbols`, `#lines`, `#patterns`, `#colors`, or `#all` to render the loaded S-52 library assets in browser.
 
-## Phase 22 OpenCPN symbology import
+## Critical OpenCPN symbology import
 
 Use the bundled OpenCPN-compatible `chartsymbols.xml` clean-check payload for repeatable CI. The clean-check path validates that the XML, raster atlases, and committed Kotlin/JS Yarn lock are present before export.
 
 ```bash
-bash scripts/phase22-clean-check.sh
+bash scripts/critical-clean-check.sh
 ```
 
 To test against a full upstream OpenCPN `chartsymbols.xml`:
 
 ```bash
-gradle --no-daemon phase22Check -Popencpn.chartsymbols=/path/to/chartsymbols.xml
+gradle --no-daemon criticalCheck -Popencpn.chartsymbols=/path/to/chartsymbols.xml
 ```
 
 or:
 
 ```bash
 export OPENCPN_CHARTSYMBOLS_XML_FILE=/path/to/chartsymbols.xml
-gradle --no-daemon phase22Check
+gradle --no-daemon criticalCheck
 ```
 
 The generated GitHub Actions artifact is `opencpn-symbology-images`. It contains:
@@ -118,7 +118,7 @@ The generated GitHub Actions artifact is `opencpn-symbology-images`. It contains
 - `symbol-atlas-dusk.png`
 - `symbol-atlas-dark.png`
 
-License note: Phase 22 changes this project to **GPL-2.0-or-later** for compatibility with the OpenCPN symbology import path.
+License note: the OpenCPN-compatible symbology import path requires **GPL-2.0-or-later** compatibility.
 
 ## Kotlin 2.5 readiness
 
@@ -126,7 +126,7 @@ Project-owned Kotlin sources should not use `data class ... private constructor(
 
 ## Historical phase compatibility
 
-The latest full check is `phase22Check`, but the project intentionally keeps the older readiness markers visible for downstream CI and release-audit tests: `phase15Check`, `phase16Check`, `phase17Check`, `phase18Check`, and `phase19Check`.
+The latest full check is `criticalCheck`, but the project intentionally keeps the older readiness markers visible for downstream CI and release-audit tests: `phase15Check`, `phase16Check`, `phase17Check`, `phase18Check`, and `phase19Check`.
 
 The Phase 18 profile API remains available through `S52ProfileCatalog`, and the Phase 19 artifact API remains available through `S52ArtifactBundle`.
 
