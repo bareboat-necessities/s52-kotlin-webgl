@@ -18,36 +18,35 @@ Optional WebGL2 renderer
 
 Experimental. Not type-approved ECDIS. Not for navigation.
 
-## Phase 21 status
+## Phase 22 status
 
-Phase 21 is complete in this increment:
+Phase 22 is the current full-check baseline:
 
 - Phase 16 `s52-api` remains the stable consumer-facing facade.
 - Phase 17 diagnostic bundles remain the support and CI handoff format.
 - Phase 18 built-in portrayal profiles remain the reproducible settings layer.
-- Added Phase 19 portable text artifact bundles through `S52ArtifactBundle`, `S52ArtifactExporter`, and `S52PortrayalSession.artifactBundle(...)`.
-- Artifact bundles can include manifest, diagnostics, profile summary, static-completeness report, command-validation report, and command transcript files.
-- Added an artifact-bundle integration sample.
-- Added Phase 20 s52lib-compatible pack and browser gallery routes.
-- Added Phase 21 JVM image export for the s52lib-compatible pack.
-- CI now runs `phase21Check` and uploads `build/s52-symbology-images` as the `s52lib-symbology-images` artifact.
+- Phase 19 portable text artifact bundles remain available through `S52ArtifactBundle`, `S52ArtifactExporter`, and `S52PortrayalSession.artifactBundle(...)`.
+- Phase 20 s52lib-compatible pack and browser gallery routes remain available.
+- Phase 21 JVM image export remains as a compatibility alias.
+- Phase 22 imports bundled OpenCPN `chartsymbols.xml` plus the three bundled raster-symbol PNG atlases and generates `opencpn-symbology-images`.
+- CI runs `gradle --no-daemon phase22Check` from a clean checkout without requiring an external `OPENCPN_CHARTSYMBOLS_XML_FILE`.
 
-The default browser demo now uses the s52lib-compatible pack. Official IHO Presentation Library source assets are still not bundled; the compatibility pack renders all assets present in the loaded pack.
+The default browser demo uses the s52lib-compatible pack. Phase 22 export/import tooling uses the bundled OpenCPN symbology inputs for repeatable CI checks.
 
 ## Build
 
 This project is configured for Gradle 8.14.5 and Kotlin 2.3.21.
 
 ```bash
-gradle phase21Check
+gradle --no-daemon phase22Check
 ```
 
-The CI workflow installs Gradle and Java 21, then runs the same task.
+The CI workflow installs Gradle and Java 21, then runs the same task from a clean checkout.
 
 To build the release handoff archive:
 
 ```bash
-gradle phase21SourceArchive
+gradle phase22SourceArchive
 ```
 
 ## Modules
@@ -79,7 +78,13 @@ Run `gradle :demo:jsBrowserDevelopmentRun` and open `#symbols`, `#lines`, `#patt
 
 ## Phase 22 OpenCPN symbology import
 
-Use OpenCPN `chartsymbols.xml` as the real scalable symbology source. No raster atlas is used in this path.
+Use OpenCPN `chartsymbols.xml` as the real scalable symbology source. The clean-check path uses the bundled copy and validates that the XML, raster atlases, and committed Kotlin/JS Yarn lock are present before export.
+
+```bash
+gradle --no-daemon phase22Check
+```
+
+To test against a different OpenCPN `chartsymbols.xml`:
 
 ```bash
 gradle --no-daemon phase22Check -Popencpn.chartsymbols=/path/to/chartsymbols.xml
