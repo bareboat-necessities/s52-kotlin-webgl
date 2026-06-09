@@ -1,10 +1,11 @@
 # Phase 22 — OpenCPN vector symbology import
 
-Phase 22 switches the real symbology export path from the earlier placeholder/libS52-compatible subset to a real **OpenCPN `chartsymbols.xml`** importer plus the bundled OpenCPN raster-symbol atlases.
+Phase 22 switches the real symbology export path from the earlier placeholder/libS52-compatible subset to an OpenCPN-compatible `chartsymbols.xml` importer plus the bundled raster-symbol atlases.
 
 ## What this phase does
 
-- imports scalable/vector symbology from bundled `s52/opencpn/chartsymbols.xml`
+- imports scalable/vector symbology from bundled `s52/opencpn/chartsymbols.xml` clean-check payload
+- accepts a full upstream OpenCPN `chartsymbols.xml` through the optional override path
 - validates that `chartsymbols.xml`, the three `rastersymbols-*.png` atlases, and the committed Kotlin/JS Yarn lock are present before export
 - exports all imported symbols, line styles, patterns, and colors as SVG images
 - exports three PNG symbol atlases for day, dusk, and dark modes
@@ -20,9 +21,9 @@ The supported clean-checkout command is the same guard used by CI:
 bash scripts/phase22-clean-check.sh
 ```
 
-The guard validates bundled OpenCPN inputs, runs `gradle --no-daemon phase22Check`, and compares the committed Kotlin/JS Yarn lock before and after the Gradle run.
+The guard validates bundled OpenCPN-compatible inputs, runs `gradle --no-daemon phase22Check`, and compares the committed Kotlin/JS Yarn lock before and after the Gradle run.
 
-No external `OPENCPN_CHARTSYMBOLS_XML_FILE` is required for the default check path because the repository contains the OpenCPN inputs used by Phase 22.
+No external `OPENCPN_CHARTSYMBOLS_XML_FILE` is required for the default check path because the repository contains the clean-check payload used by Phase 22.
 
 For a direct Gradle run without the extra preflight and lock-mutation guard:
 
@@ -32,7 +33,7 @@ gradle --no-daemon phase22Check
 
 ## Optional external input override
 
-To test against a different OpenCPN `chartsymbols.xml`, use either:
+To test against a full upstream OpenCPN `chartsymbols.xml`, use either:
 
 ```bash
 gradle --no-daemon phase22Check -Popencpn.chartsymbols=/path/to/chartsymbols.xml
@@ -82,4 +83,4 @@ Then open `#symbols`, `#lines`, `#patterns`, `#colors`, or `#all`.
 
 ## Safety and asset boundary
 
-This project remains experimental. It is not type-approved ECDIS and is not for navigation. OpenCPN-derived symbology import and bundled symbology inputs require the project’s GPL-2.0-or-later licensing boundary.
+This project remains experimental. It is not type-approved ECDIS and is not for navigation. OpenCPN-derived symbology import and bundled OpenCPN-compatible symbology inputs require the project’s GPL-2.0-or-later licensing boundary.
