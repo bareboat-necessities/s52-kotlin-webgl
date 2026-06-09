@@ -30,8 +30,14 @@ jobs:
       - name: Validate critical build, inputs, generated symbology, and lock state
         run: bash scripts/critical-clean-check.sh
 
-      - name: Build source archive, symbology ZIP, and release artifacts
-        run: gradle --no-daemon -PreleaseLabel="${GITHUB_REF_NAME}" phase22SourceArchive criticalSymbologyImagesArchive releaseArtifacts
+      - name: Build source archive
+        run: gradle --no-daemon -PreleaseLabel="${GITHUB_REF_NAME}" phase22SourceArchive
+
+      - name: Build symbology ZIP and release artifacts
+        run: gradle --no-daemon -PreleaseLabel="${GITHUB_REF_NAME}" criticalSymbologyImagesArchive releaseArtifacts
+
+      - name: Verify release build did not rewrite Kotlin/JS lock
+        run: git diff --exit-code -- kotlin-js-store/yarn.lock
 
       - name: Upload generated symbology images ZIP
         uses: actions/upload-artifact@v4
