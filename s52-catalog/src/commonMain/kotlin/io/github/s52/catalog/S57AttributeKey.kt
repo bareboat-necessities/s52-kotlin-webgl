@@ -5,9 +5,11 @@ package io.github.s52.catalog
  * acronyms outside the curated [S57Attribute] enum.
  *
  * This keeps OpenCPN attrib-code filters and lowercase aliases representable
- * without losing rows during import.
+ * without losing rows during import. This is intentionally not a data class:
+ * the constructor is private, and generated public copy methods on private
+ * data-class constructors are a Kotlin 2.5 migration warning source.
  */
-data class S57AttributeKey private constructor(
+class S57AttributeKey private constructor(
     val acronym: String,
     val standard: S57Attribute?
 ) {
@@ -16,6 +18,11 @@ data class S57AttributeKey private constructor(
     }
 
     val isStandard: Boolean get() = standard != null
+
+    override fun equals(other: Any?): Boolean =
+        this === other || (other is S57AttributeKey && acronym == other.acronym && standard == other.standard)
+
+    override fun hashCode(): Int = 31 * acronym.hashCode() + (standard?.hashCode() ?: 0)
 
     override fun toString(): String = acronym
 
