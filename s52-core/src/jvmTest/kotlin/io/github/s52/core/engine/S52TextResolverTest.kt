@@ -95,7 +95,7 @@ class S52TextResolverTest {
             args = listOf("LIGHTS", "LITYW")
         ) as S52DrawCommand.Text
 
-        assertEquals("Fl R 4s", command.textExpression)
+        assertEquals("Fl R 4s LITCHR=2 SIGGRP=(2) 4s 15-120°", command.textExpression)
         assertEquals("LITYW", command.colorToken)
     }
 
