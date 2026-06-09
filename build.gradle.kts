@@ -447,7 +447,7 @@ tasks.register("phase22RealSymbologyImportAudit") {
         check(missing.isEmpty()) { "Missing Phase 22 real-import files: $missing" }
         val readme = layout.projectDirectory.file("README.md").asFile.readText()
         check("opencpn.chartsymbols" in readme) { "README.md must explain the required real PLib input path." }
-        check("phase22Check" in readme) { "README.md must document phase22Check." }
+        check("criticalCheck" in readme) { "README.md must document criticalCheck." }
     }
 }
 
@@ -486,9 +486,9 @@ tasks.register<Zip>("phase22SourceArchive") {
     }
 }
 
-tasks.register("phase22Check") {
+tasks.register("criticalCheck") {
     group = "verification"
-    description = "Runs Phase 22 OpenCPN chartsymbols import and symbology image export checks."
+    description = "Runs the critical full OpenCPN chartsymbols import and symbology image export checks."
     dependsOn("phase21Check")
 }
 
