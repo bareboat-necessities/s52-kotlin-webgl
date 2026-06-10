@@ -1,6 +1,6 @@
 package io.github.s52.preslib.esri.svg
 
-import java.io.File
+import java.nio.file.Files
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -9,7 +9,7 @@ import kotlin.test.assertTrue
 class EsriSvgParserTest {
     @Test
     fun parsesMinimalEsriLikeSvg() {
-        val file = File.createTempFile("esri-symbol", ".svg")
+        val file = Files.createTempFile("esri-symbol", ".svg").toFile()
         file.writeText(
             """
             <?xml version="1.0" encoding="UTF-8"?>
@@ -23,8 +23,8 @@ class EsriSvgParserTest {
         val parsed = EsriSvgParser.parse(file, category = "point")
         assertEquals(2.4042, parsed.widthMm!!, 1.0e-6)
         assertEquals(2.2577, parsed.heightMm!!, 1.0e-6)
-        assertNotNull(parsed.viewBox)
-        assertTrue(parsed.viewBox!!.isValid)
+        val viewBox = assertNotNull(parsed.viewBox)
+        assertTrue(viewBox.isValid)
         assertEquals(2, parsed.paths.size)
         assertTrue(parsed.hasGeometry)
         assertTrue(parsed.isSubsetSupported)
