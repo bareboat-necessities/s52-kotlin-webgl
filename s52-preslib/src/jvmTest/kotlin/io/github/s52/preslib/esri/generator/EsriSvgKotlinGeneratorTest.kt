@@ -1,6 +1,6 @@
 package io.github.s52.preslib.esri.generator
 
-import java.io.File
+import java.nio.file.Files
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -9,7 +9,7 @@ import kotlin.test.assertTrue
 class EsriSvgKotlinGeneratorTest {
     @Test
     fun writesGeneratedRegistryFile() {
-        val root = createTempDir(prefix = "esri-source")
+        val root = Files.createTempDirectory("esri-source").toFile().apply { deleteOnExit() }
         val cpl = root.resolve("CustomPresentationLibrary")
         val point = cpl.resolve("symbols/point")
         cpl.resolve("symbols/line").mkdirs()

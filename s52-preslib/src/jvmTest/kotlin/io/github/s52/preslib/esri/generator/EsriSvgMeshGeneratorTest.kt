@@ -2,10 +2,11 @@ package io.github.s52.preslib.esri.generator
 
 import io.github.s52.preslib.esri.svg.EsriSvgMeshGenerator
 import io.github.s52.preslib.esri.svg.EsriSvgParser
+import java.io.File
+import java.nio.file.Files
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import java.io.File
 
 class EsriSvgMeshGeneratorTest {
     @Test
@@ -36,7 +37,7 @@ class EsriSvgMeshGeneratorTest {
         assertEquals(2, meshes.single().triangleCount)
     }
 
-    private fun tempSvg(text: String): File = createTempFile(prefix = "esri-test", suffix = ".svg").apply {
+    private fun tempSvg(text: String): File = Files.createTempFile("esri-test", ".svg").toFile().apply {
         writeText(text)
         deleteOnExit()
     }
