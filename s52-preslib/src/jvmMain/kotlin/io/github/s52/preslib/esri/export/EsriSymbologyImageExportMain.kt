@@ -1,5 +1,6 @@
 package io.github.s52.preslib.esri.export
 
+import io.github.s52.preslib.esri.importer.EsriCustomSymbolMapParser
 import io.github.s52.preslib.esri.importer.EsriSourceLayout
 import io.github.s52.preslib.esri.importer.EsriSvgCategory
 import io.github.s52.preslib.esri.svg.EsriGeneratedPaint
@@ -32,7 +33,9 @@ import kotlin.system.exitProcess
  * OpenCPN symbol, line style, and pattern name from OpenCpnGeneratedPresLib is
  * emitted with the same external name.  Each OpenCPN slot is then resolved to
  * the best available ESRI SVG by explicit alias, CustomSymbolMap object rule,
- * exact file-name match, semantic token match, or finally a category fallback.
+ * exact file-name match, or semantic token match.  Unmatched slots are
+ * emitted as unresolved/blank placeholders instead of copying generic fallback
+ * art into many unrelated OpenCPN names.
  *
  * That means downstream CI/release artifacts can be compared 1:1 against the
  * OpenCPN atlas by name/count/order while still reviewing the ESRI rendering.
@@ -79,8 +82,7 @@ object EsriSymbologyImageExportMain {
         copyResolvedSvgSlots(patternSlots, patternsOut)
         copyResolvedObjectSlots(objectSlots, objectsOut)
 
-        val renderFallback = resolver.firstRenderablePointFallback()
-        val pointResults = symbolSlots.map { slot -> loadPointAsset(slot, renderFallback) }
+        val pointResults = symbolSlots.map { slot -> loadPointAsset(slot) }
         val renderable = pointResults.filterIsInstance<AtlasPointAsset>()
         val failures = pointResults.filterIsInstance<AtlasPointFailure>()
 
@@ -129,9 +131,9 @@ object EsriSymbologyImageExportMain {
         if (failures.isNotEmpty()) {
             System.err.println("WARNING: ESRI matched atlas has ${failures.size} OpenCPN symbol slot(s) not rasterized. See ${reportDir.resolve("esri-opencpn-atlas-match.json")}")
         }
-        val semanticFallbacks = (symbolSlots + lineSlots + patternSlots).count { it.matchKind == MatchKind.CATEGORY_FALLBACK }
-        if (semanticFallbacks > 0) {
-            System.err.println("WARNING: ESRI matched atlas used $semanticFallbacks category fallback mapping(s). Add explicit aliases in s52/esri/*.tsv to close them.")
+        val unresolvedSlots = (symbolSlots + lineSlots + patternSlots).count { it.matchKind == MatchKind.UNRESOLVED }
+        if (unresolvedSlots > 0) {
+            System.err.println("WARNING: ESRI matched atlas has $unresolvedSlots unresolved OpenCPN slot(s). No generic fallback SVGs were substituted; add explicit aliases in s52/esri/*.tsv to close them.")
         }
         println("Exported OpenCPN-name-compatible ESRI atlas to ${outputDir.path}; OpenCPN symbols=${symbolSlots.size}, rendered=${renderable.size}, lines=${lineSlots.size}, patterns=${patternSlots.size}")
     }
@@ -175,10 +177,8 @@ object EsriSymbologyImageExportMain {
     }
 
     private fun unresolvedSvg(name: String, reason: String): String = """
-        <svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72">
-          <rect x="1" y="1" width="70" height="70" fill="none" stroke="#cc0066" stroke-width="2"/>
-          <path d="M16 16L56 56M56 16L16 56" stroke="#cc0066" stroke-width="4" stroke-linecap="round"/>
-          <text x="36" y="68" text-anchor="middle" font-size="6" fill="#cc0066">${html(name.take(16))}</text>
+        <svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72" data-opencpn-name="${html(name)}" data-match-kind="UNRESOLVED">
+          <title>${html(name)} unresolved ESRI mapping</title>
           <desc>${html(reason)}</desc>
         </svg>
     """.trimIndent()
@@ -208,24 +208,20 @@ object EsriSymbologyImageExportMain {
 
     private val xmlDeclarationRegex = Regex("""(?is)<\?xml\s+[^>]*\?>""")
 
-    private fun loadPointAsset(slot: OpenCpnEsriSlot, fallback: File?): AtlasPointResult {
+    internal fun unresolvedSvgForTest(name: String, reason: String): String = unresolvedSvg(name, reason)
+
+    internal fun matchKindNamesForTest(): List<String> = MatchKind.values().map { it.name }
+
+    private fun loadPointAsset(slot: OpenCpnEsriSlot): AtlasPointResult {
         val primary = slot.esriFile
-        val first = if (primary != null && primary.isFile) parsePoint(slot, primary, false) else null
-        if (first is AtlasPointAsset) return first
-        if (fallback != null && fallback.isFile && fallback != primary) {
-            val fallbackSlot = slot.copy(
-                esriFile = fallback,
-                esriName = fallback.name,
-                matchKind = MatchKind.RENDER_FALLBACK,
-                reason = "${slot.reason}; primary could not be rasterized: ${(first as? AtlasPointFailure)?.reason ?: "missing primary"}"
-            )
-            val second = parsePoint(fallbackSlot, fallback, true)
-            if (second is AtlasPointAsset) return second
+        return if (primary != null && primary.isFile) {
+            parsePoint(slot, primary)
+        } else {
+            AtlasPointFailure(slot.openCpnName, slot.esriName ?: "", slot.reason)
         }
-        return first ?: AtlasPointFailure(slot.openCpnName, slot.esriName ?: "", slot.reason)
     }
 
-    private fun parsePoint(slot: OpenCpnEsriSlot, svg: File, fallbackRender: Boolean): AtlasPointResult {
+    private fun parsePoint(slot: OpenCpnEsriSlot, svg: File): AtlasPointResult {
         return try {
             val document = EsriSvgParser.parse(svg, EsriSvgCategory.POINT.name)
             if (!document.isSubsetSupported) {
@@ -237,7 +233,7 @@ object EsriSymbologyImageExportMain {
                 if (meshes.isEmpty()) {
                     AtlasPointFailure(slot.openCpnName, svg.invariantSeparatorsPath, "no renderable mesh in ${svg.name}")
                 } else {
-                    AtlasPointAsset(slot.slotIndex, slot.openCpnName, svg.name, svg.invariantSeparatorsPath, slot.matchKind, slot.reason, fallbackRender, document, meshes)
+                    AtlasPointAsset(slot.slotIndex, slot.openCpnName, svg.name, svg.invariantSeparatorsPath, slot.matchKind, slot.reason, false, document, meshes)
                 }
             }
         } catch (exc: Exception) {
@@ -306,7 +302,10 @@ object EsriSymbologyImageExportMain {
             appendLine("atlasSymbols=${symbols.size}")
             appendLine("atlasRendered=${renderable.size}")
             appendLine("atlasSkipped=${failures.size}")
-            appendLine("semanticFallbacks=${all.count { it.matchKind == MatchKind.CATEGORY_FALLBACK }}")
+            appendLine("semanticFallbacks=0")
+            appendLine("categoryFallbacks=0")
+            appendLine("unresolvedMatches=${all.count { it.matchKind == MatchKind.UNRESOLVED }}")
+            appendLine("unresolvedObjects=${objects.count { it.assetSlot.matchKind == MatchKind.UNRESOLVED }}")
             appendLine("aliasMatches=${all.count { it.matchKind == MatchKind.ALIAS }}")
             appendLine("customSymbolMapMatches=${all.count { it.matchKind == MatchKind.CUSTOM_SYMBOL_MAP }}")
             appendLine("exactNameMatches=${all.count { it.matchKind == MatchKind.EXACT_NAME }}")
@@ -344,6 +343,8 @@ object EsriSymbologyImageExportMain {
             appendLine("<li>Atlas-rendered point slots: ${renderable.size}</li>")
             appendLine("<li>Rasterization failures: ${failures.size}</li>")
             appendLine("<li>Atlas grid: ${atlasLayout.columns} × ${atlasLayout.rows}, cell ${CellPx}px</li>")
+            appendLine("<li>Unresolved symbol/line/pattern slots: ${(symbols + lines + patterns).count { it.matchKind == MatchKind.UNRESOLVED }}</li>")
+            appendLine("<li>Unresolved object slots: ${objects.count { it.assetSlot.matchKind == MatchKind.UNRESOLVED }}</li>")
             appendLine("</ul>")
             appendLine("<h2>Symbol atlases</h2>")
             appendLine("<h3>Day</h3><img src=\"symbol-atlas-day.png\" alt=\"ESRI day symbol atlas, OpenCPN-compatible names\">")
@@ -351,13 +352,17 @@ object EsriSymbologyImageExportMain {
             appendLine("<h3>Dark</h3><img src=\"symbol-atlas-dark.png\" alt=\"ESRI dark symbol atlas, OpenCPN-compatible names\">")
             appendLine("<h2>First 500 OpenCPN lookup objects</h2><div class=\"grid\">")
             objects.take(500).forEach { objectSlot ->
-                appendLine("<div class=\"card\"><img src=\"objects/${html(urlPathSegment(safeFileName(objectSlot.objectAcronym)))}.svg\" alt=\"${html(objectSlot.objectAcronym)}\" loading=\"lazy\" onerror=\"this.closest('.card').classList.add('broken')\"><br><code>${html(objectSlot.objectAcronym)}</code><br><small>${html(objectSlot.primitive)} / ${html(objectSlot.openCpnAssetName)}</small></div>")
+                val extra = if (objectSlot.assetSlot.matchKind == MatchKind.UNRESOLVED) "<br><span class=\"warn\">unresolved</span>" else ""
+                appendLine("<div class=\"card\"><img src=\"objects/${html(urlPathSegment(safeFileName(objectSlot.objectAcronym)))}.svg\" alt=\"${html(objectSlot.objectAcronym)}\" loading=\"lazy\" onerror=\"this.closest('.card').classList.add('broken')\"><br><code>${html(objectSlot.objectAcronym)}</code><br><small>${html(objectSlot.primitive)} / ${html(objectSlot.openCpnAssetName)}</small>$extra</div>")
             }
             appendLine("</div>")
             if (objects.size > 500) appendLine("<p>Only first 500 object previews shown; all ${objects.size} OpenCPN lookup object SVG files are present under <code>objects/</code>.</p>")
             appendLine("<h2>First 500 OpenCPN-named point symbols</h2><div class=\"grid\">")
             symbols.take(500).forEach { slot ->
-                val extra = if (slot.matchKind == MatchKind.CATEGORY_FALLBACK) "<br><span class=\"warn\">fallback</span>" else ""
+                val extra = when (slot.matchKind) {
+                    MatchKind.UNRESOLVED -> "<br><span class=\"warn\">unresolved</span>"
+                    else -> ""
+                }
                 val esriPreviewName = html(slot.esriName ?: "unresolved")
                 appendLine("<div class=\"card\"><img src=\"symbols/${html(urlPathSegment(safeFileName(slot.openCpnName)))}.svg\" alt=\"${html(slot.openCpnName)}\" loading=\"lazy\" onerror=\"this.closest('.card').classList.add('broken')\"><br><code>${html(slot.openCpnName)}</code><br><small>$esriPreviewName</small>$extra</div>")
             }
@@ -388,6 +393,9 @@ object EsriSymbologyImageExportMain {
             appendLine("  \"opencpnObjectCount\": ${objects.size},")
             appendLine("  \"atlasRenderedCount\": ${renderable.size},")
             appendLine("  \"atlasSkippedCount\": ${failures.size},")
+            appendLine("  \"categoryFallbackCount\": 0,")
+            appendLine("  \"unresolvedSlotCount\": ${(symbols + lines + patterns).count { it.matchKind == MatchKind.UNRESOLVED }},")
+            appendLine("  \"unresolvedObjectCount\": ${objects.count { it.assetSlot.matchKind == MatchKind.UNRESOLVED }},")
             appendLine("  \"atlas\": {\"cellPx\": $CellPx, \"columns\": ${atlasLayout.columns}, \"rows\": ${atlasLayout.rows}, \"widthPx\": ${atlasLayout.widthPx}, \"heightPx\": ${atlasLayout.heightPx}},")
             appendLine("  \"mappings\": [")
             val all = symbols + lines + patterns
@@ -546,8 +554,7 @@ private class EsriOpenCpnAtlasResolver(
         bestSemanticMatch(openCpnName, prefix, category)?.let {
             return slot(slotIndex, openCpnName, category, it, MatchKind.SEMANTIC_TOKEN, "semantic token match for $prefix")
         }
-        val fallback = categoryFallback(category)
-        return slot(slotIndex, openCpnName, category, fallback, MatchKind.CATEGORY_FALLBACK, "no exact/direct/semantic match; category fallback")
+        return slot(slotIndex, openCpnName, category, null, MatchKind.UNRESOLVED, "no exact/direct/semantic ESRI match; generic category fallback disabled")
     }
 
     private val categoryCounters = mutableMapOf<EsriSvgCategory, Int>()
@@ -555,13 +562,6 @@ private class EsriOpenCpnAtlasResolver(
         val value = categoryCounters.getOrDefault(category, 0)
         categoryCounters[category] = value + 1
         return value
-    }
-
-    fun firstRenderablePointFallback(): File? {
-        val preferred = listOf("Q80_Beacon.svg", "Q20b_Conical_buoy.svg", "P1_Light.svg")
-            .firstNotNullOfOrNull { findSvg(it, EsriSvgCategory.POINT) }
-        if (preferred != null) return preferred
-        return byCategory[EsriSvgCategory.POINT].orEmpty().firstOrNull()
     }
 
     private fun slot(index: Int, openCpnName: String, category: EsriSvgCategory, file: File?, kind: MatchKind, reason: String): OpenCpnEsriSlot =
@@ -578,16 +578,6 @@ private class EsriOpenCpnAtlasResolver(
             }
         }
         return null
-    }
-
-    private fun categoryFallback(category: EsriSvgCategory): File? {
-        val preferred = when (category) {
-            EsriSvgCategory.POINT -> listOf("Q80_Beacon.svg", "Q20b_Conical_buoy.svg", "P1_Light.svg")
-            EsriSvgCategory.LINE -> listOf("M1_NavigationLine.svg", "L30_Cable.svg", "N2_1_RestrictedArea.svg")
-            EsriSvgCategory.PATTERN -> listOf("J1_Sand.svg", "N2_1_RestrictedArea.svg")
-            EsriSvgCategory.UNKNOWN -> emptyList()
-        }.firstNotNullOfOrNull { findSvg(it, category) }
-        return preferred ?: byCategory[category].orEmpty().firstOrNull()
     }
 
     private fun bestSemanticMatch(openCpnName: String, prefix: String, category: EsriSvgCategory): File? {
@@ -663,17 +653,21 @@ private class EsriOpenCpnAtlasResolver(
 
     private fun readCustomSymbolMapDirectSymbols(file: File): Map<String, List<String>> {
         if (!file.isFile) return emptyMap()
-        val result = linkedMapOf<String, MutableList<String>>()
-        val attr = Regex("""([A-Za-z0-9_:-]+)\s*=\s*['\"]([^'\"]+)['\"]""")
-        Regex("""<[^>]+>""").findAll(file.readText()).forEach { match ->
-            val attrs = attr.findAll(match.value).associate { it.groupValues[1] to it.groupValues[2] }
-            val objects = attrs["objects"] ?: attrs["object"] ?: attrs["acronym"] ?: attrs["acronyms"] ?: return@forEach
-            val symbol = attrs["symbolName"] ?: return@forEach
-            objects.split(',').map { it.trim().uppercase(Locale.US) }.filter { it.isNotBlank() }.forEach { obj ->
-                result.getOrPut(obj) { mutableListOf() }.add(symbol)
+        return try {
+            val result = linkedMapOf<String, MutableList<String>>()
+            val map = EsriCustomSymbolMapParser.parse(file)
+            map.features.forEach { feature ->
+                val symbols = feature.conditions.mapNotNull { it.symbolName?.trim()?.takeIf(String::isNotBlank) }.distinct()
+                if (symbols.isEmpty()) return@forEach
+                feature.objects
+                    .map { it.trim().uppercase(Locale.US) }
+                    .filter { it.isNotBlank() }
+                    .forEach { obj -> result.getOrPut(obj) { mutableListOf() }.addAll(symbols) }
             }
+            result.mapValues { (_, values) -> values.distinct() }
+        } catch (exc: Exception) {
+            emptyMap()
         }
-        return result
     }
 }
 
@@ -681,7 +675,7 @@ internal fun canonicalOpenCpnKey(value: String): String = value.trim().removeSuf
 internal fun openCpnObjectPrefix(value: String): String = value.takeWhile { it.isLetter() }.uppercase(Locale.US)
 internal fun normalize(value: String): String = value.lowercase(Locale.US).filter { it.isLetterOrDigit() }
 
-private enum class MatchKind { ALIAS, CUSTOM_SYMBOL_MAP, EXACT_NAME, SEMANTIC_TOKEN, CATEGORY_FALLBACK, RENDER_FALLBACK }
+private enum class MatchKind { ALIAS, CUSTOM_SYMBOL_MAP, EXACT_NAME, SEMANTIC_TOKEN, UNRESOLVED }
 
 private data class OpenCpnPresentationRef(val name: String, val category: EsriSvgCategory)
 

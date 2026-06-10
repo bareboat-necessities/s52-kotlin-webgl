@@ -42,4 +42,23 @@ class EsriSymbologyImageExportTest {
         assertFalse(copied.contains("<?xml"), "Generated SVG copies must not put metadata before an XML declaration")
         assertFalse(copied.contains("-- sanitize"), "XML comments must not contain illegal double hyphen sequences")
     }
+
+    @Test
+    fun unresolvedSlotsAreBlankNotGenericFallbackArt() {
+        val svg = EsriSymbologyImageExportMain.unresolvedSvgForTest("NOESRI01", "no match")
+
+        assertTrue(svg.contains("data-match-kind=\"UNRESOLVED\""))
+        assertFalse(svg.contains("<rect"), "Unresolved exports must not draw fake fallback boxes")
+        assertFalse(svg.contains("<path"), "Unresolved exports must not draw generic fallback symbols")
+    }
+
+    @Test
+    fun exporterNoLongerHasCategoryOrRenderFallbackMatchKinds() {
+        val kinds = EsriSymbologyImageExportMain.matchKindNamesForTest()
+
+        assertFalse("CATEGORY_FALLBACK" in kinds)
+        assertFalse("RENDER_FALLBACK" in kinds)
+        assertTrue("UNRESOLVED" in kinds)
+    }
+
 }
