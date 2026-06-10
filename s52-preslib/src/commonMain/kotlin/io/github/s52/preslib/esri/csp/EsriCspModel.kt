@@ -54,6 +54,10 @@ class EsriInstructionEmitter {
         mutable += EsriInstruction.AreaFill(color, transparency)
     }
 
+    fun areaPattern(name: String, backgroundColor: String? = null, viewingGroup: Int? = null) {
+        mutable += EsriInstruction.AreaPattern(name, backgroundColor, viewingGroup)
+    }
+
     fun text(text: String, color: String? = null, viewingGroup: Int? = null) {
         mutable += EsriInstruction.Text(text, color, viewingGroup)
     }
@@ -68,6 +72,7 @@ sealed interface EsriInstruction {
     data class ComplexLine(val name: String, val paint: String? = null, val viewingGroup: Int? = null) : EsriInstruction
     data class SimpleLine(val color: String, val style: String, val width: Double, val paint: String? = null) : EsriInstruction
     data class AreaFill(val color: String, val transparency: Double = 0.0) : EsriInstruction
+    data class AreaPattern(val name: String, val backgroundColor: String? = null, val viewingGroup: Int? = null) : EsriInstruction
     data class Text(val text: String, val color: String? = null, val viewingGroup: Int? = null) : EsriInstruction
     data class Sounding(val depth: Double, val color: String = "SNDG1") : EsriInstruction
 }

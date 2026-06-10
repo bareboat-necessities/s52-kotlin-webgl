@@ -218,14 +218,59 @@ tasks.register<JavaExec>("checkEsriAliasClosure") {
     outputs.dir(esriReportDirProvider)
 }
 
+
+tasks.register<JavaExec>("generateEsriVectorLines") {
+    group = "generation"
+    description = "Phase ESRI-8: parses ESRI line SVG assets and generates Kotlin vector line-style registry."
+
+    val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
+    dependsOn("jvmMainClasses")
+    classpath = files(jvmCompilation.output.allOutputs, jvmCompilation.runtimeDependencyFiles)
+    mainClass.set("io.github.s52.preslib.esri.generator.GenerateEsriVectorLinesMain")
+
+    val outputFile = layout.projectDirectory.file("src/commonMain/kotlin/io/github/s52/preslib/esri/generated/EsriGeneratedLineRegistry.kt")
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf(
+            esriSourceDirProvider.get(),
+            outputFile.asFile.absolutePath,
+            esriReportDirProvider.get().asFile.absolutePath
+        )
+    })
+    outputs.file(outputFile)
+    outputs.dir(esriReportDirProvider)
+}
+
+tasks.register<JavaExec>("generateEsriVectorPatterns") {
+    group = "generation"
+    description = "Phase ESRI-9: parses ESRI pattern SVG assets and generates Kotlin vector area-pattern registry."
+
+    val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
+    dependsOn("jvmMainClasses")
+    classpath = files(jvmCompilation.output.allOutputs, jvmCompilation.runtimeDependencyFiles)
+    mainClass.set("io.github.s52.preslib.esri.generator.GenerateEsriVectorPatternsMain")
+
+    val outputFile = layout.projectDirectory.file("src/commonMain/kotlin/io/github/s52/preslib/esri/generated/EsriGeneratedPatternRegistry.kt")
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf(
+            esriSourceDirProvider.get(),
+            outputFile.asFile.absolutePath,
+            esriReportDirProvider.get().asFile.absolutePath
+        )
+    })
+    outputs.file(outputFile)
+    outputs.dir(esriReportDirProvider)
+}
+
 tasks.register("criticalEsriCheck") {
     group = "verification"
-    description = "Runs phases ESRI-0 through ESRI-7 inventory, SVG subset, vector Kotlin generation, direct XML rules, alias closure, CSP tests, and WebGL build."
+    description = "Runs phases ESRI-0 through ESRI-9 inventory, SVG subset, vector symbol/line/pattern generation, direct XML rules, alias closure, CSP tests, and WebGL build."
     dependsOn(
         "esriInventory",
         "esriCoverageReport",
         "validateEsriSvgSubset",
         "generateEsriVectorSymbols",
+        "generateEsriVectorLines",
+        "generateEsriVectorPatterns",
         "generateEsriDirectRules",
         "checkEsriAliasClosure",
         "jvmTest",

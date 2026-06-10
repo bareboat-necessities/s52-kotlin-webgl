@@ -1,3 +1,8 @@
-# opencpn_pattern	esri_pattern	confidence	reason
-FOULAR01	GENERATED_FOULAR01	low	Seed foul-area equivalent; requires visual review.
-NODATA03	GENERATED_NODATA03	low	Seed no-data fill equivalent; requires visual review.
+opencpn_pattern	esri_pattern	confidence	reason
+FOULAR01	GENERATED_FOULAR01	medium	Foul ground pattern equivalent; create if no direct ESRI SVG exists.
+SBDARE01	J1_Sand.svg	medium	Sand seabed area tile equivalent.
+SBDARE04	J2_Mud.svg	medium	Mud seabed area tile equivalent.
+SBDARE05	J3_Clay.svg	medium	Clay seabed area tile equivalent.
+SBDARE06	J4_Silt.svg	medium	Silt seabed area tile equivalent.
+SBDARE07	J5_Stones.svg	medium	Stone seabed area tile equivalent.
+RESARE01	N2_1_RestrictedArea.svg	low	Area tiling fallback until rule-specific area patterns are ported.

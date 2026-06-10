@@ -1,10 +1,11 @@
 package io.github.s52.preslib.esri.vector
 
 /**
- * Runtime-side ESRI vector symbol model.
+ * Runtime-side ESRI vector asset model.
  *
- * Phase ESRI-3 generates instances of this model from ESRI SVG files.  The WebGL
- * renderer consumes triangles directly; it must not parse SVG at runtime.
+ * Phase ESRI-3 generated point-symbol meshes. Phases ESRI-8/9 extend the same
+ * generated Kotlin mesh model to complex line styles and area-pattern tiles.
+ * Runtime renderers consume triangles directly; they must not parse SVG files.
  */
 data class EsriSvgViewBox(
     val minX: Float,
@@ -68,6 +69,39 @@ data class EsriVectorSymbol(
     val isRenderable: Boolean get() = viewBox.isValid && meshes.any { it.isRenderable }
 }
 
+data class EsriVectorLineStyle(
+    val name: String,
+    val viewBox: EsriSvgViewBox,
+    val widthMm: Float?,
+    val heightMm: Float?,
+    val repeatMm: Float,
+    val pivotX: Float,
+    val pivotY: Float,
+    val meshes: List<EsriMesh>
+) {
+    val isRenderable: Boolean get() = viewBox.isValid && repeatMm > 0f && meshes.any { it.isRenderable }
+}
+
+data class EsriVectorAreaPattern(
+    val name: String,
+    val viewBox: EsriSvgViewBox,
+    val tileWidthMm: Float,
+    val tileHeightMm: Float,
+    val pivotX: Float,
+    val pivotY: Float,
+    val meshes: List<EsriMesh>
+) {
+    val isRenderable: Boolean get() = viewBox.isValid && tileWidthMm > 0f && tileHeightMm > 0f && meshes.any { it.isRenderable }
+}
+
 object EmptyEsriVectorSymbolRegistry {
     val symbols: Map<String, EsriVectorSymbol> = emptyMap()
+}
+
+object EmptyEsriVectorLineRegistry {
+    val lines: Map<String, EsriVectorLineStyle> = emptyMap()
+}
+
+object EmptyEsriVectorPatternRegistry {
+    val patterns: Map<String, EsriVectorAreaPattern> = emptyMap()
 }

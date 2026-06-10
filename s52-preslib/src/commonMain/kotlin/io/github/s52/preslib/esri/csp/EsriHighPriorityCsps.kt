@@ -164,6 +164,7 @@ object EsriRestrictedAreaCsp : EsriConditionalProcedure {
             else -> "N2_1_RestrictedArea.svg"
         }
         emit.complexLine(symbol.removeSuffix(".svg"))
+        if (feature.primitive == 3) emit.areaPattern(symbol.removeSuffix(".svg"), backgroundColor = null)
         emit.symbol(symbol)
         return true
     }
@@ -203,7 +204,8 @@ object EsriSeabedAreaCsp : EsriConditionalProcedure {
             7 -> "J5_Stones.svg"
             else -> "J1_Sand.svg"
         }
-        emit.symbol(symbol)
+        if (feature.primitive == 3) emit.areaPattern(symbol.removeSuffix(".svg"), backgroundColor = "CHBRN")
+        else emit.symbol(symbol)
         return true
     }
 }
