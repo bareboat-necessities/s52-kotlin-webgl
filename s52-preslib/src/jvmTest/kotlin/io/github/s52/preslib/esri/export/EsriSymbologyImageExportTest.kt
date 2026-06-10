@@ -61,4 +61,35 @@ class EsriSymbologyImageExportTest {
         assertTrue("UNRESOLVED" in kinds)
     }
 
+    @Test
+    fun enhancedSvgRecolorsMonochromeEsriGeometryAndAddsIdentityOverlay() {
+        val svg = EsriSymbologyImageExportMain.enhancedEsriSvgForOpenCpn(
+            sourceXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
+                  <path d="M12 12 L60 12 L36 60 Z" style="fill:#000000;stroke:#000000"/>
+                </svg>
+            """.trimIndent(),
+            openCpnName = "LIGHTS11",
+            category = "POINT",
+            esriName = "Light.svg",
+            matchKind = "ALIAS",
+            reason = "test alias"
+        )
+
+        assertTrue(svg.contains("data-enhanced-svg=\"true\""))
+        assertTrue(svg.contains("fill:#ffd21f"), "Light symbols should receive an OpenCPN/S-52-inspired yellow fill")
+        assertTrue(svg.contains("id=\"opencpn-enhancement\""), "Enhanced SVGs should carry deterministic identity/category marks")
+        assertFalse(svg.contains("<?xml"), "Enhanced SVG copies must remain browser-loadable after metadata injection")
+    }
+
+    @Test
+    fun enhancedUnresolvedPlaceholderIsDistinctInsteadOfBlank() {
+        val svg = EsriSymbologyImageExportMain.enhancedPlaceholderSvg("NOESRI01", "POINT", "no match")
+
+        assertTrue(svg.contains("data-enhanced-svg=\"true\""))
+        assertTrue(svg.contains("<path"), "Enhanced unresolved slots should remain visible and reviewable in the portrayal-input set")
+        assertTrue(svg.contains("<circle"), "Enhanced unresolved slots should include deterministic identity marks")
+    }
+
 }
