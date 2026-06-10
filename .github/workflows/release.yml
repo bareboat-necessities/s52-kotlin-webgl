@@ -33,17 +33,33 @@ jobs:
       - name: Build source archive
         run: gradle --no-daemon -PreleaseLabel="${GITHUB_REF_NAME}" sourceArchive
 
-      - name: Build symbology ZIP and release artifacts
+      - name: Build OpenCPN symbology ZIP and release artifacts
         run: gradle --no-daemon -PreleaseLabel="${GITHUB_REF_NAME}" criticalSymbologyImagesArchive releaseArtifacts
+
+      - name: Check out ESRI nautical chart symbols
+        uses: actions/checkout@v4
+        with:
+          repository: Esri/nautical-chart-symbols
+          path: s52/esri/source
+
+      - name: Build ESRI symbology ZIP
+        run: gradle --no-daemon -PreleaseLabel="${GITHUB_REF_NAME}" :s52-preslib:criticalEsriSymbologyImagesArchive -Pesri.sourceDir=s52/esri/source
 
       - name: Verify release build did not rewrite Kotlin/JS lock
         run: git diff --exit-code -- kotlin-js-store/yarn.lock
 
-      - name: Upload generated symbology images ZIP
+      - name: Upload generated OpenCPN symbology images ZIP
         uses: actions/upload-artifact@v4
         with:
           name: s52-kotlin-webgl-symbology-images
           path: build/distributions/*symbology-images*.zip
+          if-no-files-found: error
+
+      - name: Upload generated ESRI symbology images ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: s52-kotlin-webgl-esri-symbology-images
+          path: s52-preslib/build/distributions/*esri-symbology-images*.zip
           if-no-files-found: error
 
       - name: Upload generated OpenCPN symbology image directory
@@ -51,6 +67,13 @@ jobs:
         with:
           name: opencpn-symbology-images-directory
           path: build/s52-symbology-images
+          if-no-files-found: error
+
+      - name: Upload generated ESRI symbology image directory
+        uses: actions/upload-artifact@v4
+        with:
+          name: esri-symbology-images-directory
+          path: s52-preslib/build/s52-esri-symbology-images
           if-no-files-found: error
 
       - name: Upload source archive
@@ -80,5 +103,6 @@ jobs:
           files: |
             build/distributions/*source*.zip
             build/distributions/*symbology-images*.zip
+            s52-preslib/build/distributions/*esri-symbology-images*.zip
             build/distributions/*release-maven*.zip
             build/release-artifacts/jars/**/*.jar

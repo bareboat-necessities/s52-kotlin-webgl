@@ -1,4 +1,5 @@
 import org.gradle.process.CommandLineArgumentProvider
+import org.gradle.api.tasks.bundling.Zip
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -363,6 +364,49 @@ tasks.register<JavaExec>("esriNoaaSmokeTest") {
     })
     inputs.file(fixture)
     outputs.dir(esriReportDirProvider)
+}
+
+
+
+tasks.register<JavaExec>("exportEsriSymbologyImages") {
+    group = "documentation"
+    description = "Exports ESRI/INT1 symbology browser artifacts and three point-symbol PNG atlases from the ESRI SVG source tree."
+
+    val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
+    dependsOn(
+        "jvmMainClasses",
+        "generateEsriVectorSymbols",
+        "generateEsriVectorLines",
+        "generateEsriVectorPatterns"
+    )
+    classpath = files(jvmCompilation.output.allOutputs, jvmCompilation.runtimeDependencyFiles)
+    mainClass.set("io.github.s52.preslib.esri.export.EsriSymbologyImageExportMain")
+
+    val outputDir = layout.buildDirectory.dir("s52-esri-symbology-images")
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf(
+            esriSourceDirProvider.get(),
+            outputDir.get().asFile.absolutePath,
+            esriReportDirProvider.get().asFile.absolutePath
+        )
+    })
+    outputs.dir(outputDir)
+    outputs.dir(esriReportDirProvider)
+}
+
+tasks.register<Zip>("criticalEsriSymbologyImagesArchive") {
+    group = "distribution"
+    description = "Archives generated ESRI symbology SVG copies, PNG atlases, manifest, reports, and browser index."
+    dependsOn("criticalEsriCheck", "exportEsriSymbologyImages")
+    archiveBaseName.set("s52-kotlin-webgl-esri-symbology-images")
+    archiveClassifier.set("critical-esri")
+    archiveVersion.set(project.version.toString())
+    from(layout.buildDirectory.dir("s52-esri-symbology-images")) {
+        into("s52-esri-symbology-images")
+    }
+    from(esriReportDirProvider) {
+        into("s52-esri-symbology-images/reports")
+    }
 }
 
 tasks.register("criticalEsriCheck") {
