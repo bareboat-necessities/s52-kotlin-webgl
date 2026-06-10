@@ -26,6 +26,12 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Check out ESRI nautical chart symbols
+        uses: actions/checkout@v4
+        with:
+          repository: Esri/nautical-chart-symbols
+          path: s52/esri/source
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -41,6 +47,8 @@ jobs:
         run: echo "criticalCheck covers phase15Check phase16Check phase17Check; sourceArchive supersedes phase15SourceArchive phase16SourceArchive phase17SourceArchive"
 
       - name: Validate critical build, inputs, generated symbology, and lock state
+        env:
+          ESRI_NAUTICAL_CHART_SYMBOLS_DIR: s52/esri/source
         run: bash scripts/critical-clean-check.sh
 
       - name: Build source archive
@@ -48,12 +56,6 @@ jobs:
 
       - name: Build OpenCPN symbology ZIP and release artifacts
         run: gradle --no-daemon -PreleaseLabel="${GITHUB_REF_NAME}" criticalSymbologyImagesArchive releaseArtifacts
-
-      - name: Check out ESRI nautical chart symbols
-        uses: actions/checkout@v4
-        with:
-          repository: Esri/nautical-chart-symbols
-          path: s52/esri/source
 
       - name: Build ESRI symbology ZIP
         run: gradle --no-daemon -PreleaseLabel="${GITHUB_REF_NAME}" :s52-preslib:criticalEsriSymbologyImagesArchive -Pesri.sourceDir=s52/esri/source

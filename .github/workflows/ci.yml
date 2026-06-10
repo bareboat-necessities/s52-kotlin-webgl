@@ -39,6 +39,8 @@ jobs:
         run: echo "criticalCheck covers phase15Check phase16Check phase17Check phase18Check phase19Check phase20Check phase21Check"
 
       - name: Validate critical build, inputs, and lock state
+        env:
+          ESRI_NAUTICAL_CHART_SYMBOLS_DIR: s52/esri/source
         run: bash scripts/critical-clean-check.sh
 
       - name: Build ESRI symbology atlas ZIP

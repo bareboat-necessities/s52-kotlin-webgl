@@ -65,7 +65,19 @@ PY
 
 LOCK_BEFORE="$(lock_hash)"
 
-gradle --no-daemon criticalCheck "$@"
+# ESRI phases are optional for the historical OpenCPN critical path, but newer
+# aggregate tasks may depend on ESRI generation when the ESRI source checkout is
+# present. Forward the source path explicitly so Gradle workers do not rely on
+# process-local defaults.
+GRADLE_ARGS=(--no-daemon criticalCheck)
+if [[ -n "${ESRI_NAUTICAL_CHART_SYMBOLS_DIR:-}" ]]; then
+  GRADLE_ARGS+=("-Pesri.sourceDir=${ESRI_NAUTICAL_CHART_SYMBOLS_DIR}")
+elif [[ -f "s52/esri/source/CustomPresentationLibrary/CustomSymbolMap.xml" ]]; then
+  GRADLE_ARGS+=("-Pesri.sourceDir=s52/esri/source")
+fi
+
+GRADLE_ARGS+=("$@")
+gradle "${GRADLE_ARGS[@]}"
 
 LOCK_AFTER="$(lock_hash)"
 if [[ "$LOCK_BEFORE" != "$LOCK_AFTER" ]]; then
