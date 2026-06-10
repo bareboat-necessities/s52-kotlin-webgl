@@ -71,10 +71,13 @@ object EsriSymbologyImageExportMain {
         val symbolSlots = openCpnSymbols.map { resolver.resolve(it, EsriSvgCategory.POINT) }
         val lineSlots = openCpnLines.map { resolver.resolve(it, EsriSvgCategory.LINE) }
         val patternSlots = openCpnPatterns.map { resolver.resolve(it, EsriSvgCategory.PATTERN) }
+        val objectSlots = buildObjectSlots(openCpnPack.lookupRecords, resolver)
 
+        val objectsOut = outputDir.resolve("objects").apply { mkdirs() }
         copyResolvedSvgSlots(symbolSlots, symbolsOut)
         copyResolvedSvgSlots(lineSlots, linesOut)
         copyResolvedSvgSlots(patternSlots, patternsOut)
+        copyResolvedObjectSlots(objectSlots, objectsOut)
 
         val renderFallback = resolver.firstRenderablePointFallback()
         val pointResults = symbolSlots.map { slot -> loadPointAsset(slot, renderFallback) }
@@ -99,22 +102,25 @@ object EsriSymbologyImageExportMain {
             symbolSlots,
             lineSlots,
             patternSlots,
+            objectSlots,
             renderable,
             failures,
             atlasLayout
         )
-        writeIndex(outputDir.resolve("index.html"), symbolSlots, lineSlots, patternSlots, renderable, failures, atlasLayout)
+        writeIndex(outputDir.resolve("index.html"), symbolSlots, lineSlots, patternSlots, objectSlots, renderable, failures, atlasLayout)
         writeReport(
             reportDir.resolve("esri-opencpn-atlas-match.json"),
             outputDir,
             symbolSlots,
             lineSlots,
             patternSlots,
+            objectSlots,
             renderable,
             failures,
             atlasLayout
         )
         writeCsv(reportDir.resolve("esri-opencpn-atlas-match.csv"), symbolSlots + lineSlots + patternSlots)
+        writeObjectCsv(reportDir.resolve("esri-opencpn-object-match.csv"), objectSlots)
 
         if (symbolSlots.isEmpty()) {
             System.err.println("OpenCPN generated symbology has no symbols; cannot build ESRI matched atlas")
@@ -151,6 +157,19 @@ object EsriSymbologyImageExportMain {
                 target.writeText(comment + source.readText(), Charsets.UTF_8)
             } else {
                 target.writeText(unresolvedSvg(slot.openCpnName, slot.reason), Charsets.UTF_8)
+            }
+        }
+    }
+
+    private fun copyResolvedObjectSlots(slots: List<OpenCpnEsriObjectSlot>, outputDir: File) {
+        slots.forEach { objectSlot ->
+            val target = outputDir.resolve("${safeFileName(objectSlot.objectAcronym)}.svg")
+            val source = objectSlot.assetSlot.esriFile
+            if (source != null && source.isFile) {
+                val comment = "<!-- OpenCPN object: ${objectSlot.objectAcronym}; primitive: ${objectSlot.primitive}; OpenCPN instruction asset: ${objectSlot.openCpnAssetName}; ESRI source: ${objectSlot.assetSlot.esriName}; match: ${objectSlot.assetSlot.matchKind.name}; reason: ${objectSlot.assetSlot.reason} -->\n"
+                target.writeText(comment + source.readText(), Charsets.UTF_8)
+            } else {
+                target.writeText(unresolvedSvg(objectSlot.objectAcronym, objectSlot.assetSlot.reason), Charsets.UTF_8)
             }
         }
     }
@@ -237,6 +256,7 @@ object EsriSymbologyImageExportMain {
         symbols: List<OpenCpnEsriSlot>,
         lines: List<OpenCpnEsriSlot>,
         patterns: List<OpenCpnEsriSlot>,
+        objects: List<OpenCpnEsriObjectSlot>,
         renderable: List<AtlasPointAsset>,
         failures: List<AtlasPointFailure>,
         atlasLayout: AtlasLayout
@@ -256,6 +276,8 @@ object EsriSymbologyImageExportMain {
             appendLine("symbols=${symbols.size}")
             appendLine("lines=${lines.size}")
             appendLine("patterns=${patterns.size}")
+            appendLine("objects=${objects.size}")
+            appendLine("objectContract=opencpn-lookup-object-compatible")
             appendLine("atlasSymbols=${symbols.size}")
             appendLine("atlasRendered=${renderable.size}")
             appendLine("atlasSkipped=${failures.size}")
@@ -277,6 +299,7 @@ object EsriSymbologyImageExportMain {
         symbols: List<OpenCpnEsriSlot>,
         lines: List<OpenCpnEsriSlot>,
         patterns: List<OpenCpnEsriSlot>,
+        objects: List<OpenCpnEsriObjectSlot>,
         renderable: List<AtlasPointAsset>,
         failures: List<AtlasPointFailure>,
         atlasLayout: AtlasLayout
@@ -292,6 +315,7 @@ object EsriSymbologyImageExportMain {
             appendLine("<li>OpenCPN point-symbol slots: ${symbols.size}</li>")
             appendLine("<li>OpenCPN line-style slots: ${lines.size}</li>")
             appendLine("<li>OpenCPN pattern slots: ${patterns.size}</li>")
+            appendLine("<li>OpenCPN lookup objects: ${objects.size}</li>")
             appendLine("<li>Atlas-rendered point slots: ${renderable.size}</li>")
             appendLine("<li>Rasterization failures: ${failures.size}</li>")
             appendLine("<li>Atlas grid: ${atlasLayout.columns} × ${atlasLayout.rows}, cell ${CellPx}px</li>")
@@ -300,10 +324,17 @@ object EsriSymbologyImageExportMain {
             appendLine("<h3>Day</h3><img src=\"symbol-atlas-day.png\" alt=\"ESRI day symbol atlas, OpenCPN-compatible names\">")
             appendLine("<h3>Dusk</h3><img src=\"symbol-atlas-dusk.png\" alt=\"ESRI dusk symbol atlas, OpenCPN-compatible names\">")
             appendLine("<h3>Dark</h3><img src=\"symbol-atlas-dark.png\" alt=\"ESRI dark symbol atlas, OpenCPN-compatible names\">")
+            appendLine("<h2>First 500 OpenCPN lookup objects</h2><div class=\"grid\">")
+            objects.take(500).forEach { objectSlot ->
+                appendLine("<div class=\"card\"><img src=\"objects/${html(safeFileName(objectSlot.objectAcronym))}.svg\" alt=\"${html(objectSlot.objectAcronym)}\"><br><code>${html(objectSlot.objectAcronym)}</code><br><small>${html(objectSlot.primitive)} / ${html(objectSlot.openCpnAssetName)}</small></div>")
+            }
+            appendLine("</div>")
+            if (objects.size > 500) appendLine("<p>Only first 500 object previews shown; all ${objects.size} OpenCPN lookup object SVG files are present under <code>objects/</code>.</p>")
             appendLine("<h2>First 500 OpenCPN-named point symbols</h2><div class=\"grid\">")
             symbols.take(500).forEach { slot ->
                 val extra = if (slot.matchKind == MatchKind.CATEGORY_FALLBACK) "<br><span class=\"warn\">fallback</span>" else ""
-                appendLine("<div class=\"card\"><img src=\"symbols/${html(slot.openCpnName)}.svg\" alt=\"${html(slot.openCpnName)}\"><br><code>${html(slot.openCpnName)}</code><br><small>${html(slot.esriName ?: \"unresolved\")}</small>$extra</div>")
+                val esriPreviewName = html(slot.esriName ?: "unresolved")
+                appendLine("<div class=\"card\"><img src=\"symbols/${html(slot.openCpnName)}.svg\" alt=\"${html(slot.openCpnName)}\"><br><code>${html(slot.openCpnName)}</code><br><small>$esriPreviewName</small>$extra</div>")
             }
             appendLine("</div>")
             if (symbols.size > 500) appendLine("<p>Only first 500 point SVG previews shown; all ${symbols.size} OpenCPN-named SVG files are present under <code>symbols/</code>.</p>")
@@ -317,6 +348,7 @@ object EsriSymbologyImageExportMain {
         symbols: List<OpenCpnEsriSlot>,
         lines: List<OpenCpnEsriSlot>,
         patterns: List<OpenCpnEsriSlot>,
+        objects: List<OpenCpnEsriObjectSlot>,
         renderable: List<AtlasPointAsset>,
         failures: List<AtlasPointFailure>,
         atlasLayout: AtlasLayout
@@ -328,6 +360,7 @@ object EsriSymbologyImageExportMain {
             appendLine("  \"opencpnSymbolCount\": ${symbols.size},")
             appendLine("  \"opencpnLineCount\": ${lines.size},")
             appendLine("  \"opencpnPatternCount\": ${patterns.size},")
+            appendLine("  \"opencpnObjectCount\": ${objects.size},")
             appendLine("  \"atlasRenderedCount\": ${renderable.size},")
             appendLine("  \"atlasSkippedCount\": ${failures.size},")
             appendLine("  \"atlas\": {\"cellPx\": $CellPx, \"columns\": ${atlasLayout.columns}, \"rows\": ${atlasLayout.rows}, \"widthPx\": ${atlasLayout.widthPx}, \"heightPx\": ${atlasLayout.heightPx}},")
@@ -336,6 +369,13 @@ object EsriSymbologyImageExportMain {
             all.forEachIndexed { index, slot ->
                 append("    {\"category\": \"${slot.category.name}\", \"openCpnName\": \"${json(slot.openCpnName)}\", \"outputSvg\": \"${json(slot.outputSubdir)}/${json(slot.openCpnName)}.svg\", \"esriName\": \"${json(slot.esriName ?: "")}\", \"matchKind\": \"${slot.matchKind.name}\", \"reason\": \"${json(slot.reason)}\"}")
                 if (index != all.lastIndex) append(',')
+                appendLine()
+            }
+            appendLine("  ],")
+            appendLine("  \"objects\": [")
+            objects.forEachIndexed { index, objectSlot ->
+                append("    {\"objectAcronym\": \"${json(objectSlot.objectAcronym)}\", \"primitive\": \"${json(objectSlot.primitive)}\", \"outputSvg\": \"objects/${json(safeFileName(objectSlot.objectAcronym))}.svg\", \"openCpnAssetName\": \"${json(objectSlot.openCpnAssetName)}\", \"esriName\": \"${json(objectSlot.assetSlot.esriName ?: "")}\", \"matchKind\": \"${objectSlot.assetSlot.matchKind.name}\"}")
+                if (index != objects.lastIndex) append(',')
                 appendLine()
             }
             appendLine("  ],")
@@ -358,6 +398,68 @@ object EsriSymbologyImageExportMain {
             }
         })
     }
+
+    private fun writeObjectCsv(file: File, slots: List<OpenCpnEsriObjectSlot>) {
+        file.writeText(buildString {
+            appendLine("object_acronym,primitive,output_svg,opencpn_instruction_asset,esri_source,match_kind,source_instruction")
+            slots.forEach { slot ->
+                appendLine(listOf(slot.objectAcronym, slot.primitive, "objects/${safeFileName(slot.objectAcronym)}.svg", slot.openCpnAssetName, slot.assetSlot.esriName ?: "", slot.assetSlot.matchKind.name, slot.instruction).joinToString(",") { csv(it) })
+            }
+        })
+    }
+
+    private fun buildObjectSlots(
+        lookups: List<io.github.s52.preslib.source.SourceLookupRecord>,
+        resolver: EsriOpenCpnAtlasResolver
+    ): List<OpenCpnEsriObjectSlot> {
+        val byObject = linkedMapOf<String, MutableList<io.github.s52.preslib.source.SourceLookupRecord>>()
+        lookups.forEach { lookup ->
+            byObject.getOrPut(lookup.objectClassKey.acronym) { mutableListOf() }.add(lookup)
+        }
+        return byObject.entries.mapIndexed { index, (acronym, rows) ->
+            val chosen = rows.firstOrNull { it.primitive == io.github.s52.catalog.PrimitiveType.Point && extractPresentationRefs(it.instruction).any { ref -> ref.category == EsriSvgCategory.POINT } }
+                ?: rows.firstOrNull { it.primitive == io.github.s52.catalog.PrimitiveType.Line && extractPresentationRefs(it.instruction).any { ref -> ref.category == EsriSvgCategory.LINE } }
+                ?: rows.firstOrNull { it.primitive == io.github.s52.catalog.PrimitiveType.Area && extractPresentationRefs(it.instruction).any { ref -> ref.category == EsriSvgCategory.PATTERN || ref.category == EsriSvgCategory.POINT } }
+                ?: rows.first()
+            val refs = extractPresentationRefs(chosen.instruction)
+            val preferred = refs.firstOrNull { ref ->
+                when (chosen.primitive) {
+                    io.github.s52.catalog.PrimitiveType.Point -> ref.category == EsriSvgCategory.POINT
+                    io.github.s52.catalog.PrimitiveType.Line -> ref.category == EsriSvgCategory.LINE || ref.category == EsriSvgCategory.POINT
+                    io.github.s52.catalog.PrimitiveType.Area -> ref.category == EsriSvgCategory.PATTERN || ref.category == EsriSvgCategory.POINT || ref.category == EsriSvgCategory.LINE
+                    io.github.s52.catalog.PrimitiveType.Collection -> true
+                }
+            } ?: refs.firstOrNull()
+            val category = preferred?.category ?: when (chosen.primitive) {
+                io.github.s52.catalog.PrimitiveType.Point -> EsriSvgCategory.POINT
+                io.github.s52.catalog.PrimitiveType.Line -> EsriSvgCategory.LINE
+                io.github.s52.catalog.PrimitiveType.Area -> EsriSvgCategory.PATTERN
+                io.github.s52.catalog.PrimitiveType.Collection -> EsriSvgCategory.POINT
+            }
+            val openCpnAssetName = preferred?.name ?: acronym
+            val assetSlot = resolver.resolve(openCpnAssetName, category)
+            OpenCpnEsriObjectSlot(index, acronym, chosen.primitive.name, openCpnAssetName, chosen.instruction, assetSlot)
+        }
+    }
+
+    private fun extractPresentationRefs(instruction: String): List<OpenCpnPresentationRef> {
+        val out = mutableListOf<OpenCpnPresentationRef>()
+        fun collect(regex: Regex, category: EsriSvgCategory) {
+            regex.findAll(instruction).forEach { match ->
+                val name = match.groupValues[1].trim()
+                if (name.isNotBlank()) out += OpenCpnPresentationRef(name, category)
+            }
+        }
+        collect(Regex("SY\\(([^)]+)\\)"), EsriSvgCategory.POINT)
+        collect(Regex("LC\\(([^)]+)\\)"), EsriSvgCategory.LINE)
+        collect(Regex("LS\\(([^,\\)]+)"), EsriSvgCategory.LINE)
+        collect(Regex("AP\\(([^)]+)\\)"), EsriSvgCategory.PATTERN)
+        return out.distinct()
+    }
+
+    private fun safeFileName(value: String): String = value.map { ch ->
+        if (ch.isLetterOrDigit() || ch == '_' || ch == '-' || ch == '.' || ch == '$') ch else '_'
+    }.joinToString("").ifBlank { "unnamed" }
 
     private fun html(value: String): String = value
         .replace("&", "&amp;")
@@ -542,6 +644,17 @@ internal fun openCpnObjectPrefix(value: String): String = value.takeWhile { it.i
 internal fun normalize(value: String): String = value.lowercase(Locale.US).filter { it.isLetterOrDigit() }
 
 private enum class MatchKind { ALIAS, CUSTOM_SYMBOL_MAP, EXACT_NAME, SEMANTIC_TOKEN, CATEGORY_FALLBACK, RENDER_FALLBACK }
+
+private data class OpenCpnPresentationRef(val name: String, val category: EsriSvgCategory)
+
+private data class OpenCpnEsriObjectSlot(
+    val objectIndex: Int,
+    val objectAcronym: String,
+    val primitive: String,
+    val openCpnAssetName: String,
+    val instruction: String,
+    val assetSlot: OpenCpnEsriSlot
+)
 
 private data class OpenCpnEsriSlot(
     val slotIndex: Int,
