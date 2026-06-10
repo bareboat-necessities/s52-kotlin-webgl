@@ -8,6 +8,7 @@ import io.github.s52.preslib.esri.svg.EsriGeneratedSvgMesh
 import io.github.s52.preslib.esri.svg.EsriSvgDocument
 import io.github.s52.preslib.esri.svg.EsriSvgMeshGenerator
 import io.github.s52.preslib.esri.svg.EsriSvgParser
+import io.github.s52.preslib.esri.svg.EsriSvgViewBox
 import io.github.s52.preslib.opencpn.generated.OpenCpnGeneratedPresLib
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -68,6 +69,7 @@ object EsriSymbologyImageExportMain {
         val symbolsOut = outputDir.resolve("symbols").apply { mkdirs() }
         val linesOut = outputDir.resolve("lines").apply { mkdirs() }
         val patternsOut = outputDir.resolve("patterns").apply { mkdirs() }
+        val enhancedOut = outputDir.resolve("enhanced-svg").apply { mkdirs() }
 
         val resolver = EsriOpenCpnAtlasResolver(layout, rootAliasDir = detectAliasDir(sourceDir))
 
@@ -81,6 +83,10 @@ object EsriSymbologyImageExportMain {
         copyResolvedSvgSlots(lineSlots, linesOut)
         copyResolvedSvgSlots(patternSlots, patternsOut)
         copyResolvedObjectSlots(objectSlots, objectsOut)
+        writeEnhancedSvgSlots(symbolSlots, enhancedOut.resolve("symbols").apply { mkdirs() })
+        writeEnhancedSvgSlots(lineSlots, enhancedOut.resolve("lines").apply { mkdirs() })
+        writeEnhancedSvgSlots(patternSlots, enhancedOut.resolve("patterns").apply { mkdirs() })
+        writeEnhancedObjectSlots(objectSlots, enhancedOut.resolve("objects").apply { mkdirs() })
 
         val pointResults = symbolSlots.map { slot -> loadPointAsset(slot) }
         val renderable = pointResults.filterIsInstance<AtlasPointAsset>()
@@ -176,6 +182,159 @@ object EsriSymbologyImageExportMain {
             }
         }
     }
+
+    private fun writeEnhancedSvgSlots(slots: List<OpenCpnEsriSlot>, outputDir: File) {
+        slots.forEach { slot ->
+            val target = outputDir.resolve("${safeFileName(slot.openCpnName)}.svg")
+            target.writeText(enhancedSvgForSlot(slot), Charsets.UTF_8)
+        }
+    }
+
+    private fun writeEnhancedObjectSlots(slots: List<OpenCpnEsriObjectSlot>, outputDir: File) {
+        slots.forEach { objectSlot ->
+            val target = outputDir.resolve("${safeFileName(objectSlot.objectAcronym)}.svg")
+            target.writeText(enhancedSvgForSlot(objectSlot.assetSlot.copy(openCpnName = objectSlot.objectAcronym)), Charsets.UTF_8)
+        }
+    }
+
+    private fun enhancedSvgForSlot(slot: OpenCpnEsriSlot): String {
+        val source = slot.esriFile
+        return if (source != null && source.isFile) {
+            enhancedEsriSvgForOpenCpn(
+                sourceXml = source.readText(Charsets.UTF_8),
+                openCpnName = slot.openCpnName,
+                category = slot.category.name,
+                esriName = slot.esriName.orEmpty(),
+                matchKind = slot.matchKind.name,
+                reason = slot.reason
+            )
+        } else {
+            enhancedPlaceholderSvg(slot.openCpnName, slot.category.name, slot.reason)
+        }
+    }
+
+    internal fun enhancedEsriSvgForOpenCpn(
+        sourceXml: String,
+        openCpnName: String,
+        category: String,
+        esriName: String,
+        matchKind: String,
+        reason: String
+    ): String {
+        val colors = enhancedColors(openCpnName, category)
+        val metadata = "OpenCPN enhanced slot: $openCpnName; ESRI source: $esriName; match: $matchKind; reason: $reason"
+        var body = esriSvgCopyAsStandaloneXml(sourceXml, metadata).trimEnd()
+        body = body.replaceFirst(
+            Regex("""<svg\b""", RegexOption.IGNORE_CASE),
+            "<svg data-opencpn-name=\"${html(openCpnName)}\" data-enhanced-svg=\"true\""
+        )
+        body = replacePaint(body, "fill", colors.primary)
+        body = replacePaint(body, "stroke", colors.outline)
+        body = body.replace(
+            Regex("""<path\b(?![^>]*(?:fill|style)=)""", RegexOption.IGNORE_CASE),
+            "<path fill=\"${colors.primary}\""
+        )
+        body = body.replace(
+            Regex("""<path\b(?![^>]*(?:stroke|style)=)""", RegexOption.IGNORE_CASE),
+            "<path stroke=\"${colors.outline}\" stroke-width=\"0.7\""
+        )
+        val viewBox = parseSvgViewBox(body) ?: EsriSvgViewBox(0.0, 0.0, 72.0, 72.0)
+        val overlay = enhancedOverlay(openCpnName, category, colors, viewBox)
+        return body.replaceBeforeClosingSvg(overlay)
+    }
+
+    internal fun enhancedPlaceholderSvg(name: String, category: String, reason: String): String {
+        val colors = enhancedColors(name, category)
+        val chipX = 52 + (stableHash(name) % 9)
+        val chipY = 10 + ((stableHash(name) / 11) % 9)
+        return """
+            <svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72" data-opencpn-name="${html(name)}" data-match-kind="UNRESOLVED" data-enhanced-svg="true">
+              <title>${html(name)} enhanced unresolved ESRI mapping</title>
+              <desc>${html(reason)}</desc>
+              <circle cx="36" cy="36" r="24" fill="none" stroke="${colors.outline}" stroke-width="3" stroke-dasharray="7 4"/>
+              <path d="M21 48 L36 18 L51 48 Z" fill="${colors.primary}" fill-opacity="0.72" stroke="${colors.outline}" stroke-width="2"/>
+              <circle cx="$chipX" cy="$chipY" r="5" fill="${colors.accent}" stroke="${colors.outline}" stroke-width="1"/>
+            </svg>
+        """.trimIndent()
+    }
+
+    private fun replacePaint(svg: String, property: String, color: String): String {
+        val attr = Regex("""($property\s*=\s*["'])(?!none["'])[^"']+(["'])""", setOf(RegexOption.IGNORE_CASE))
+        val style = Regex("""($property\s*:\s*)(?!none(?:;|$))[^;"']+""", setOf(RegexOption.IGNORE_CASE))
+        return style.replace(attr.replace(svg) { it.groupValues[1] + color + it.groupValues[2] }) { it.groupValues[1] + color }
+    }
+
+    private fun enhancedOverlay(name: String, category: String, colors: EnhancedColors, viewBox: EsriSvgViewBox): String {
+        val marker = viewBox.width.coerceAtMost(viewBox.height) * 0.085
+        val x = viewBox.minX + viewBox.width - marker * (1.8 + (stableHash(name) % 3) * 0.35)
+        val y = viewBox.minY + marker * (1.6 + ((stableHash(name) / 7) % 3) * 0.35)
+        val stroke = (viewBox.width.coerceAtMost(viewBox.height) * 0.018).coerceAtLeast(0.4)
+        val categoryShape = when (category.uppercase(Locale.US)) {
+            "LINE" -> """<path d="M${fmt(x - marker)} ${fmt(y)} H${fmt(x + marker)}" stroke="${colors.accent}" stroke-width="${fmt(stroke * 2.2)}" stroke-linecap="round"/>"""
+            "PATTERN" -> """<rect x="${fmt(x - marker)}" y="${fmt(y - marker)}" width="${fmt(marker * 2)}" height="${fmt(marker * 2)}" fill="${colors.accent}" stroke="${colors.outline}" stroke-width="${fmt(stroke)}"/>"""
+            else -> """<circle cx="${fmt(x)}" cy="${fmt(y)}" r="${fmt(marker)}" fill="${colors.accent}" stroke="${colors.outline}" stroke-width="${fmt(stroke)}"/>"""
+        }
+        return """
+          <g id="opencpn-enhancement" fill="none" pointer-events="none">
+            <rect x="${fmt(viewBox.minX + stroke)}" y="${fmt(viewBox.minY + stroke)}" width="${fmt(viewBox.width - stroke * 2)}" height="${fmt(viewBox.height - stroke * 2)}" rx="${fmt(marker * 0.65)}" ry="${fmt(marker * 0.65)}" stroke="${colors.category}" stroke-width="${fmt(stroke)}" stroke-opacity="0.55"/>
+            $categoryShape
+          </g>
+        """.trimIndent()
+    }
+
+    private fun String.replaceBeforeClosingSvg(fragment: String): String =
+        replace(Regex("""</svg>\s*$""", RegexOption.IGNORE_CASE), "$fragment\n</svg>")
+
+    private fun parseSvgViewBox(svg: String): EsriSvgViewBox? {
+        val raw = Regex("""viewBox\s*=\s*["']([^"']+)["']""", RegexOption.IGNORE_CASE).find(svg)?.groupValues?.get(1) ?: return null
+        val values = raw.trim().split(Regex("""[\s,]+""")).mapNotNull { it.toDoubleOrNull() }
+        return if (values.size == 4 && values[2] > 0.0 && values[3] > 0.0) EsriSvgViewBox(values[0], values[1], values[2], values[3]) else null
+    }
+
+    private fun enhancedColors(name: String, category: String): EnhancedColors {
+        val upper = name.uppercase(Locale.US)
+        val base = when {
+            "LIGHT" in upper || upper.startsWith("LIT") -> "#ffd21f" to "#b05a00"
+            "WRECK" in upper -> "#111111" to "#2a7fff"
+            "OBSTR" in upper || "DANGER" in upper -> "#d1007a" to "#111111"
+            "BOY" in upper || "BUOY" in upper -> if (stableHash(name) % 2 == 0) "#e21b2d" to "#0b7f3a" else "#0b7f3a" to "#e21b2d"
+            "BCN" in upper || "BEACON" in upper -> "#f2c400" to "#111111"
+            "TOP" in upper -> "#111111" to "#f2c400"
+            "ACH" in upper || "ANCH" in upper -> "#8b4bd6" to "#111111"
+            "CBL" in upper || "CABLE" in upper -> "#7a4a21" to "#111111"
+            "DEP" in upper || "DRG" in upper || "SOUND" in upper -> "#5da9e9" to "#003f73"
+            "SAND" in upper || "SBDARE" in upper -> "#c9a76a" to "#7a5a1a"
+            else -> hashColor(name) to "#111111"
+        }
+        val categoryColor = when (category.uppercase(Locale.US)) {
+            "LINE" -> "#8a5a00"
+            "PATTERN" -> "#006d77"
+            else -> "#324a8f"
+        }
+        return EnhancedColors(primary = base.first, accent = base.second, outline = "#111111", category = categoryColor)
+    }
+
+    private fun hashColor(value: String): String {
+        val hue = stableHash(value) % 360
+        val c = 0.62
+        val x = c * (1.0 - kotlin.math.abs((hue / 60.0) % 2.0 - 1.0))
+        val (r1, g1, b1) = when (hue / 60) {
+            0 -> Triple(c, x, 0.0)
+            1 -> Triple(x, c, 0.0)
+            2 -> Triple(0.0, c, x)
+            3 -> Triple(0.0, x, c)
+            4 -> Triple(x, 0.0, c)
+            else -> Triple(c, 0.0, x)
+        }
+        val m = 0.28
+        fun ch(v: Double) = ((v + m) * 255).roundToInt().coerceIn(0, 255).toString(16).padStart(2, '0')
+        return "#${ch(r1)}${ch(g1)}${ch(b1)}"
+    }
+
+    private fun stableHash(value: String): Int = value.fold(0) { acc, ch -> (acc * 31 + ch.code) and 0x7fffffff }
+
+    private fun fmt(value: Double): String = String.format(Locale.US, "%.3f", value).trimEnd('0').trimEnd('.')
+
 
     private fun unresolvedSvg(name: String, reason: String): String = """
         <svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72" data-opencpn-name="${html(name)}" data-match-kind="UNRESOLVED">
@@ -292,6 +451,8 @@ object EsriSymbologyImageExportMain {
             appendLine("synthetic=false")
             appendLine("svgSource=true")
             appendLine("runtimePath=generated-kotlin-vector-mesh")
+            appendLine("enhancedSvgSet=enhanced-svg")
+            appendLine("enhancedSvgPalette=opencpn-inspired-day")
             appendLine("atlasContract=opencpn-symbol-name-compatible")
             appendLine("opencpnCoverageOracle=OpenCpnGeneratedPresLib")
             appendLine("pngSymbolAtlases=3")
@@ -336,6 +497,7 @@ object EsriSymbologyImageExportMain {
             appendLine("</head><body>")
             appendLine("<h1>ESRI / INT1 symbology image export, OpenCPN-name compatible</h1>")
             appendLine("<p>This artifact uses OpenCPN generated symbology as the coverage oracle. Every exported SVG file keeps the OpenCPN symbol, line, or pattern name, while its drawing comes from the best-matched ESRI SVG source.</p>")
+            appendLine("<p>The <code>enhanced-svg/</code> directory is the intermediate portrayal-input set: ESRI geometry recolored with OpenCPN/S-52-inspired day colors, category accents, and deterministic identity marks so otherwise monochrome ESRI symbols stay distinct in the OpenCPN atlas contract.</p>")
             appendLine("<ul>")
             appendLine("<li>OpenCPN point-symbol slots: ${symbols.size}</li>")
             appendLine("<li>OpenCPN line-style slots: ${lines.size}</li>")
@@ -405,6 +567,8 @@ object EsriSymbologyImageExportMain {
             appendLine("{")
             appendLine("  \"outputDir\": \"${json(outputDir.invariantSeparatorsPath)}\",")
             appendLine("  \"contract\": \"opencpn-name-compatible\",")
+            appendLine("  \"enhancedSvgSetDir\": \"${json(outputDir.resolve("enhanced-svg").invariantSeparatorsPath)}\",")
+            appendLine("  \"enhancedSvgSetFileCount\": ${symbols.size + lines.size + patterns.size + objects.size},")
             appendLine("  \"opencpnSymbolCount\": ${symbols.size},")
             appendLine("  \"opencpnLineCount\": ${lines.size},")
             appendLine("  \"opencpnPatternCount\": ${patterns.size},")
@@ -696,6 +860,8 @@ internal fun normalize(value: String): String = value.lowercase(Locale.US).filte
 private enum class MatchKind { ALIAS, CUSTOM_SYMBOL_MAP, EXACT_NAME, SEMANTIC_TOKEN, UNRESOLVED }
 
 private data class OpenCpnPresentationRef(val name: String, val category: EsriSvgCategory)
+
+private data class EnhancedColors(val primary: String, val accent: String, val outline: String, val category: String)
 
 private data class OpenCpnEsriObjectSlot(
     val objectIndex: Int,
