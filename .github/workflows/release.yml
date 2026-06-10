@@ -72,6 +72,18 @@ jobs:
       - name: Verify release build did not rewrite Kotlin/JS lock
         run: git diff --exit-code -- kotlin-js-store/yarn.lock
 
+      - name: Capture ESRI atlas browser screenshot
+        run: |
+          npx --yes playwright@1.49.1 install --with-deps chromium
+          npx --yes playwright@1.49.1 screenshot \
+            --browser=chromium \
+            --viewport-size=1440,900 \
+            --full-page \
+            --wait-for-selector '#symbol-atlases img' \
+            --wait-for-timeout 1000 \
+            "file://${PWD}/s52-preslib/build/s52-esri-symbology-images/atlas-screenshot.html" \
+            s52-preslib/build/s52-esri-symbology-images/esri-atlas-browser-screenshot.png
+
       - name: Upload generated OpenCPN symbology images ZIP
         uses: actions/upload-artifact@v4
         with:
@@ -98,6 +110,13 @@ jobs:
         with:
           name: esri-symbology-images-directory
           path: s52-preslib/build/s52-esri-symbology-images
+          if-no-files-found: error
+
+      - name: Upload ESRI atlas browser screenshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: esri-atlas-browser-screenshot
+          path: s52-preslib/build/s52-esri-symbology-images/esri-atlas-browser-screenshot.png
           if-no-files-found: error
 
       - name: Upload source archive
@@ -128,5 +147,6 @@ jobs:
             build/distributions/*source*.zip
             build/distributions/*symbology-images*.zip
             s52-preslib/build/distributions/*esri-symbology-images*.zip
+            s52-preslib/build/s52-esri-symbology-images/esri-atlas-browser-screenshot.png
             build/distributions/*release-maven*.zip
             build/release-artifacts/jars/**/*.jar
