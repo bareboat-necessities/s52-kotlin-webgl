@@ -92,6 +92,7 @@ class EsriSymbologyImageExportTest {
         assertTrue(svg.contains("data-enhanced-svg=\"true\""))
         assertTrue(svg.contains("<path"), "Enhanced unresolved slots should remain visible and reviewable in the portrayal-input set")
         assertTrue(svg.contains("<circle"), "Enhanced unresolved slots should include deterministic identity marks")
+        assertTrue(svg.contains("stroke-linecap=\"round\""), "Enhanced unresolved slots should include a color stripe for review distinctness")
     }
 
 }

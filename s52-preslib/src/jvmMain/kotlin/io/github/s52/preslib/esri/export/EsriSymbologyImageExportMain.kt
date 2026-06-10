@@ -10,6 +10,8 @@ import io.github.s52.preslib.esri.svg.EsriSvgMeshGenerator
 import io.github.s52.preslib.esri.svg.EsriSvgParser
 import io.github.s52.preslib.esri.svg.EsriSvgViewBox
 import io.github.s52.preslib.opencpn.generated.OpenCpnGeneratedPresLib
+import io.github.s52.preslib.source.PresLibSourcePack
+import io.github.s52.preslib.source.SourceBitmapRef
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.nio.ByteBuffer
@@ -73,6 +75,7 @@ object EsriSymbologyImageExportMain {
 
         val resolver = EsriOpenCpnAtlasResolver(layout, rootAliasDir = detectAliasDir(sourceDir))
 
+        val openCpnStyleHints = OpenCpnStyleHints.from(openCpnPack)
         val symbolSlots = openCpnSymbols.map { resolver.resolve(it, EsriSvgCategory.POINT) }
         val lineSlots = openCpnLines.map { resolver.resolve(it, EsriSvgCategory.LINE) }
         val patternSlots = openCpnPatterns.map { resolver.resolve(it, EsriSvgCategory.PATTERN) }
@@ -83,11 +86,11 @@ object EsriSymbologyImageExportMain {
         copyResolvedSvgSlots(lineSlots, linesOut)
         copyResolvedSvgSlots(patternSlots, patternsOut)
         copyResolvedObjectSlots(objectSlots, objectsOut)
-        writeEnhancedSvgSlots(symbolSlots, enhancedOut.resolve("symbols").apply { mkdirs() })
-        writeEnhancedSvgSlots(lineSlots, enhancedOut.resolve("lines").apply { mkdirs() })
-        writeEnhancedSvgSlots(patternSlots, enhancedOut.resolve("patterns").apply { mkdirs() })
-        writeEnhancedObjectSlots(objectSlots, enhancedOut.resolve("objects").apply { mkdirs() })
-        writeEnhancedSvgSetManifest(enhancedOut, symbolSlots, lineSlots, patternSlots, objectSlots)
+        writeEnhancedSvgSlots(symbolSlots, enhancedOut.resolve("symbols").apply { mkdirs() }, openCpnStyleHints)
+        writeEnhancedSvgSlots(lineSlots, enhancedOut.resolve("lines").apply { mkdirs() }, openCpnStyleHints)
+        writeEnhancedSvgSlots(patternSlots, enhancedOut.resolve("patterns").apply { mkdirs() }, openCpnStyleHints)
+        writeEnhancedObjectSlots(objectSlots, enhancedOut.resolve("objects").apply { mkdirs() }, openCpnStyleHints)
+        writeEnhancedSvgSetManifest(enhancedOut, symbolSlots, lineSlots, patternSlots, objectSlots, openCpnStyleHints)
 
         val pointResults = symbolSlots.map { slot -> loadPointAsset(slot) }
         val renderable = pointResults.filterIsInstance<AtlasPointAsset>()
@@ -184,17 +187,19 @@ object EsriSymbologyImageExportMain {
         }
     }
 
-    private fun writeEnhancedSvgSlots(slots: List<OpenCpnEsriSlot>, outputDir: File) {
+    private fun writeEnhancedSvgSlots(slots: List<OpenCpnEsriSlot>, outputDir: File, hints: OpenCpnStyleHints) {
         slots.forEach { slot ->
             val target = outputDir.resolve("${safeFileName(slot.openCpnName)}.svg")
-            target.writeText(enhancedSvgForSlot(slot), Charsets.UTF_8)
+            target.writeText(enhancedSvgForSlot(slot, hints.forSlot(slot)), Charsets.UTF_8)
         }
     }
 
-    private fun writeEnhancedObjectSlots(slots: List<OpenCpnEsriObjectSlot>, outputDir: File) {
+    private fun writeEnhancedObjectSlots(slots: List<OpenCpnEsriObjectSlot>, outputDir: File, hints: OpenCpnStyleHints) {
         slots.forEach { objectSlot ->
             val target = outputDir.resolve("${safeFileName(objectSlot.objectAcronym)}.svg")
-            target.writeText(enhancedSvgForSlot(objectSlot.assetSlot.copy(openCpnName = objectSlot.objectAcronym)), Charsets.UTF_8)
+            val slot = objectSlot.assetSlot.copy(openCpnName = objectSlot.objectAcronym)
+            val hint = hints.forSlot(objectSlot.assetSlot).copy(identityName = objectSlot.objectAcronym)
+            target.writeText(enhancedSvgForSlot(slot, hint), Charsets.UTF_8)
         }
     }
 
@@ -204,7 +209,8 @@ object EsriSymbologyImageExportMain {
         symbols: List<OpenCpnEsriSlot>,
         lines: List<OpenCpnEsriSlot>,
         patterns: List<OpenCpnEsriSlot>,
-        objects: List<OpenCpnEsriObjectSlot>
+        objects: List<OpenCpnEsriObjectSlot>,
+        hints: OpenCpnStyleHints
     ) {
         val all = symbols + lines + patterns
         outputDir.resolve("manifest.properties").writeText(buildString {
@@ -223,7 +229,11 @@ object EsriSymbologyImageExportMain {
             appendLine("unresolved=${all.count { it.matchKind == MatchKind.UNRESOLVED } + objects.count { it.assetSlot.matchKind == MatchKind.UNRESOLVED }}")
             appendLine("identityOverlay=true")
             appendLine("monochromeRecolored=true")
+            appendLine("opencpnColorHints=true")
+            appendLine("opencpnBitmapHints=true")
+            appendLine("distinctIdentityMarks=hash-stripe-and-category-chip")
         }, Charsets.UTF_8)
+        writeEnhancedComparison(outputDir.resolve("opencpn-comparison.csv"), symbols, lines, patterns, objects, hints)
         outputDir.resolve("README.md").writeText(buildString {
             appendLine("# ESRI enhanced SVG portrayal-input set")
             appendLine()
@@ -231,14 +241,43 @@ object EsriSymbologyImageExportMain {
             appendLine()
             appendLine("- `symbols/`, `lines/`, and `patterns/` follow the OpenCPN generated symbology name contract.")
             appendLine("- `objects/` follows the OpenCPN lookup object acronym contract for object-level review.")
-            appendLine("- Resolved files preserve ESRI geometry, recolor monochrome paths with OpenCPN/S-52-inspired day colors, and add deterministic identity/category overlays.")
+            appendLine("- Resolved files preserve ESRI geometry, recolor monochrome paths with OpenCPN/S-52 day color hints, and add deterministic identity/category overlays.")
+            appendLine("- `opencpn-comparison.csv` records the OpenCPN bitmap/color reference used to style each ESRI-derived SVG.")
             appendLine("- Unresolved slots are visible review placeholders, not generic substitutes for production portrayal.")
             appendLine()
             appendLine("Counts: `${symbols.size}` symbols, `${lines.size}` lines, `${patterns.size}` patterns, `${objects.size}` objects.")
         }, Charsets.UTF_8)
     }
 
-    private fun enhancedSvgForSlot(slot: OpenCpnEsriSlot): String {
+    private fun writeEnhancedComparison(
+        file: File,
+        symbols: List<OpenCpnEsriSlot>,
+        lines: List<OpenCpnEsriSlot>,
+        patterns: List<OpenCpnEsriSlot>,
+        objects: List<OpenCpnEsriObjectSlot>,
+        hints: OpenCpnStyleHints
+    ) {
+        fun row(slot: OpenCpnEsriSlot, logicalName: String = slot.openCpnName): String {
+            val hint = hints.forSlot(slot).copy(identityName = logicalName)
+            return listOf(
+                logicalName,
+                slot.category.name,
+                slot.matchKind.name,
+                slot.esriName.orEmpty(),
+                hint.colorRefs.joinToString("|"),
+                hint.dayColors.joinToString("|"),
+                hint.bitmapSummary,
+                slot.reason
+            ).joinToString(",") { csv(it) }
+        }
+        file.writeText(buildString {
+            appendLine("opencpnName,category,matchKind,esriName,opencpnColorRefs,opencpnDayColors,opencpnBitmap,matchReason")
+            (symbols + lines + patterns).forEach { appendLine(row(it)) }
+            objects.forEach { appendLine(row(it.assetSlot, it.objectAcronym)) }
+        }, Charsets.UTF_8)
+    }
+
+    private fun enhancedSvgForSlot(slot: OpenCpnEsriSlot, hint: OpenCpnStyleHint): String {
         val source = slot.esriFile
         return if (source != null && source.isFile) {
             enhancedEsriSvgForOpenCpn(
@@ -247,10 +286,11 @@ object EsriSymbologyImageExportMain {
                 category = slot.category.name,
                 esriName = slot.esriName.orEmpty(),
                 matchKind = slot.matchKind.name,
-                reason = slot.reason
+                reason = slot.reason,
+                hint = hint
             )
         } else {
-            enhancedPlaceholderSvg(slot.openCpnName, slot.category.name, slot.reason)
+            enhancedPlaceholderSvg(slot.openCpnName, slot.category.name, slot.reason, hint)
         }
     }
 
@@ -260,14 +300,15 @@ object EsriSymbologyImageExportMain {
         category: String,
         esriName: String,
         matchKind: String,
-        reason: String
+        reason: String,
+        hint: OpenCpnStyleHint = OpenCpnStyleHint(openCpnName, category)
     ): String {
-        val colors = enhancedColors(openCpnName, category)
+        val colors = enhancedColors(openCpnName, category, hint)
         val metadata = "OpenCPN enhanced slot: $openCpnName; ESRI source: $esriName; match: $matchKind; reason: $reason"
         var body = esriSvgCopyAsStandaloneXml(sourceXml, metadata).trimEnd()
         body = body.replaceFirst(
             Regex("""<svg\b""", RegexOption.IGNORE_CASE),
-            "<svg data-opencpn-name=\"${html(openCpnName)}\" data-esri-source=\"${html(esriName)}\" data-match-kind=\"${html(matchKind)}\" data-enhancement-palette=\"opencpn-inspired-day\" data-enhanced-svg=\"true\""
+            "<svg data-opencpn-name=\"${html(openCpnName)}\" data-esri-source=\"${html(esriName)}\" data-match-kind=\"${html(matchKind)}\" data-enhancement-palette=\"opencpn-inspired-day\" data-enhanced-svg=\"true\" data-opencpn-colors=\"${html(hint.colorRefs.joinToString(","))}\" data-opencpn-bitmap=\"${html(hint.bitmapSummary)}\""
         )
         body = replacePaint(body, "fill", colors.primary)
         body = replacePaint(body, "stroke", colors.outline)
@@ -284,8 +325,13 @@ object EsriSymbologyImageExportMain {
         return body.replaceBeforeClosingSvg(overlay)
     }
 
-    internal fun enhancedPlaceholderSvg(name: String, category: String, reason: String): String {
-        val colors = enhancedColors(name, category)
+    internal fun enhancedPlaceholderSvg(
+        name: String,
+        category: String,
+        reason: String,
+        hint: OpenCpnStyleHint = OpenCpnStyleHint(name, category)
+    ): String {
+        val colors = enhancedColors(name, category, hint)
         val chipX = 52 + (stableHash(name) % 9)
         val chipY = 10 + ((stableHash(name) / 11) % 9)
         return """
@@ -294,6 +340,7 @@ object EsriSymbologyImageExportMain {
               <desc>${html(reason)}</desc>
               <circle cx="36" cy="36" r="24" fill="none" stroke="${colors.outline}" stroke-width="3" stroke-dasharray="7 4"/>
               <path d="M21 48 L36 18 L51 48 Z" fill="${colors.primary}" fill-opacity="0.72" stroke="${colors.outline}" stroke-width="2"/>
+              <path d="M23 50 L49 24" stroke="${colors.secondary}" stroke-width="3" stroke-linecap="round" opacity="0.86"/>
               <circle cx="$chipX" cy="$chipY" r="5" fill="${colors.accent}" stroke="${colors.outline}" stroke-width="1"/>
             </svg>
         """.trimIndent()
@@ -317,6 +364,7 @@ object EsriSymbologyImageExportMain {
         }
         return """
           <g id="opencpn-enhancement" fill="none" pointer-events="none">
+            <path d="${identityStripePath(name, viewBox, marker)}" stroke="${colors.secondary}" stroke-width="${fmt(stroke * 1.8)}" stroke-linecap="round" stroke-opacity="0.82"/>
             <rect x="${fmt(viewBox.minX + stroke)}" y="${fmt(viewBox.minY + stroke)}" width="${fmt(viewBox.width - stroke * 2)}" height="${fmt(viewBox.height - stroke * 2)}" rx="${fmt(marker * 0.65)}" ry="${fmt(marker * 0.65)}" stroke="${colors.category}" stroke-width="${fmt(stroke)}" stroke-opacity="0.55"/>
             $categoryShape
           </g>
@@ -332,9 +380,11 @@ object EsriSymbologyImageExportMain {
         return if (values.size == 4 && values[2] > 0.0 && values[3] > 0.0) EsriSvgViewBox(values[0], values[1], values[2], values[3]) else null
     }
 
-    private fun enhancedColors(name: String, category: String): EnhancedColors {
+    private fun enhancedColors(name: String, category: String, hint: OpenCpnStyleHint = OpenCpnStyleHint(name, category)): EnhancedColors {
         val upper = name.uppercase(Locale.US)
+        val hinted = hint.dayColors.filterNot { it.equals("#ffffff", ignoreCase = true) || it.equals("#000000", ignoreCase = true) }
         val base = when {
+            hinted.isNotEmpty() -> hinted.first() to (hint.dayColors.drop(1).firstOrNull() ?: semanticAccent(name))
             "LIGHT" in upper || upper.startsWith("LIT") -> "#ffd21f" to "#b05a00"
             "WRECK" in upper -> "#111111" to "#2a7fff"
             "OBSTR" in upper || "DANGER" in upper -> "#d1007a" to "#111111"
@@ -352,7 +402,28 @@ object EsriSymbologyImageExportMain {
             "PATTERN" -> "#006d77"
             else -> "#324a8f"
         }
-        return EnhancedColors(primary = base.first, accent = base.second, outline = "#111111", category = categoryColor)
+        val secondary = hint.dayColors.drop(2).firstOrNull() ?: hashColor("$name-secondary")
+        return EnhancedColors(primary = base.first, accent = base.second, secondary = secondary, outline = "#111111", category = categoryColor)
+    }
+
+    private fun semanticAccent(name: String): String {
+        val upper = name.uppercase(Locale.US)
+        return when {
+            "LIGHT" in upper -> "#b05a00"
+            "BOY" in upper || "BUOY" in upper -> "#0b7f3a"
+            "BCN" in upper || "BEACON" in upper -> "#f2c400"
+            else -> hashColor("$name-accent")
+        }
+    }
+
+    private fun identityStripePath(name: String, viewBox: EsriSvgViewBox, marker: Double): String {
+        val h = stableHash(name)
+        val inset = marker * (0.9 + (h % 5) * 0.16)
+        return if ((h and 1) == 0) {
+            "M${fmt(viewBox.minX + inset)} ${fmt(viewBox.minY + viewBox.height - inset)} L${fmt(viewBox.minX + viewBox.width - inset)} ${fmt(viewBox.minY + inset)}"
+        } else {
+            "M${fmt(viewBox.minX + inset)} ${fmt(viewBox.minY + inset)} L${fmt(viewBox.minX + viewBox.width - inset)} ${fmt(viewBox.minY + viewBox.height - inset)}"
+        }
     }
 
     private fun hashColor(value: String): String {
@@ -902,7 +973,48 @@ private enum class MatchKind { ALIAS, CUSTOM_SYMBOL_MAP, EXACT_NAME, SEMANTIC_TO
 
 private data class OpenCpnPresentationRef(val name: String, val category: EsriSvgCategory)
 
-private data class EnhancedColors(val primary: String, val accent: String, val outline: String, val category: String)
+internal data class OpenCpnStyleHint(
+    val identityName: String,
+    val category: String,
+    val colorRefs: List<String> = emptyList(),
+    val dayColors: List<String> = emptyList(),
+    val bitmap: SourceBitmapRef? = null
+) {
+    val bitmapSummary: String = bitmap?.let { "${it.atlasFileName}:${it.x.toInt()},${it.y.toInt()},${it.width.toInt()}x${it.height.toInt()}@${it.pivotX.toInt()},${it.pivotY.toInt()}" }.orEmpty()
+}
+
+private class OpenCpnStyleHints(
+    private val symbolHints: Map<String, OpenCpnStyleHint>,
+    private val lineHints: Map<String, OpenCpnStyleHint>,
+    private val patternHints: Map<String, OpenCpnStyleHint>
+) {
+    fun forSlot(slot: OpenCpnEsriSlot): OpenCpnStyleHint {
+        val key = canonicalOpenCpnKey(slot.openCpnName)
+        return when (slot.category) {
+            EsriSvgCategory.POINT -> symbolHints[key]
+            EsriSvgCategory.LINE -> lineHints[key]
+            EsriSvgCategory.PATTERN -> patternHints[key]
+            EsriSvgCategory.UNKNOWN -> null
+        } ?: OpenCpnStyleHint(slot.openCpnName, slot.category.name)
+    }
+
+    companion object {
+        fun from(pack: PresLibSourcePack): OpenCpnStyleHints {
+            val day = pack.colorTables.firstOrNull { it.palette.name == "DayBright" }?.colors.orEmpty()
+                .associate { it.token.uppercase(Locale.US) to "#${hex(it.r)}${hex(it.g)}${hex(it.b)}" }
+            fun colors(refs: List<String>): List<String> = refs.mapNotNull { day[it.uppercase(Locale.US)] }.distinct()
+            return OpenCpnStyleHints(
+                symbolHints = pack.symbols.associate { canonicalOpenCpnKey(it.name) to OpenCpnStyleHint(it.name, EsriSvgCategory.POINT.name, it.colorRefs, colors(it.colorRefs), it.bitmap) },
+                lineHints = pack.lineStyles.associate { canonicalOpenCpnKey(it.name) to OpenCpnStyleHint(it.name, EsriSvgCategory.LINE.name, it.colorRefs, colors(it.colorRefs), it.bitmap) },
+                patternHints = pack.patterns.associate { canonicalOpenCpnKey(it.name) to OpenCpnStyleHint(it.name, EsriSvgCategory.PATTERN.name, it.colorRefs, colors(it.colorRefs), it.bitmap) }
+            )
+        }
+
+        private fun hex(value: Int): String = value.coerceIn(0, 255).toString(16).padStart(2, '0')
+    }
+}
+
+private data class EnhancedColors(val primary: String, val accent: String, val secondary: String, val outline: String, val category: String)
 
 private data class OpenCpnEsriObjectSlot(
     val objectIndex: Int,
