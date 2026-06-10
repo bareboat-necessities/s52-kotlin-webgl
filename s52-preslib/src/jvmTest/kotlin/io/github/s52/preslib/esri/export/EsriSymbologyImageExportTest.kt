@@ -3,6 +3,7 @@ package io.github.s52.preslib.esri.export
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import io.github.s52.preslib.opencpn.generated.OpenCpnGeneratedPresLib
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class EsriSymbologyImageExportTest {
@@ -28,5 +29,17 @@ class EsriSymbologyImageExportTest {
         assertEquals(OpenCpnGeneratedPresLib.LINE_STYLE_COUNT, pack.lineStyles.size)
         assertEquals(OpenCpnGeneratedPresLib.PATTERN_COUNT, pack.patterns.size)
         assertTrue(objectCount >= 100, "ESRI atlas must be driven by the OpenCPN lookup object set, not only raw ESRI SVG filenames")
+    }
+
+    @Test
+    fun copiedEsriSvgStripsXmlDeclarationBeforeMetadataComment() {
+        val copied = EsriSymbologyImageExportMain.esriSvgCopyAsStandaloneXml(
+            "\uFEFF<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\"/>",
+            "OpenCPN slot -- sanitize"
+        )
+
+        assertTrue(copied.startsWith("<!-- OpenCPN slot - - sanitize -->\n<svg"))
+        assertFalse(copied.contains("<?xml"), "Generated SVG copies must not put metadata before an XML declaration")
+        assertFalse(copied.contains("-- sanitize"), "XML comments must not contain illegal double hyphen sequences")
     }
 }

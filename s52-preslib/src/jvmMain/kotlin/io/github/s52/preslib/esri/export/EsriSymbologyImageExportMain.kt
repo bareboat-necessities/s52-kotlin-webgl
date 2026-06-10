@@ -149,12 +149,12 @@ object EsriSymbologyImageExportMain {
 
     private fun copyResolvedSvgSlots(slots: List<OpenCpnEsriSlot>, outputDir: File) {
         slots.forEach { slot ->
-            val fileName = "${slot.openCpnName}.svg"
+            val fileName = "${safeFileName(slot.openCpnName)}.svg"
             val target = outputDir.resolve(fileName)
             val source = slot.esriFile
             if (source != null && source.isFile) {
-                val comment = "<!-- OpenCPN slot: ${slot.openCpnName}; ESRI source: ${slot.esriName}; match: ${slot.matchKind.name}; reason: ${slot.reason} -->\n"
-                target.writeText(comment + source.readText(), Charsets.UTF_8)
+                val metadata = "OpenCPN slot: ${slot.openCpnName}; ESRI source: ${slot.esriName}; match: ${slot.matchKind.name}; reason: ${slot.reason}"
+                target.writeText(esriSvgCopyAsStandaloneXml(source.readText(Charsets.UTF_8), metadata), Charsets.UTF_8)
             } else {
                 target.writeText(unresolvedSvg(slot.openCpnName, slot.reason), Charsets.UTF_8)
             }
@@ -166,8 +166,8 @@ object EsriSymbologyImageExportMain {
             val target = outputDir.resolve("${safeFileName(objectSlot.objectAcronym)}.svg")
             val source = objectSlot.assetSlot.esriFile
             if (source != null && source.isFile) {
-                val comment = "<!-- OpenCPN object: ${objectSlot.objectAcronym}; primitive: ${objectSlot.primitive}; OpenCPN instruction asset: ${objectSlot.openCpnAssetName}; ESRI source: ${objectSlot.assetSlot.esriName}; match: ${objectSlot.assetSlot.matchKind.name}; reason: ${objectSlot.assetSlot.reason} -->\n"
-                target.writeText(comment + source.readText(), Charsets.UTF_8)
+                val metadata = "OpenCPN object: ${objectSlot.objectAcronym}; primitive: ${objectSlot.primitive}; OpenCPN instruction asset: ${objectSlot.openCpnAssetName}; ESRI source: ${objectSlot.assetSlot.esriName}; match: ${objectSlot.assetSlot.matchKind.name}; reason: ${objectSlot.assetSlot.reason}"
+                target.writeText(esriSvgCopyAsStandaloneXml(source.readText(Charsets.UTF_8), metadata), Charsets.UTF_8)
             } else {
                 target.writeText(unresolvedSvg(objectSlot.objectAcronym, objectSlot.assetSlot.reason), Charsets.UTF_8)
             }
@@ -182,6 +182,31 @@ object EsriSymbologyImageExportMain {
           <desc>${html(reason)}</desc>
         </svg>
     """.trimIndent()
+
+
+    /**
+     * Make copied ESRI SVGs browser-loadable standalone XML.
+     *
+     * The previous exporter prepended an XML comment before the source bytes.
+     * Many ESRI SVG files begin with an XML declaration, and XML declarations
+     * are only legal as the first construct in a document.  A prepended comment
+     * therefore made otherwise-good SVGs malformed.  We strip source XML
+     * declarations, sanitize our metadata comment, and leave the original
+     * <svg> payload untouched.
+     */
+    internal fun esriSvgCopyAsStandaloneXml(sourceXml: String, metadata: String): String {
+        val withoutBom = sourceXml.removePrefix("\uFEFF")
+        val withoutDeclarations = xmlDeclarationRegex.replace(withoutBom, "")
+        val body = withoutDeclarations.trimStart()
+        val comment = sanitizeXmlComment(metadata)
+        return "<!-- $comment -->\n" + body.trimEnd() + "\n"
+    }
+
+    private fun sanitizeXmlComment(value: String): String = value
+        .replace("--", "- -")
+        .let { if (it.endsWith("-")) "$it " else it }
+
+    private val xmlDeclarationRegex = Regex("""(?is)<\?xml\s+[^>]*\?>""")
 
     private fun loadPointAsset(slot: OpenCpnEsriSlot, fallback: File?): AtlasPointResult {
         val primary = slot.esriFile
@@ -307,7 +332,7 @@ object EsriSymbologyImageExportMain {
         file.writeText(buildString {
             appendLine("<!doctype html>")
             appendLine("<html><head><meta charset=\"utf-8\"><title>ESRI OpenCPN-matched S-52 Symbology Images</title>")
-            appendLine("<style>body{font-family:system-ui,sans-serif;margin:24px} img{max-width:100%;height:auto;border:1px solid #ccc} code{background:#f5f5f5;padding:2px 4px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px}.card{border:1px solid #ddd;padding:8px;overflow:hidden}.card img{width:72px;height:72px;object-fit:contain;border:0}.warn{color:#9a5200}</style>")
+            appendLine("<style>body{font-family:system-ui,sans-serif;margin:24px} img{max-width:100%;height:auto;border:1px solid #ccc} code{background:#f5f5f5;padding:2px 4px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px}.card{border:1px solid #ddd;padding:8px;overflow:hidden}.card img{width:72px;height:72px;object-fit:contain;border:0}.card.broken{background:#fff2f2;border-color:#d55}.card.broken:after{content:'SVG failed to load';display:block;color:#a00;font-size:12px}.warn{color:#9a5200}</style>")
             appendLine("</head><body>")
             appendLine("<h1>ESRI / INT1 symbology image export, OpenCPN-name compatible</h1>")
             appendLine("<p>This artifact uses OpenCPN generated symbology as the coverage oracle. Every exported SVG file keeps the OpenCPN symbol, line, or pattern name, while its drawing comes from the best-matched ESRI SVG source.</p>")
@@ -326,7 +351,7 @@ object EsriSymbologyImageExportMain {
             appendLine("<h3>Dark</h3><img src=\"symbol-atlas-dark.png\" alt=\"ESRI dark symbol atlas, OpenCPN-compatible names\">")
             appendLine("<h2>First 500 OpenCPN lookup objects</h2><div class=\"grid\">")
             objects.take(500).forEach { objectSlot ->
-                appendLine("<div class=\"card\"><img src=\"objects/${html(safeFileName(objectSlot.objectAcronym))}.svg\" alt=\"${html(objectSlot.objectAcronym)}\"><br><code>${html(objectSlot.objectAcronym)}</code><br><small>${html(objectSlot.primitive)} / ${html(objectSlot.openCpnAssetName)}</small></div>")
+                appendLine("<div class=\"card\"><img src=\"objects/${html(urlPathSegment(safeFileName(objectSlot.objectAcronym)))}.svg\" alt=\"${html(objectSlot.objectAcronym)}\" loading=\"lazy\" onerror=\"this.closest('.card').classList.add('broken')\"><br><code>${html(objectSlot.objectAcronym)}</code><br><small>${html(objectSlot.primitive)} / ${html(objectSlot.openCpnAssetName)}</small></div>")
             }
             appendLine("</div>")
             if (objects.size > 500) appendLine("<p>Only first 500 object previews shown; all ${objects.size} OpenCPN lookup object SVG files are present under <code>objects/</code>.</p>")
@@ -334,7 +359,7 @@ object EsriSymbologyImageExportMain {
             symbols.take(500).forEach { slot ->
                 val extra = if (slot.matchKind == MatchKind.CATEGORY_FALLBACK) "<br><span class=\"warn\">fallback</span>" else ""
                 val esriPreviewName = html(slot.esriName ?: "unresolved")
-                appendLine("<div class=\"card\"><img src=\"symbols/${html(slot.openCpnName)}.svg\" alt=\"${html(slot.openCpnName)}\"><br><code>${html(slot.openCpnName)}</code><br><small>$esriPreviewName</small>$extra</div>")
+                appendLine("<div class=\"card\"><img src=\"symbols/${html(urlPathSegment(safeFileName(slot.openCpnName)))}.svg\" alt=\"${html(slot.openCpnName)}\" loading=\"lazy\" onerror=\"this.closest('.card').classList.add('broken')\"><br><code>${html(slot.openCpnName)}</code><br><small>$esriPreviewName</small>$extra</div>")
             }
             appendLine("</div>")
             if (symbols.size > 500) appendLine("<p>Only first 500 point SVG previews shown; all ${symbols.size} OpenCPN-named SVG files are present under <code>symbols/</code>.</p>")
@@ -367,7 +392,7 @@ object EsriSymbologyImageExportMain {
             appendLine("  \"mappings\": [")
             val all = symbols + lines + patterns
             all.forEachIndexed { index, slot ->
-                append("    {\"category\": \"${slot.category.name}\", \"openCpnName\": \"${json(slot.openCpnName)}\", \"outputSvg\": \"${json(slot.outputSubdir)}/${json(slot.openCpnName)}.svg\", \"esriName\": \"${json(slot.esriName ?: "")}\", \"matchKind\": \"${slot.matchKind.name}\", \"reason\": \"${json(slot.reason)}\"}")
+                append("    {\"category\": \"${slot.category.name}\", \"openCpnName\": \"${json(slot.openCpnName)}\", \"outputSvg\": \"${json(slot.outputSubdir)}/${json(safeFileName(slot.openCpnName))}.svg\", \"esriName\": \"${json(slot.esriName ?: "")}\", \"matchKind\": \"${slot.matchKind.name}\", \"reason\": \"${json(slot.reason)}\"}")
                 if (index != all.lastIndex) append(',')
                 appendLine()
             }
@@ -394,7 +419,7 @@ object EsriSymbologyImageExportMain {
         file.writeText(buildString {
             appendLine("category,opencpn_name,output_svg,esri_source,match_kind,reason")
             slots.forEach { slot ->
-                appendLine(listOf(slot.category.name, slot.openCpnName, "${slot.outputSubdir}/${slot.openCpnName}.svg", slot.esriName ?: "", slot.matchKind.name, slot.reason).joinToString(",") { csv(it) })
+                appendLine(listOf(slot.category.name, slot.openCpnName, "${slot.outputSubdir}/${safeFileName(slot.openCpnName)}.svg", slot.esriName ?: "", slot.matchKind.name, slot.reason).joinToString(",") { csv(it) })
             }
         })
     }
@@ -466,6 +491,19 @@ object EsriSymbologyImageExportMain {
         .replace("<", "&lt;")
         .replace(">", "&gt;")
         .replace("\"", "&quot;")
+
+    private fun urlPathSegment(value: String): String = buildString {
+        value.toByteArray(Charsets.UTF_8).forEach { raw ->
+            val b = raw.toInt() and 0xff
+            val ch = b.toChar()
+            if ((b in 'A'.code..'Z'.code) || (b in 'a'.code..'z'.code) || (b in '0'.code..'9'.code) || ch == '-' || ch == '_' || ch == '.' || ch == '$') {
+                append(ch)
+            } else {
+                append('%')
+                append(b.toString(16).uppercase(Locale.US).padStart(2, '0'))
+            }
+        }
+    }
 
     private fun json(value: String): String = value
         .replace("\\", "\\\\")
