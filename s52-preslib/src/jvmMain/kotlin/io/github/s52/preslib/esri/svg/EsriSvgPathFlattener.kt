@@ -12,12 +12,12 @@ object EsriSvgPathFlattener {
         var lastQuadraticControl: EsriPoint? = null
 
         fun active(): MutableList<EsriPoint> {
-            if (subpaths.isEmpty()) subpaths += mutableListOf()
+            if (subpaths.isEmpty()) subpaths.add(mutableListOf())
             return subpaths.last()
         }
 
         fun moveTo(point: EsriPoint) {
-            subpaths += mutableListOf(point)
+            subpaths.add(mutableListOf(point))
             current = point
             start = point
             lastCubicControl = null
@@ -25,7 +25,7 @@ object EsriSvgPathFlattener {
         }
 
         fun lineTo(point: EsriPoint) {
-            active() += point
+            active().add(point)
             current = point
             lastCubicControl = null
             lastQuadraticControl = null
@@ -115,7 +115,7 @@ object EsriSvgPathFlattener {
                     }
                 }
                 'Z' -> {
-                    if (active().lastOrNull() != start) active() += start
+                    if (active().lastOrNull() != start) active().add(start)
                     current = start
                     lastCubicControl = null
                     lastQuadraticControl = null
@@ -132,10 +132,10 @@ object EsriSvgPathFlattener {
         for (i in 1..steps.coerceAtLeast(1)) {
             val t = i.toDouble() / steps.coerceAtLeast(1)
             val u = 1.0 - t
-            out += EsriPoint(
+            out.add(EsriPoint(
                 u.pow(3) * p0.x + 3.0 * u.pow(2) * t * p1.x + 3.0 * u * t.pow(2) * p2.x + t.pow(3) * p3.x,
                 u.pow(3) * p0.y + 3.0 * u.pow(2) * t * p1.y + 3.0 * u * t.pow(2) * p2.y + t.pow(3) * p3.y
-            )
+            ))
         }
     }
 
@@ -143,10 +143,10 @@ object EsriSvgPathFlattener {
         for (i in 1..steps.coerceAtLeast(1)) {
             val t = i.toDouble() / steps.coerceAtLeast(1)
             val u = 1.0 - t
-            out += EsriPoint(
+            out.add(EsriPoint(
                 u * u * p0.x + 2.0 * u * t * p1.x + t * t * p2.x,
                 u * u * p0.y + 2.0 * u * t * p1.y + t * t * p2.y
-            )
+            ))
         }
     }
 }

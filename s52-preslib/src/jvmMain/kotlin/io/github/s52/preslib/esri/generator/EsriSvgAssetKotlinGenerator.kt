@@ -11,7 +11,7 @@ import java.util.Locale
 
 /** Generates Kotlin registries for ESRI line and area-pattern SVG assets. */
 object EsriSvgAssetKotlinGenerator {
-    fun generate(
+    internal fun generate(
         sourceRoot: File,
         outputFile: File,
         category: EsriSvgCategory,

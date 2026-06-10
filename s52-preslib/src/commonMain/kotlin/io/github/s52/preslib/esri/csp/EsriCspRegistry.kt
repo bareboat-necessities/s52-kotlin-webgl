@@ -13,7 +13,7 @@ object EsriCspRegistry {
         EsriLandAreaCsp
     ).flatMap { procedure -> procedure.names.map { it.lowercase() to procedure } }.toMap()
 
-    val names: Set<String> = procedures.keys.toSortedSet()
+    val names: Set<String> = procedures.keys.sorted().toSet()
 
     fun find(name: String): EsriConditionalProcedure? = procedures[name.lowercase()]
 
