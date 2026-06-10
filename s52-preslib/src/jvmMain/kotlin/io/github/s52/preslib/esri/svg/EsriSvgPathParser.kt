@@ -1,10 +1,11 @@
 package io.github.s52.preslib.esri.svg
 
 /**
- * Lightweight SVG path tokenizer for Phase ESRI-2 validation.
+ * SVG path tokenizer used by the ESRI SVG importer.
  *
- * It records path commands and numeric payloads without doing geometric normalization yet.
- * Mesh generation in later phases can build on this parser or replace it with a fuller implementation.
+ * Phase ESRI-2 records all path commands and rejects unsupported commands before
+ * any renderer can silently substitute a placeholder.  Phase ESRI-3 consumes this
+ * token stream to flatten paths into generated Kotlin mesh data.
  */
 object EsriSvgPathParser {
     private val supportedCommands = setOf('M', 'L', 'H', 'V', 'C', 'S', 'Q', 'T', 'Z')
@@ -40,7 +41,7 @@ object EsriSvgPathParser {
         return EsriSvgPathData(commands = commands, unsupportedCommands = unsupported.toList())
     }
 
-    private fun tokenize(d: String): List<String> {
+    internal fun tokenize(d: String): List<String> {
         val out = mutableListOf<String>()
         var i = 0
         while (i < d.length) {

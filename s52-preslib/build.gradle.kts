@@ -142,8 +142,31 @@ tasks.register<JavaExec>("esriCoverageReport") {
     outputs.dir(esriReportDirProvider)
 }
 
+
+
+tasks.register<JavaExec>("generateEsriVectorSymbols") {
+    group = "generation"
+    description = "Phase ESRI-3: parses ESRI SVG assets, generates Kotlin vector mesh symbol registry, and writes a generation report."
+
+    val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
+    dependsOn("jvmMainClasses")
+    classpath = files(jvmCompilation.output.allOutputs, jvmCompilation.runtimeDependencyFiles)
+    mainClass.set("io.github.s52.preslib.esri.generator.GenerateEsriVectorSymbolsMain")
+
+    val outputFile = layout.projectDirectory.file("src/commonMain/kotlin/io/github/s52/preslib/esri/generated/EsriGeneratedSymbolRegistry.kt")
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf(
+            esriSourceDirProvider.get(),
+            outputFile.asFile.absolutePath,
+            esriReportDirProvider.get().asFile.absolutePath
+        )
+    })
+    outputs.file(outputFile)
+    outputs.dir(esriReportDirProvider)
+}
+
 tasks.register("criticalEsriCheck") {
     group = "verification"
-    description = "Runs phases ESRI-0/1/2 source-boundary, inventory, initial coverage, and SVG subset checks."
-    dependsOn("esriInventory", "esriCoverageReport", "validateEsriSvgSubset", "jvmTest")
+    description = "Runs phases ESRI-0 through ESRI-4 inventory, SVG subset, vector Kotlin generation, and JVM tests."
+    dependsOn("esriInventory", "esriCoverageReport", "validateEsriSvgSubset", "generateEsriVectorSymbols", "jvmTest", ":s52-render-webgl:build")
 }

@@ -51,3 +51,26 @@ data class EsriSvgPathCommand(
     val relative: Boolean,
     val values: List<Double>
 )
+
+data class EsriPoint(val x: Double, val y: Double)
+
+data class EsriPolygon(val points: List<EsriPoint>) {
+    val isClosed: Boolean get() = points.size >= 3
+}
+
+data class EsriGeneratedSvgMesh(
+    val vertices: FloatArray,
+    val indices: ShortArray,
+    val paint: EsriGeneratedPaint,
+    val sourcePathId: String?
+) {
+    val vertexCount: Int get() = vertices.size / 2
+    val triangleCount: Int get() = indices.size / 3
+    val isRenderable: Boolean get() = vertexCount > 0 && triangleCount > 0 && paint != EsriGeneratedPaint.None
+}
+
+sealed interface EsriGeneratedPaint {
+    data class LiteralHex(val hex: String) : EsriGeneratedPaint
+    data class Token(val token: String) : EsriGeneratedPaint
+    data object None : EsriGeneratedPaint
+}
