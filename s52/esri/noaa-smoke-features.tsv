@@ -1,0 +1,11 @@
+# object	prim	csp	attributes	leastDepth	greatestDepth	lowAccuracy
+SOUNDG	1	sounding	VALSOU=12.4	12.4		false
+LIGHTS	1	lights	COLOUR=3;LITCHR=2			false
+WRECKS	1	wrecks05	VALSOU=4.0;WATLEV=3;CATWRK=2	4.0	40.0	false
+WRECKS	3	wrecks05	WATLEV=5;CATWRK=2	0.0	45.0	true
+DEPARE	3	depare03	DRVAL1=0;DRVAL2=5			false
+RESARE	3	resare04	CATREA=1,7			false
+CBLSUB	2	cblsub02	CATCBL=1			false
+BRIDGE	2	bridge02	VERCLR=15.0			false
+SBDARE	3	sbdare01	NATSUR=4			false
+LNDARE	3	lndare01				false

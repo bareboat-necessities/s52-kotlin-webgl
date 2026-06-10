@@ -261,9 +261,113 @@ tasks.register<JavaExec>("generateEsriVectorPatterns") {
     outputs.dir(esriReportDirProvider)
 }
 
+
+val esriStrictCoverageProvider = providers.gradleProperty("esri.strictCoverage")
+    .orElse(providers.environmentVariable("ESRI_STRICT_COVERAGE"))
+    .orElse("false")
+
+tasks.register<JavaExec>("generateEsriPresLib") {
+    group = "generation"
+    description = "Phase ESRI-10: generates the ESRI/INT1 profile metadata facade."
+
+    val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
+    dependsOn(
+        "jvmMainClasses",
+        "generateEsriVectorSymbols",
+        "generateEsriVectorLines",
+        "generateEsriVectorPatterns",
+        "generateEsriDirectRules"
+    )
+    classpath = files(jvmCompilation.output.allOutputs, jvmCompilation.runtimeDependencyFiles)
+    mainClass.set("io.github.s52.preslib.esri.generator.GenerateEsriPresLibMain")
+
+    val outputFile = layout.projectDirectory.file("src/commonMain/kotlin/io/github/s52/preslib/esri/generated/EsriGeneratedPresLib.kt")
+    val aliasDir = rootProject.layout.projectDirectory.dir("s52/esri")
+    val revisionFile = rootProject.layout.projectDirectory.file("s52/esri/source-revision.properties")
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf(
+            esriSourceDirProvider.get(),
+            aliasDir.asFile.absolutePath,
+            outputFile.asFile.absolutePath,
+            revisionFile.asFile.absolutePath,
+            esriReportDirProvider.get().asFile.absolutePath
+        )
+    })
+    inputs.files(
+        aliasDir.file("esri-symbol-aliases.tsv"),
+        aliasDir.file("esri-line-aliases.tsv"),
+        aliasDir.file("esri-pattern-aliases.tsv"),
+        revisionFile
+    )
+    outputs.file(outputFile)
+    outputs.dir(esriReportDirProvider)
+}
+
+tasks.register<JavaExec>("checkEsriStrictCoverage") {
+    group = "verification"
+    description = "Phase ESRI-11: writes strict ESRI coverage closure reports and optionally fails unresolved release coverage."
+
+    val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
+    dependsOn(
+        "jvmMainClasses",
+        "generateEsriVectorSymbols",
+        "generateEsriVectorLines",
+        "generateEsriVectorPatterns",
+        "generateEsriDirectRules",
+        "checkEsriAliasClosure",
+        "generateEsriPresLib"
+    )
+    classpath = files(jvmCompilation.output.allOutputs, jvmCompilation.runtimeDependencyFiles)
+    mainClass.set("io.github.s52.preslib.esri.coverage.EsriStrictCoverageClosureMain")
+
+    val openCpnGenerated = layout.projectDirectory.file("src/commonMain/kotlin/io/github/s52/preslib/opencpn/generated/OpenCpnGeneratedPresLib.kt")
+    val symbolRegistry = layout.projectDirectory.file("src/commonMain/kotlin/io/github/s52/preslib/esri/generated/EsriGeneratedSymbolRegistry.kt")
+    val lineRegistry = layout.projectDirectory.file("src/commonMain/kotlin/io/github/s52/preslib/esri/generated/EsriGeneratedLineRegistry.kt")
+    val patternRegistry = layout.projectDirectory.file("src/commonMain/kotlin/io/github/s52/preslib/esri/generated/EsriGeneratedPatternRegistry.kt")
+    val aliasDir = rootProject.layout.projectDirectory.dir("s52/esri")
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf(
+            openCpnGenerated.asFile.absolutePath,
+            symbolRegistry.asFile.absolutePath,
+            lineRegistry.asFile.absolutePath,
+            patternRegistry.asFile.absolutePath,
+            aliasDir.asFile.absolutePath,
+            esriReportDirProvider.get().asFile.absolutePath,
+            esriStrictCoverageProvider.get()
+        )
+    })
+    inputs.files(openCpnGenerated, symbolRegistry, lineRegistry, patternRegistry)
+    inputs.files(
+        aliasDir.file("esri-symbol-aliases.tsv"),
+        aliasDir.file("esri-line-aliases.tsv"),
+        aliasDir.file("esri-pattern-aliases.tsv")
+    )
+    outputs.dir(esriReportDirProvider)
+}
+
+tasks.register<JavaExec>("esriNoaaSmokeTest") {
+    group = "verification"
+    description = "Phase ESRI-12: runs NOAA-style smoke fixtures through the ESRI profile facade and CSP ports."
+
+    val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
+    dependsOn("jvmMainClasses", "generateEsriPresLib")
+    classpath = files(jvmCompilation.output.allOutputs, jvmCompilation.runtimeDependencyFiles)
+    mainClass.set("io.github.s52.preslib.esri.smoke.EsriNoaaSmokeMain")
+
+    val fixture = rootProject.layout.projectDirectory.file("s52/esri/noaa-smoke-features.tsv")
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf(
+            fixture.asFile.absolutePath,
+            esriReportDirProvider.get().asFile.absolutePath
+        )
+    })
+    inputs.file(fixture)
+    outputs.dir(esriReportDirProvider)
+}
+
 tasks.register("criticalEsriCheck") {
     group = "verification"
-    description = "Runs phases ESRI-0 through ESRI-9 inventory, SVG subset, vector symbol/line/pattern generation, direct XML rules, alias closure, CSP tests, and WebGL build."
+    description = "Runs phases ESRI-0 through ESRI-12: inventory, SVG validation, vector generation, direct rules, aliases, CSP/profile tests, coverage reports, NOAA smoke, and WebGL build."
     dependsOn(
         "esriInventory",
         "esriCoverageReport",
@@ -273,6 +377,9 @@ tasks.register("criticalEsriCheck") {
         "generateEsriVectorPatterns",
         "generateEsriDirectRules",
         "checkEsriAliasClosure",
+        "generateEsriPresLib",
+        "checkEsriStrictCoverage",
+        "esriNoaaSmokeTest",
         "jvmTest",
         ":s52-render-webgl:build"
     )
