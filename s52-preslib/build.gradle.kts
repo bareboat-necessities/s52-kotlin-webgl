@@ -311,15 +311,18 @@ val esriGeneratedKotlinWriterTaskNames = listOf(
     "generateEsriPresLib"
 )
 
-// The ESRI generators intentionally refresh generated registries under src/commonMain/kotlin
-// so the repository can keep useful fallback placeholders while CI can regenerate real INT1 data.
-// When criticalEsriCheck puts both generation and Kotlin compilation in the same task graph,
-// Gradle 8.14 correctly requires an explicit ordering edge for compile tasks that read that
-// source directory. mustRunAfter is used instead of dependsOn to avoid a cycle: the generators
-// run as JavaExec tools from the JVM main compilation, while Kotlin compile tasks only need a
-// deterministic order when the generators are already in the requested task graph.
+// The ESRI generators currently refresh generated registries under src/commonMain/kotlin.
+// Gradle 8.14 requires an explicit ordering edge when JS compilation and those generators
+// are both in the same task graph. Do NOT apply this to JVM/common metadata compilation:
+// the generators themselves run from jvmMainClasses, so ordering JVM compilation after
+// the generators creates a circular dependency. The only observed implicit-dependency
+// validation failure is from the JS compilation path used by the WebGL build.
 tasks.matching { task ->
-    task.name.startsWith("compile") && task.name.contains("Kotlin")
+    task.name == "compileKotlinJs" ||
+        task.name == "compileProductionLibraryKotlinJs" ||
+        task.name == "compileDevelopmentExecutableKotlinJs" ||
+        task.name == "compileProductionExecutableKotlinJs" ||
+        task.name == "compileTestKotlinJs"
 }.configureEach {
     mustRunAfter(esriGeneratedKotlinWriterTaskNames)
 }
