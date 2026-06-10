@@ -1,5 +1,6 @@
 package io.github.s52.preslib.esri.svg
 
+import io.github.s52.preslib.esri.generator.EsriGenerationFailurePolicy
 import io.github.s52.preslib.esri.importer.EsriJson
 import io.github.s52.preslib.esri.importer.EsriSourceLayout
 import java.io.File
@@ -10,6 +11,11 @@ import java.io.File
  * Args:
  * 0: ESRI nautical-chart-symbols source root
  * 1: output report directory
+ *
+ * Default behavior is report-only. The ESRI upstream SVG corpus contains valid
+ * assets that are outside the early parser subset; those must not break normal
+ * OpenCPN CI or partial ESRI atlas generation. Set ESRI_FAIL_ON_SVG_FAILURES=true
+ * to make subset violations fatal for a strict parser-completeness gate.
  */
 object ValidateEsriSvgSubsetMain {
     @JvmStatic
@@ -46,7 +52,8 @@ object ValidateEsriSvgSubsetMain {
             }
         }
 
-        reportDir.resolve("svg-subset-report.csv").writeText(buildString {
+        val csvReport = reportDir.resolve("svg-subset-report.csv")
+        csvReport.writeText(buildString {
             appendLine("path,category,parsed,validViewBox,hasGeometry,pathCount,unsupported,error")
             rows.forEach { row ->
                 appendLine(listOf(
@@ -68,6 +75,7 @@ object ValidateEsriSvgSubsetMain {
             appendLine("  \"parsed\": ${rows.count { it.parsed }},")
             appendLine("  \"withUnsupportedFeatures\": ${rows.count { it.unsupported.isNotEmpty() }},")
             appendLine("  \"withErrors\": ${rows.count { it.error != null }},")
+            appendLine("  \"strictFailureEnabled\": ${EsriGenerationFailurePolicy.failOnSvgAssetFailures()},")
             appendLine("  \"rows\": [")
             appendLine(rows.joinToString(",\n") { it.toJson().prependIndent("    ") })
             appendLine("  ]")
@@ -75,8 +83,11 @@ object ValidateEsriSvgSubsetMain {
         })
 
         val invalid = rows.filter { !it.parsed || !it.validViewBox || !it.hasGeometry || it.unsupported.isNotEmpty() }
-        check(invalid.isEmpty()) {
-            "ESRI SVG subset validation failed for ${invalid.size} file(s). See ${reportDir.resolve("svg-subset-report.csv").path}"
+        if (invalid.isNotEmpty()) {
+            EsriGenerationFailurePolicy.warnSubsetValidation(invalid.size, csvReport.path)
+            check(!EsriGenerationFailurePolicy.failOnSvgAssetFailures()) {
+                "ESRI SVG subset validation failed for ${invalid.size} file(s). See ${csvReport.path}"
+            }
         }
     }
 

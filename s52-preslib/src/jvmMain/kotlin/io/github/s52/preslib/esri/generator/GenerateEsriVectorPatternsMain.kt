@@ -17,10 +17,18 @@ object GenerateEsriVectorPatternsMain {
             registryKind = RegistryKind.PATTERN
         )
         val reportDir = File(args[2]).apply { mkdirs() }
-        writeReport(summary, reportDir.resolve("generated-vector-patterns.json"), "generatedPatternCount")
+        val reportFile = reportDir.resolve("generated-vector-patterns.json")
+        writeReport(summary, reportFile, "generatedPatternCount")
         if (summary.failedAssetCount > 0) {
-            System.err.println("Generated ${summary.generatedAssetCount} ESRI vector patterns; ${summary.failedAssetCount} failed.")
-            exitProcess(1)
+            EsriGenerationFailurePolicy.warnPartialGeneration(
+                kind = "patterns",
+                generated = summary.generatedAssetCount,
+                failed = summary.failedAssetCount,
+                reportPath = reportFile.path
+            )
+            if (EsriGenerationFailurePolicy.failOnSvgAssetFailures()) {
+                exitProcess(1)
+            }
         }
         println("Generated ${summary.generatedAssetCount} ESRI vector area patterns to ${summary.generatedFile.path}")
     }

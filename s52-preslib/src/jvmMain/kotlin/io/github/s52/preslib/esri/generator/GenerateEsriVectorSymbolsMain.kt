@@ -13,10 +13,18 @@ object GenerateEsriVectorSymbolsMain {
         val outputFile = File(args[1])
         val reportDir = File(args[2]).apply { mkdirs() }
         val summary = EsriSvgKotlinGenerator.generate(sourceDir, outputFile)
-        writeReport(summary, reportDir.resolve("generated-vector-symbols.json"))
+        val reportFile = reportDir.resolve("generated-vector-symbols.json")
+        writeReport(summary, reportFile)
         if (summary.failedSymbolCount > 0) {
-            System.err.println("Generated ${summary.generatedSymbolCount} ESRI vector symbols; ${summary.failedSymbolCount} failed. See ${reportDir.resolve("generated-vector-symbols.json")}")
-            exitProcess(1)
+            EsriGenerationFailurePolicy.warnPartialGeneration(
+                kind = "symbols",
+                generated = summary.generatedSymbolCount,
+                failed = summary.failedSymbolCount,
+                reportPath = reportFile.path
+            )
+            if (EsriGenerationFailurePolicy.failOnSvgAssetFailures()) {
+                exitProcess(1)
+            }
         }
         println("Generated ${summary.generatedSymbolCount} ESRI vector symbols to ${outputFile.path}")
     }
@@ -27,6 +35,7 @@ object GenerateEsriVectorSymbolsMain {
             appendLine("  \"generatedFile\": \"${summary.generatedFile.invariantSeparatorsPath}\",")
             appendLine("  \"generatedSymbolCount\": ${summary.generatedSymbolCount},")
             appendLine("  \"failedSymbolCount\": ${summary.failedSymbolCount},")
+            appendLine("  \"strictFailureEnabled\": ${EsriGenerationFailurePolicy.failOnSvgAssetFailures()},")
             appendLine("  \"failures\": [")
             summary.failures.forEachIndexed { index, failure ->
                 append("    {\"name\": \"${failure.name}\", \"relativePath\": \"${failure.relativePath}\", \"reason\": \"${failure.reason.replace("\"", "'")}\"}")

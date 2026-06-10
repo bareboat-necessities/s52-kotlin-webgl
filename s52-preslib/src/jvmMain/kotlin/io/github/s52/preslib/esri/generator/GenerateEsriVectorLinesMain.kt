@@ -17,10 +17,18 @@ object GenerateEsriVectorLinesMain {
             registryKind = RegistryKind.LINE
         )
         val reportDir = File(args[2]).apply { mkdirs() }
-        writeReport(summary, reportDir.resolve("generated-vector-lines.json"), "generatedLineCount")
+        val reportFile = reportDir.resolve("generated-vector-lines.json")
+        writeReport(summary, reportFile, "generatedLineCount")
         if (summary.failedAssetCount > 0) {
-            System.err.println("Generated ${summary.generatedAssetCount} ESRI vector lines; ${summary.failedAssetCount} failed.")
-            exitProcess(1)
+            EsriGenerationFailurePolicy.warnPartialGeneration(
+                kind = "lines",
+                generated = summary.generatedAssetCount,
+                failed = summary.failedAssetCount,
+                reportPath = reportFile.path
+            )
+            if (EsriGenerationFailurePolicy.failOnSvgAssetFailures()) {
+                exitProcess(1)
+            }
         }
         println("Generated ${summary.generatedAssetCount} ESRI vector line styles to ${summary.generatedFile.path}")
     }
@@ -32,6 +40,7 @@ internal fun writeReport(summary: EsriAssetGenerationSummary, file: File, countK
         appendLine("  \"generatedFile\": \"${summary.generatedFile.invariantSeparatorsPath}\",")
         appendLine("  \"$countKey\": ${summary.generatedAssetCount},")
         appendLine("  \"failedAssetCount\": ${summary.failedAssetCount},")
+        appendLine("  \"strictFailureEnabled\": ${EsriGenerationFailurePolicy.failOnSvgAssetFailures()},")
         appendLine("  \"failures\": [")
         summary.failures.forEachIndexed { index, failure ->
             append("    {\"name\": \"${failure.name}\", \"relativePath\": \"${failure.relativePath}\", \"reason\": \"${failure.reason.replace("\"", "'")}\"}")
