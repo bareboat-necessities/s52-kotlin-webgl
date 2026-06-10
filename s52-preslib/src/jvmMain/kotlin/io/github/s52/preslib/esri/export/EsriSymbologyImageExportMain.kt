@@ -110,6 +110,7 @@ object EsriSymbologyImageExportMain {
             atlasLayout
         )
         writeIndex(outputDir.resolve("index.html"), symbolSlots, lineSlots, patternSlots, objectSlots, renderable, failures, atlasLayout)
+        writeAtlasScreenshotPage(outputDir.resolve("atlas-screenshot.html"), atlasLayout)
         writeReport(
             reportDir.resolve("esri-opencpn-atlas-match.json"),
             outputDir,
@@ -368,6 +369,23 @@ object EsriSymbologyImageExportMain {
             }
             appendLine("</div>")
             if (symbols.size > 500) appendLine("<p>Only first 500 point SVG previews shown; all ${symbols.size} OpenCPN-named SVG files are present under <code>symbols/</code>.</p>")
+            appendLine("</body></html>")
+        })
+    }
+
+    private fun writeAtlasScreenshotPage(file: File, atlasLayout: AtlasLayout) {
+        file.writeText(buildString {
+            appendLine("<!doctype html>")
+            appendLine("<html><head><meta charset=\"utf-8\"><title>ESRI symbol atlas browser screenshot</title>")
+            appendLine("<style>body{font-family:system-ui,sans-serif;margin:24px;background:#fff;color:#111} .atlas{margin:0 0 28px} img{display:block;width:${atlasLayout.widthPx}px;height:${atlasLayout.heightPx}px;max-width:none;border:1px solid #ccc} h1{margin-top:0} h2{margin:0 0 8px}</style>")
+            appendLine("</head><body>")
+            appendLine("<h1>ESRI / INT1 OpenCPN-compatible symbol atlas</h1>")
+            appendLine("<p>Browser-rendered screenshot source for the uploaded ESRI atlas PNG artifact. Atlas grid: ${atlasLayout.columns} × ${atlasLayout.rows}, cell ${CellPx}px.</p>")
+            appendLine("<section id=\"symbol-atlases\" aria-label=\"ESRI symbol atlases\">")
+            appendLine("<div class=\"atlas\"><h2>Day</h2><img src=\"symbol-atlas-day.png\" alt=\"ESRI day symbol atlas, OpenCPN-compatible names\"></div>")
+            appendLine("<div class=\"atlas\"><h2>Dusk</h2><img src=\"symbol-atlas-dusk.png\" alt=\"ESRI dusk symbol atlas, OpenCPN-compatible names\"></div>")
+            appendLine("<div class=\"atlas\"><h2>Dark</h2><img src=\"symbol-atlas-dark.png\" alt=\"ESRI dark symbol atlas, OpenCPN-compatible names\"></div>")
+            appendLine("</section>")
             appendLine("</body></html>")
         })
     }
