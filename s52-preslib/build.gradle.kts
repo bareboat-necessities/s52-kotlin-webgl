@@ -144,7 +144,6 @@ tasks.register<JavaExec>("esriCoverageReport") {
 }
 
 
-
 tasks.register<JavaExec>("generateEsriVectorSymbols") {
     group = "generation"
     description = "Phase ESRI-3: parses ESRI SVG assets, generates Kotlin vector mesh symbol registry, and writes a generation report."
@@ -304,6 +303,27 @@ tasks.register<JavaExec>("generateEsriPresLib") {
     outputs.dir(esriReportDirProvider)
 }
 
+val esriGeneratedKotlinWriterTaskNames = listOf(
+    "generateEsriVectorSymbols",
+    "generateEsriVectorLines",
+    "generateEsriVectorPatterns",
+    "generateEsriDirectRules",
+    "generateEsriPresLib"
+)
+
+// The ESRI generators intentionally refresh generated registries under src/commonMain/kotlin
+// so the repository can keep useful fallback placeholders while CI can regenerate real INT1 data.
+// When criticalEsriCheck puts both generation and Kotlin compilation in the same task graph,
+// Gradle 8.14 correctly requires an explicit ordering edge for compile tasks that read that
+// source directory. mustRunAfter is used instead of dependsOn to avoid a cycle: the generators
+// run as JavaExec tools from the JVM main compilation, while Kotlin compile tasks only need a
+// deterministic order when the generators are already in the requested task graph.
+tasks.matching { task ->
+    task.name.startsWith("compile") && task.name.contains("Kotlin")
+}.configureEach {
+    mustRunAfter(esriGeneratedKotlinWriterTaskNames)
+}
+
 tasks.register<JavaExec>("checkEsriStrictCoverage") {
     group = "verification"
     description = "Phase ESRI-11: writes strict ESRI coverage closure reports and optionally fails unresolved release coverage."
@@ -365,7 +385,6 @@ tasks.register<JavaExec>("esriNoaaSmokeTest") {
     inputs.file(fixture)
     outputs.dir(esriReportDirProvider)
 }
-
 
 
 tasks.register<JavaExec>("exportEsriSymbologyImages") {
