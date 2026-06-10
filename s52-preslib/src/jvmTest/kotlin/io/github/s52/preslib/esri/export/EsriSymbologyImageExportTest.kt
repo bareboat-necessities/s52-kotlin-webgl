@@ -78,6 +78,8 @@ class EsriSymbologyImageExportTest {
         )
 
         assertTrue(svg.contains("data-enhanced-svg=\"true\""))
+        assertTrue(svg.contains("data-match-kind=\"ALIAS\""))
+        assertTrue(svg.contains("data-enhancement-palette=\"opencpn-inspired-day\""))
         assertTrue(svg.contains("fill:#ffd21f"), "Light symbols should receive an OpenCPN/S-52-inspired yellow fill")
         assertTrue(svg.contains("id=\"opencpn-enhancement\""), "Enhanced SVGs should carry deterministic identity/category marks")
         assertFalse(svg.contains("<?xml"), "Enhanced SVG copies must remain browser-loadable after metadata injection")

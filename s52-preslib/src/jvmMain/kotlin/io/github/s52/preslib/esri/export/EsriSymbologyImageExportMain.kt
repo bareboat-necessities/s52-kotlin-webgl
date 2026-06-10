@@ -87,6 +87,7 @@ object EsriSymbologyImageExportMain {
         writeEnhancedSvgSlots(lineSlots, enhancedOut.resolve("lines").apply { mkdirs() })
         writeEnhancedSvgSlots(patternSlots, enhancedOut.resolve("patterns").apply { mkdirs() })
         writeEnhancedObjectSlots(objectSlots, enhancedOut.resolve("objects").apply { mkdirs() })
+        writeEnhancedSvgSetManifest(enhancedOut, symbolSlots, lineSlots, patternSlots, objectSlots)
 
         val pointResults = symbolSlots.map { slot -> loadPointAsset(slot) }
         val renderable = pointResults.filterIsInstance<AtlasPointAsset>()
@@ -197,6 +198,46 @@ object EsriSymbologyImageExportMain {
         }
     }
 
+
+    private fun writeEnhancedSvgSetManifest(
+        outputDir: File,
+        symbols: List<OpenCpnEsriSlot>,
+        lines: List<OpenCpnEsriSlot>,
+        patterns: List<OpenCpnEsriSlot>,
+        objects: List<OpenCpnEsriObjectSlot>
+    ) {
+        val all = symbols + lines + patterns
+        outputDir.resolve("manifest.properties").writeText(buildString {
+            appendLine("kind=esri-enhanced-svg-portrayal-input")
+            appendLine("palette=opencpn-inspired-day")
+            appendLine("sourceGeometry=esri-nautical-chart-symbols")
+            appendLine("coverageOracle=OpenCpnGeneratedPresLib")
+            appendLine("uploadIntent=intermediate-portrayal-input")
+            appendLine("generatedAt=${Instant.now()}")
+            appendLine("symbols=${symbols.size}")
+            appendLine("lines=${lines.size}")
+            appendLine("patterns=${patterns.size}")
+            appendLine("objects=${objects.size}")
+            appendLine("files=${symbols.size + lines.size + patterns.size + objects.size}")
+            appendLine("resolved=${all.count { it.matchKind != MatchKind.UNRESOLVED } + objects.count { it.assetSlot.matchKind != MatchKind.UNRESOLVED }}")
+            appendLine("unresolved=${all.count { it.matchKind == MatchKind.UNRESOLVED } + objects.count { it.assetSlot.matchKind == MatchKind.UNRESOLVED }}")
+            appendLine("identityOverlay=true")
+            appendLine("monochromeRecolored=true")
+        }, Charsets.UTF_8)
+        outputDir.resolve("README.md").writeText(buildString {
+            appendLine("# ESRI enhanced SVG portrayal-input set")
+            appendLine()
+            appendLine("This directory is the intermediate handoff between raw ESRI nautical chart SVGs and the generated ESRI/OpenCPN portrayal layer.")
+            appendLine()
+            appendLine("- `symbols/`, `lines/`, and `patterns/` follow the OpenCPN generated symbology name contract.")
+            appendLine("- `objects/` follows the OpenCPN lookup object acronym contract for object-level review.")
+            appendLine("- Resolved files preserve ESRI geometry, recolor monochrome paths with OpenCPN/S-52-inspired day colors, and add deterministic identity/category overlays.")
+            appendLine("- Unresolved slots are visible review placeholders, not generic substitutes for production portrayal.")
+            appendLine()
+            appendLine("Counts: `${symbols.size}` symbols, `${lines.size}` lines, `${patterns.size}` patterns, `${objects.size}` objects.")
+        }, Charsets.UTF_8)
+    }
+
     private fun enhancedSvgForSlot(slot: OpenCpnEsriSlot): String {
         val source = slot.esriFile
         return if (source != null && source.isFile) {
@@ -226,7 +267,7 @@ object EsriSymbologyImageExportMain {
         var body = esriSvgCopyAsStandaloneXml(sourceXml, metadata).trimEnd()
         body = body.replaceFirst(
             Regex("""<svg\b""", RegexOption.IGNORE_CASE),
-            "<svg data-opencpn-name=\"${html(openCpnName)}\" data-enhanced-svg=\"true\""
+            "<svg data-opencpn-name=\"${html(openCpnName)}\" data-esri-source=\"${html(esriName)}\" data-match-kind=\"${html(matchKind)}\" data-enhancement-palette=\"opencpn-inspired-day\" data-enhanced-svg=\"true\""
         )
         body = replacePaint(body, "fill", colors.primary)
         body = replacePaint(body, "stroke", colors.outline)

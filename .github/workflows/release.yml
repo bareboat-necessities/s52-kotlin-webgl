@@ -112,6 +112,13 @@ jobs:
           path: s52-preslib/build/s52-esri-symbology-images
           if-no-files-found: error
 
+      - name: Upload enhanced ESRI SVG portrayal input set
+        uses: actions/upload-artifact@v4
+        with:
+          name: esri-enhanced-svg-portrayal-input
+          path: s52-preslib/build/s52-esri-symbology-images/enhanced-svg
+          if-no-files-found: error
+
       - name: Upload ESRI atlas browser screenshot
         uses: actions/upload-artifact@v4
         with:
