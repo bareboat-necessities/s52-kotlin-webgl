@@ -79,3 +79,71 @@ tasks.register<JavaExec>("generateOpenCpnPresLib") {
     outputs.file(outputFile)
 }
 
+val esriSourceDirProvider = providers.gradleProperty("esri.sourceDir")
+    .orElse(providers.environmentVariable("ESRI_NAUTICAL_CHART_SYMBOLS_DIR"))
+    .orElse(rootProject.layout.projectDirectory.dir("s52/esri/source").asFile.absolutePath)
+
+val esriReportDirProvider = layout.buildDirectory.dir("reports/esri")
+
+tasks.register<JavaExec>("esriInventory") {
+    group = "verification"
+    description = "Inventories ESRI CustomPresentationLibrary XML, Lua, and SVG sources for phases ESRI-0/1."
+
+    val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
+    dependsOn("jvmMainClasses")
+    classpath = files(jvmCompilation.output.allOutputs, jvmCompilation.runtimeDependencyFiles)
+    mainClass.set("io.github.s52.preslib.esri.importer.EsriInventoryMain")
+
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf(
+            esriSourceDirProvider.get(),
+            esriReportDirProvider.get().asFile.absolutePath
+        )
+    })
+    outputs.dir(esriReportDirProvider)
+}
+
+tasks.register<JavaExec>("validateEsriSvgSubset") {
+    group = "verification"
+    description = "Validates that ESRI SVG symbols fit the phase ESRI-2 parser subset."
+
+    val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
+    dependsOn("jvmMainClasses")
+    classpath = files(jvmCompilation.output.allOutputs, jvmCompilation.runtimeDependencyFiles)
+    mainClass.set("io.github.s52.preslib.esri.svg.ValidateEsriSvgSubsetMain")
+
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf(
+            esriSourceDirProvider.get(),
+            esriReportDirProvider.get().asFile.absolutePath
+        )
+    })
+    outputs.dir(esriReportDirProvider)
+}
+
+tasks.register<JavaExec>("esriCoverageReport") {
+    group = "verification"
+    description = "Writes the phase ESRI-1 OpenCPN coverage oracle and initial ESRI direct-rule gap report."
+
+    val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
+    dependsOn("jvmMainClasses")
+    classpath = files(jvmCompilation.output.allOutputs, jvmCompilation.runtimeDependencyFiles)
+    mainClass.set("io.github.s52.preslib.esri.importer.EsriCoverageReportMain")
+
+    val openCpnGenerated = layout.projectDirectory.file("src/commonMain/kotlin/io/github/s52/preslib/opencpn/generated/OpenCpnGeneratedPresLib.kt")
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf(
+            esriSourceDirProvider.get(),
+            openCpnGenerated.asFile.absolutePath,
+            esriReportDirProvider.get().asFile.absolutePath
+        )
+    })
+    inputs.file(openCpnGenerated)
+    outputs.dir(esriReportDirProvider)
+}
+
+tasks.register("criticalEsriCheck") {
+    group = "verification"
+    description = "Runs phases ESRI-0/1/2 source-boundary, inventory, initial coverage, and SVG subset checks."
+    dependsOn("esriInventory", "esriCoverageReport", "validateEsriSvgSubset", "jvmTest")
+}
