@@ -1,0 +1,9 @@
+# opencpn_symbol	esri_symbol	confidence	reason
+BOYCON01	Q20b_Conical_buoy.svg	medium	Seed INT1 conical buoy equivalent; refine after full OpenCPN symbol extraction.
+BOYSPH01	Q22a_Spherical_buoy.svg	medium	Seed INT1 spherical buoy equivalent.
+BCNSTK01	Q90_Stake_pole.svg	medium	Seed stake/pole beacon equivalent.
+WRECKS01	K24_Wreck_showing_hull.svg	medium	Seed wreck hull equivalent.
+WRECKS05	K25_Wreck_danger_no_depth.svg	medium	Seed dangerous wreck no-depth equivalent.
+LIGHTS82	P1_Light.svg	low	Seed generic light symbol; sector/flaring handled by lights CSP.
+ISODGR01	GENERATED_ISODGR01	medium	Required S-52 isolated danger symbol referenced by ESRI Lua; generated composite planned.
+LOWACC01	GENERATED_LOWACC01	medium	Required low-accuracy point marker; generated composite planned.

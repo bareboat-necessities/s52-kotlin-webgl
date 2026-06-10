@@ -1,0 +1,4 @@
+# opencpn_line	esri_line	confidence	reason
+LOWACC41	GENERATED_LOWACC41	medium	Required by wrecks/obstruction low-accuracy area portrayal.
+CBLSUB01	L30_Cable.svg	low	Seed submarine cable equivalent.
+CBLOHD01	L31_1_PowerCable.svg	low	Seed overhead/power cable equivalent when applicable.

@@ -1,0 +1,3 @@
+# opencpn_pattern	esri_pattern	confidence	reason
+FOULAR01	GENERATED_FOULAR01	low	Seed foul-area equivalent; requires visual review.
+NODATA03	GENERATED_NODATA03	low	Seed no-data fill equivalent; requires visual review.

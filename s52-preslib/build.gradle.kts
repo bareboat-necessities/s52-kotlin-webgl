@@ -165,8 +165,70 @@ tasks.register<JavaExec>("generateEsriVectorSymbols") {
     outputs.dir(esriReportDirProvider)
 }
 
+
+tasks.register<JavaExec>("generateEsriDirectRules") {
+    group = "generation"
+    description = "Phase ESRI-5: generates Kotlin direct/function rule registry from ESRI CustomSymbolMap.xml."
+
+    val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
+    dependsOn("jvmMainClasses")
+    classpath = files(jvmCompilation.output.allOutputs, jvmCompilation.runtimeDependencyFiles)
+    mainClass.set("io.github.s52.preslib.esri.generator.GenerateEsriDirectRulesMain")
+
+    val outputFile = layout.projectDirectory.file("src/commonMain/kotlin/io/github/s52/preslib/esri/generated/EsriGeneratedRuleRegistry.kt")
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf(
+            esriSourceDirProvider.get(),
+            outputFile.asFile.absolutePath,
+            esriReportDirProvider.get().asFile.absolutePath
+        )
+    })
+    outputs.file(outputFile)
+    outputs.dir(esriReportDirProvider)
+}
+
+tasks.register<JavaExec>("checkEsriAliasClosure") {
+    group = "verification"
+    description = "Phase ESRI-6: writes ESRI alias closure reports against OpenCPN symbol candidates and generated ESRI symbols."
+
+    val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
+    dependsOn("jvmMainClasses", "generateEsriVectorSymbols")
+    classpath = files(jvmCompilation.output.allOutputs, jvmCompilation.runtimeDependencyFiles)
+    mainClass.set("io.github.s52.preslib.esri.alias.EsriAliasClosureReportMain")
+
+    val openCpnGenerated = layout.projectDirectory.file("src/commonMain/kotlin/io/github/s52/preslib/opencpn/generated/OpenCpnGeneratedPresLib.kt")
+    val generatedSymbols = layout.projectDirectory.file("src/commonMain/kotlin/io/github/s52/preslib/esri/generated/EsriGeneratedSymbolRegistry.kt")
+    val aliasDir = rootProject.layout.projectDirectory.dir("s52/esri")
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf(
+            esriSourceDirProvider.get(),
+            openCpnGenerated.asFile.absolutePath,
+            generatedSymbols.asFile.absolutePath,
+            aliasDir.asFile.absolutePath,
+            esriReportDirProvider.get().asFile.absolutePath
+        )
+    })
+    inputs.file(openCpnGenerated)
+    inputs.file(generatedSymbols)
+    inputs.files(
+        aliasDir.file("esri-symbol-aliases.tsv"),
+        aliasDir.file("esri-line-aliases.tsv"),
+        aliasDir.file("esri-pattern-aliases.tsv")
+    )
+    outputs.dir(esriReportDirProvider)
+}
+
 tasks.register("criticalEsriCheck") {
     group = "verification"
-    description = "Runs phases ESRI-0 through ESRI-4 inventory, SVG subset, vector Kotlin generation, and JVM tests."
-    dependsOn("esriInventory", "esriCoverageReport", "validateEsriSvgSubset", "generateEsriVectorSymbols", "jvmTest", ":s52-render-webgl:build")
+    description = "Runs phases ESRI-0 through ESRI-7 inventory, SVG subset, vector Kotlin generation, direct XML rules, alias closure, CSP tests, and WebGL build."
+    dependsOn(
+        "esriInventory",
+        "esriCoverageReport",
+        "validateEsriSvgSubset",
+        "generateEsriVectorSymbols",
+        "generateEsriDirectRules",
+        "checkEsriAliasClosure",
+        "jvmTest",
+        ":s52-render-webgl:build"
+    )
 }
