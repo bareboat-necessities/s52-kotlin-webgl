@@ -80,3 +80,14 @@ Generated reports are written to:
 ```text
 s52-preslib/build/reports/esri/
 ```
+
+## Enhanced OpenCPN-compatible SVG handoff
+
+The ESRI image export now produces an intermediate `enhanced-svg/` directory under `s52-preslib/build/s52-esri-symbology-images/`.  This set is intended to be the portrayal-input handoff before Kotlin vector generation:
+
+- it is keyed by OpenCPN symbol, line, pattern, and lookup-object names;
+- resolved files retain ESRI SVG geometry but recolor monochrome artwork with OpenCPN/S-52-inspired day colors;
+- each file carries `data-opencpn-name`, match metadata, and deterministic category/identity overlays so repeated ESRI source shapes remain visually distinct;
+- unresolved matches are explicit visible review placeholders rather than silent generic substitutes.
+
+CI and release workflows upload this directory separately as the `esri-enhanced-svg-portrayal-input` artifact, in addition to the full ESRI symbology-image artifact.
