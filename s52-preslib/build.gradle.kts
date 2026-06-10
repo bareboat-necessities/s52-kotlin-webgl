@@ -431,6 +431,18 @@ tasks.register<Zip>("criticalEsriSymbologyImagesArchive") {
     }
 }
 
+tasks.register<Zip>("enhancedEsriSvgSetArchive") {
+    group = "distribution"
+    description = "Archives the OpenCPN-comparable enhanced ESRI SVG portrayal-input set for upload/review before portrayal generation."
+    dependsOn("exportEsriSymbologyImages")
+    archiveBaseName.set("s52-kotlin-webgl-esri-enhanced-svg-set")
+    archiveClassifier.set("portrayal-input")
+    archiveVersion.set(project.version.toString())
+    from(layout.buildDirectory.dir("s52-esri-symbology-images/enhanced-svg")) {
+        into("enhanced-svg")
+    }
+}
+
 tasks.register("criticalEsriCheck") {
     group = "verification"
     description = "Runs phases ESRI-0 through ESRI-12: inventory, SVG validation, vector generation, direct rules, aliases, CSP/profile tests, coverage reports, NOAA smoke, and WebGL build."
