@@ -392,7 +392,7 @@ tasks.register<JavaExec>("esriNoaaSmokeTest") {
 
 tasks.register<JavaExec>("exportEsriSymbologyImages") {
     group = "documentation"
-    description = "Exports ESRI/INT1 symbology browser artifacts and three point-symbol PNG atlases from the ESRI SVG source tree."
+    description = "Exports OpenCPN-name-compatible ESRI/INT1 symbology artifacts and three point-symbol PNG atlases."
 
     val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
     dependsOn(
