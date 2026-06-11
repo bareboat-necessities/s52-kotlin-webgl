@@ -25,7 +25,9 @@ class S57CatalogTest {
     fun commonS52ObjectClassesArePresentForFutureLookupTables() {
         listOf(
             "DEPARE", "DEPCNT", "SOUNDG", "WRECKS", "OBSTRN", "LIGHTS", "TOPMAR",
-            "RESARE", "M_QUAL", "M_COVR", "LNDARE", "COALNE", "BOYLAT", "BCNLAT"
+            "RESARE", "M_QUAL", "M_COVR", "LNDARE", "COALNE", "BOYLAT", "BCNLAT",
+            "ACHBRT", "BUAARE", "CBLARE", "CTNARE", "DRYDOC", "HRBFAC", "LNDRGN",
+            "PIPARE", "SLOTOP", "UNSARE"
         ).forEach { acronym ->
             assertNotNull(S57ObjectClass.fromAcronym(acronym), "Missing object class $acronym")
         }
@@ -35,10 +37,52 @@ class S57CatalogTest {
     fun commonCspAttributesArePresentForFutureProcedures() {
         listOf(
             "DRVAL1", "DRVAL2", "VALSOU", "WATLEV", "CATWRK", "CATOBS", "COLOUR",
-            "CATLAM", "LITCHR", "SIGGRP", "SIGPER", "SECTR1", "SECTR2", "CATZOC"
+            "CATLAM", "LITCHR", "SIGGRP", "SIGPER", "SECTR1", "SECTR2", "CATZOC",
+            "CATAIR", "CATSEA", "CATSPM", "CATSIL", "CATSLC", "NATSUR", "TRAFIC"
         ).forEach { acronym ->
             assertNotNull(S57Attribute.fromAcronym(acronym), "Missing attribute $acronym")
         }
+    }
+
+    @Test
+    fun projectLogObjectClassesAndPrimitivesAreAccepted() {
+        mapOf(
+            S57ObjectClass.ACHBRT to listOf(PrimitiveType.Point, PrimitiveType.Area),
+            S57ObjectClass.BUAARE to listOf(PrimitiveType.Point, PrimitiveType.Area),
+            S57ObjectClass.CBLARE to listOf(PrimitiveType.Area),
+            S57ObjectClass.CTNARE to listOf(PrimitiveType.Point, PrimitiveType.Area),
+            S57ObjectClass.DRYDOC to listOf(PrimitiveType.Area),
+            S57ObjectClass.HRBFAC to listOf(PrimitiveType.Point, PrimitiveType.Area),
+            S57ObjectClass.LNDRGN to listOf(PrimitiveType.Point, PrimitiveType.Area),
+            S57ObjectClass.PIPARE to listOf(PrimitiveType.Point, PrimitiveType.Area),
+            S57ObjectClass.SLOTOP to listOf(PrimitiveType.Point, PrimitiveType.Line),
+            S57ObjectClass.UNSARE to listOf(PrimitiveType.Area),
+            S57ObjectClass.SBDARE to listOf(PrimitiveType.Point, PrimitiveType.Line, PrimitiveType.Area),
+            S57ObjectClass.SLCONS to listOf(PrimitiveType.Point, PrimitiveType.Line, PrimitiveType.Area),
+            S57ObjectClass.MAGVAR to listOf(PrimitiveType.Point, PrimitiveType.Line, PrimitiveType.Area),
+            S57ObjectClass.BUISGL to listOf(PrimitiveType.Point, PrimitiveType.Area),
+            S57ObjectClass.LNDARE to listOf(PrimitiveType.Point, PrimitiveType.Line, PrimitiveType.Area)
+        ).forEach { (objectClass, primitives) ->
+            primitives.forEach { primitive ->
+                assertTrue(objectClass.supports(primitive), "${objectClass.acronym} should support $primitive")
+            }
+        }
+    }
+
+    @Test
+    fun projectLogAttributesAreKnownToRuntimeCatalogue() {
+        listOf(
+            S57Attribute.CATAIR,
+            S57Attribute.CATSEA,
+            S57Attribute.CATSPM,
+            S57Attribute.CATSIL,
+            S57Attribute.CATSLC,
+            S57Attribute.NATSUR,
+            S57Attribute.TRAFIC
+        ).forEach { attribute ->
+            assertEquals(attribute, S57Attribute.fromAcronym(attribute.acronym))
+        }
+        assertEquals(S57AttributeValueKind.EnumerationList, S57Attribute.NATSUR.valueKind)
     }
 
     @Test

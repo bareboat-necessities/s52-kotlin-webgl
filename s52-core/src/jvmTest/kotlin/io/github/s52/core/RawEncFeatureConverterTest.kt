@@ -87,6 +87,39 @@ class RawEncFeatureConverterTest {
         )
     }
 
+    @Test
+    fun convertsProjectLogObjectClassesAttributesAndPrimitives() {
+        val raw = RawEncFeature(
+            id = 14,
+            objectClassAcronym = "SBDARE",
+            primitive = PrimitiveType.Point,
+            rawAttributes = mapOf(
+                "NATSUR" to S57Value.ListValue(listOf(S57Value.Integer(1), S57Value.Integer(4)))
+            ),
+            geometry = EncGeometry.Point(Coordinate(-74.0, 40.0))
+        )
+
+        val feature = raw.toTypedFeature()
+
+        assertEquals(S57ObjectClass.SBDARE, feature.objectClass)
+        assertEquals(listOf(1, 4), feature.attributes.ints(S57Attribute.NATSUR))
+    }
+
+    @Test
+    fun convertsProjectLogSpecialPurposeMarkAttributes() {
+        val raw = RawEncFeature(
+            id = 15,
+            objectClassAcronym = "BOYSPP",
+            primitive = PrimitiveType.Point,
+            rawAttributes = mapOf("CATSPM" to S57Value.Integer(6)),
+            geometry = EncGeometry.Point(Coordinate(-74.0, 40.0))
+        )
+
+        val feature = raw.toTypedFeature()
+
+        assertEquals(6, feature.attributes.int(S57Attribute.CATSPM))
+    }
+
     private fun samplePolygon(): EncGeometry.Polygon = EncGeometry.Polygon(
         outer = listOf(
             Coordinate(-74.0, 40.0),

@@ -84,7 +84,8 @@ internal class RasterAtlasCache(
             val image = document.createElement("img") as HTMLImageElement
             image.onload = { _ ->
                 gl.bindTexture(WebGLRenderingContext.TEXTURE_2D, texture)
-                gl.asDynamic().texImage2D(
+                uploadTexImage2DFromImage(
+                    gl,
                     WebGLRenderingContext.TEXTURE_2D,
                     0,
                     WebGLRenderingContext.RGBA,
@@ -113,5 +114,19 @@ internal class RasterAtlasCache(
 
     private companion object {
         private val atlases = mutableMapOf<String, Entry>()
+
+        @Suppress("UnsafeCastFromDynamic")
+        private fun uploadTexImage2DFromImage(
+            gl: WebGLRenderingContext,
+            target: Int,
+            level: Int,
+            internalFormat: Int,
+            format: Int,
+            type: Int,
+            image: HTMLImageElement
+        ) {
+            val upload: dynamic = js("(function(gl,target,level,internalFormat,format,type,image){gl.texImage2D(target,level,internalFormat,format,type,image);})")
+            upload(gl, target, level, internalFormat, format, type, image)
+        }
     }
 }
