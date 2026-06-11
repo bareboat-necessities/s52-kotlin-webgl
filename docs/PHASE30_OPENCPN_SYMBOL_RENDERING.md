@@ -12,7 +12,7 @@ styles (`LC(...)`) and area patterns (`AP(...)`) remain for the next phase.
 Implemented:
 
 - WebGL textured-quad program for raster-symbol atlases.
-- Lazy browser loading of OpenCPN raster atlases from `s52/opencpn/`.
+- Lazy browser loading of OpenCPN raster atlases from generated Kotlin data URIs.
 - Palette-to-atlas selection:
   - `DayBright`, `DayBlackBack`, `DayWhiteBack` -> `rastersymbols-day.png`
   - `Dusk` -> `rastersymbols-dusk.png`
@@ -29,16 +29,9 @@ Implemented:
 
 ## Resource layout
 
-The three OpenCPN raster atlases are copied into browser resources under:
+The three OpenCPN raster atlases are source inputs under root `s52/opencpn`, but they are not browser runtime resources.  `:s52-preslib:generateOpenCpnRasterAtlasData` embeds them into generated commonMain Kotlin as chunked base64 `data:image/png` URIs before compilation.
 
-```text
-s52/opencpn/rastersymbols-day.png
-s52/opencpn/rastersymbols-dusk.png
-s52/opencpn/rastersymbols-dark.png
-```
-
-The renderer defaults to that same relative path, so a consuming browser app can
-either use the bundled resources or serve equivalent files at the same URL.
+A consuming browser application using `s52-render-webgl` only needs the compiled Kotlin/JS library output.  It does not need to copy or serve `rastersymbols-*.png` beside its own `index.html`.
 
 ## Deliberate limitations
 

@@ -1,4 +1,5 @@
 import org.gradle.process.CommandLineArgumentProvider
+import java.util.Base64
 import org.gradle.api.tasks.bundling.Zip
 
 plugins {
@@ -25,6 +26,136 @@ kotlin {
             }
         }
     }
+
+}
+
+val openCpnRasterAtlasFileNames = listOf(
+    "rastersymbols-day.png",
+    "rastersymbols-dusk.png",
+    "rastersymbols-dark.png"
+)
+
+val generateOpenCpnRasterAtlasData = tasks.register("generateOpenCpnRasterAtlasData") {
+    group = "generation"
+    description = "Embeds OpenCPN raster-symbol PNG atlases into generated commonMain Kotlin data URIs."
+
+    val payloadDir = rootProject.layout.projectDirectory.dir("s52/opencpn")
+    val outputFile = layout.projectDirectory.file("src/commonMain/kotlin/io/github/s52/preslib/opencpn/generated/OpenCpnRasterAtlasData.kt")
+
+    inputs.files(openCpnRasterAtlasFileNames.map { payloadDir.file(it) })
+    outputs.file(outputFile)
+
+    doLast {
+        fun String.kt(): String = buildString {
+            append('"')
+            for (ch in this@kt) when (ch) {
+                '\\' -> append("\\\\")
+                '"' -> append("\\\"")
+                '\n' -> append("\\n")
+                '\r' -> append("\\r")
+                '\t' -> append("\\t")
+                '$' -> { append('\\'); append('$') }
+                else -> append(ch)
+            }
+            append('"')
+        }
+
+        fun propertyName(fileName: String): String {
+            val parts = fileName
+                .removePrefix("rastersymbols-")
+                .removeSuffix(".png")
+                .replace(Regex("[^A-Za-z0-9]+"), " ")
+                .trim()
+                .split(Regex("\\s+"))
+                .filter { it.isNotBlank() }
+            if (parts.isEmpty()) return "atlas"
+            return parts.first().replaceFirstChar { if (it.isUpperCase()) it.lowercase() else it.toString() } +
+                parts.drop(1).joinToString(separator = "") { part ->
+                    part.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+                }
+        }
+
+        val generated = buildString {
+            appendLine("package io.github.s52.preslib.opencpn.generated")
+            appendLine()
+            appendLine("/**")
+            appendLine(" * Generated from s52/opencpn/rastersymbols-*.png.")
+            appendLine(" *")
+            appendLine(" * The browser renderer consumes these data URIs directly, so host")
+            appendLine(" * applications do not need to copy rastersymbols-*.png at runtime.")
+            appendLine(" */")
+            appendLine("object OpenCpnRasterAtlasData {")
+            appendLine("    val availableFileNames: Set<String> = setOf(${openCpnRasterAtlasFileNames.joinToString { it.kt() }})")
+            appendLine()
+            appendLine("    fun dataUriFor(fileName: String): String? = when (fileName) {")
+            openCpnRasterAtlasFileNames.forEach { fileName ->
+                appendLine("        ${fileName.kt()} -> ${propertyName(fileName)}DataUri")
+            }
+            appendLine("        else -> null")
+            appendLine("    }")
+
+            openCpnRasterAtlasFileNames.forEach { fileName ->
+                val file = payloadDir.file(fileName).asFile
+                require(file.isFile) { "Missing OpenCPN raster atlas: ${file.absolutePath}" }
+                val base64 = Base64.getEncoder().encodeToString(file.readBytes())
+                val chunks = base64.chunked(12_000)
+                val property = propertyName(fileName)
+                appendLine()
+                appendLine("    private val ${property}DataUri: String by lazy(LazyThreadSafetyMode.PUBLICATION) {")
+                appendLine("        \"data:image/png;base64,\" + ${property}Chunks.joinToString(separator = \"\")")
+                appendLine("    }")
+                appendLine("    private val ${property}Chunks: Array<String> = arrayOf(")
+                chunks.forEachIndexed { index, chunk ->
+                    appendLine("        ${chunk.kt()}${if (index == chunks.lastIndex) "" else ","}")
+                }
+                appendLine("    )")
+            }
+            appendLine("}")
+        }
+
+        outputFile.asFile.parentFile.mkdirs()
+        outputFile.asFile.writeText(generated)
+    }
+}
+
+// Keep generated embedded PNG data fresh for every normal compile/build path.
+tasks.matching { task ->
+    task.name == "compileKotlinMetadata" ||
+        task.name == "compileCommonMainKotlinMetadata" ||
+        task.name == "metadataMainClasses" ||
+        task.name == "compileKotlinJvm" ||
+        task.name == "compileKotlinJs" ||
+        task.name == "compileProductionLibraryKotlinJs" ||
+        task.name == "compileDevelopmentExecutableKotlinJs" ||
+        task.name == "compileProductionExecutableKotlinJs" ||
+        task.name == "compileTestKotlinJs"
+}.configureEach {
+    dependsOn(generateOpenCpnRasterAtlasData)
+}
+
+
+tasks.matching { task ->
+    task.name.endsWith("SourcesJar") || task.name == "sourcesJar"
+}.configureEach {
+    dependsOn(generateOpenCpnRasterAtlasData)
+}
+
+tasks.register<JavaExec>("generateOpenCpnRasterAtlasDataWithJvmGenerator") {
+    group = "generation"
+    description = "Regenerates the embedded OpenCPN raster atlas Kotlin file using the checked-in JVM generator."
+
+    val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
+    dependsOn("jvmMainClasses")
+    classpath = files(jvmCompilation.output.allOutputs, jvmCompilation.runtimeDependencyFiles)
+    mainClass.set("io.github.s52.preslib.opencpn.generator.OpenCpnRasterAtlasDataGeneratorMain")
+
+    val payloadDir = rootProject.layout.projectDirectory.dir("s52/opencpn")
+    val outputFile = layout.projectDirectory.file("src/commonMain/kotlin/io/github/s52/preslib/opencpn/generated/OpenCpnRasterAtlasData.kt")
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf(payloadDir.asFile.absolutePath, outputFile.asFile.absolutePath)
+    })
+    inputs.files(openCpnRasterAtlasFileNames.map { payloadDir.file(it) })
+    outputs.file(outputFile)
 }
 
 tasks.register<JavaExec>("generateSymbologyImages") {

@@ -10,6 +10,8 @@ kotlin {
 
     sourceSets {
         jsMain {
+            resources.exclude("s52/opencpn/rastersymbols-*.png")
+
             dependencies {
                 implementation(libs.kotlinx.browser)
                 implementation(project(":s52-catalog"))
