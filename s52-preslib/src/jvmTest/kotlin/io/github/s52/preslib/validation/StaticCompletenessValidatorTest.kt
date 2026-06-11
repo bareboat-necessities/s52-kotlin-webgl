@@ -48,7 +48,7 @@ class StaticCompletenessValidatorTest {
                     attributeFilter = SourceAttributeFilter.TextEquals(S57Attribute.DRVAL1, "wrong-kind")
                 ),
                 SourceLookupRecord(
-                    objectClass = S57ObjectClass.LNDARE,
+                    objectClass = S57ObjectClass.DEPARE,
                     primitive = PrimitiveType.Point,
                     instruction = "SY(BROKEN",
                     displayCategory = DisplayCategory.Standard,
