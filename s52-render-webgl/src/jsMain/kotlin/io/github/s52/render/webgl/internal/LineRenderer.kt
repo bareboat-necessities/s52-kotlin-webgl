@@ -17,6 +17,15 @@ internal class LineRenderer(
         return drawGeometry(command.geometry, projector, colors.resolve(command.colorToken), lineWidth = command.width)
     }
 
+    fun renderSimpleBatch(commands: List<S52DrawCommand.LineSimple>, projector: GeometryProjector, colors: ColorResolver): Int {
+        if (commands.isEmpty()) return 0
+        val first = commands.first()
+        val vertices = lineSegments(commands, projector)
+        if (vertices.isEmpty()) return 0
+        gl.lineWidth(first.width.toFloat().coerceAtLeast(1.0f))
+        return program.draw(WebGLRenderingContext.LINES, vertices, colors.resolve(first.colorToken))
+    }
+
     fun renderComplex(command: S52DrawCommand.LineComplex, projector: GeometryProjector, colors: ColorResolver): Int {
         val style = presLib.lineStyles.find(command.lineStyleName)
         val hpgl = style?.vectorHpgl
@@ -69,7 +78,7 @@ internal class LineRenderer(
         val tileHeightPx = tileHeightPx(style, bounds)
         val originX = bounds.minX
         val originY = if (style.height > 0.0) style.pivotY else bounds.centerY
-        val floats = ArrayList<Float>()
+        val floats = FloatArrayBuilder()
 
         for (i in 0 until coordinates.lastIndex) {
             val a = projector.project(coordinates[i])
@@ -112,7 +121,7 @@ internal class LineRenderer(
     }
 
     private fun appendLineStyleTile(
-        out: MutableList<Float>,
+        out: FloatArrayBuilder,
         hpglSegments: List<HpglLineSegment>,
         originX: Double,
         originY: Double,
@@ -137,8 +146,7 @@ internal class LineRenderer(
         for (segment in hpglSegments) {
             val a = point(segment.x1, segment.y1)
             val b = point(segment.x2, segment.y2)
-            out.add(a.x); out.add(a.y)
-            out.add(b.x); out.add(b.y)
+            out.addLine(a, b)
         }
     }
 
@@ -161,12 +169,38 @@ internal class LineRenderer(
     }
 
     private fun List<Coordinate>.toVertices(projector: GeometryProjector): FloatArray {
-        val floats = ArrayList<Float>(size * 2)
+        val floats = FloatArrayBuilder(size * 2)
         for (coordinate in this) {
             val point = projector.project(coordinate)
-            floats.add(point.x); floats.add(point.y)
+            floats.add(point.x, point.y)
         }
         return floats.toFloatArray()
+    }
+
+    private fun lineSegments(commands: List<S52DrawCommand.LineSimple>, projector: GeometryProjector): FloatArray {
+        val floats = FloatArrayBuilder(commands.size * 8)
+        for (command in commands) {
+            when (val geometry = command.geometry) {
+                is EncGeometry.LineString -> appendLineStripSegments(geometry.coordinates, projector, floats)
+                is EncGeometry.Polygon -> appendLineStripSegments(geometry.outer, projector, floats)
+                else -> Unit
+            }
+        }
+        return floats.toFloatArray()
+    }
+
+    private fun appendLineStripSegments(
+        coordinates: List<Coordinate>,
+        projector: GeometryProjector,
+        out: FloatArrayBuilder
+    ) {
+        if (coordinates.size < 2) return
+        var previous = projector.project(coordinates[0])
+        for (i in 1 until coordinates.size) {
+            val next = projector.project(coordinates[i])
+            out.addLine(previous, next)
+            previous = next
+        }
     }
 
     private companion object {

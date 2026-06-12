@@ -31,7 +31,7 @@ internal object LineGlyphFont {
 
     fun lineVertices(text: String, anchor: ClipPoint, projector: GeometryProjector, pixelSize: Double): FloatArray {
         val normalized = text.uppercase().take(48)
-        val floats = ArrayList<Float>(normalized.length * 12)
+        val floats = FloatArrayBuilder(normalized.length * 12)
         val totalWidthPx = normalized.length * CHAR_ADVANCE * pixelSize
         appendGlyphs(
             out = floats,
@@ -60,7 +60,7 @@ internal object LineGlyphFont {
         val totalWidthPx = mainWidthPx + gapPx + fractionWidthPx
         val leftPx = -totalWidthPx * 0.5
 
-        val floats = ArrayList<Float>((parts.main.length + parts.fraction.length) * 12)
+        val floats = FloatArrayBuilder((parts.main.length + parts.fraction.length) * 12)
         appendGlyphs(
             out = floats,
             text = parts.main,
@@ -85,7 +85,7 @@ internal object LineGlyphFont {
     }
 
     private fun appendGlyphs(
-        out: MutableList<Float>,
+        out: FloatArrayBuilder,
         text: String,
         anchor: ClipPoint,
         projector: GeometryProjector,
@@ -105,7 +105,7 @@ internal object LineGlyphFont {
     }
 
     private fun appendSegment(
-        out: MutableList<Float>,
+        out: FloatArrayBuilder,
         segment: Segment,
         anchor: ClipPoint,
         sx: Double,
@@ -120,15 +120,14 @@ internal object LineGlyphFont {
     }
 
     private fun appendPoint(
-        out: MutableList<Float>,
+        out: FloatArrayBuilder,
         anchor: ClipPoint,
         sx: Double,
         sy: Double,
         localXpx: Double,
         localYpx: Double
     ) {
-        out += (anchor.x + localXpx * sx).toFloat()
-        out += (anchor.y - localYpx * sy).toFloat()
+        out.add((anchor.x + localXpx * sx).toFloat(), (anchor.y - localYpx * sy).toFloat())
     }
 
     private fun normalizeSounding(label: String): SoundingParts {

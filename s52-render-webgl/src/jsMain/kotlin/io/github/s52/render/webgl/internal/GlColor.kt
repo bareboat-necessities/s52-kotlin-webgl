@@ -10,22 +10,38 @@ internal class ColorResolver(
     private val presLib: PresLibPack,
     private val palette: S52Palette
 ) {
+    private val cache = HashMap<String, GlColor>()
+    private val colorCache = HashMap<String, S52Color?>()
+
     fun resolve(token: String?, fallback: String = "CHBLK"): GlColor {
+        val key = "${token.orEmpty()}\u0000$fallback"
+        cache[key]?.let { return it }
+
         val color = token?.let(::resolveOpenCpnToken)
-            ?: presLib.colors.color(palette, fallback)
+            ?: color(fallback)
             ?: S52Color(fallback, 0, 0, 0)
-        return GlColor(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, 1.0f)
+        val resolved = GlColor(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, 1.0f)
+        cache[key] = resolved
+        return resolved
     }
 
     private fun resolveOpenCpnToken(token: String): S52Color? {
-        presLib.colors.color(palette, token)?.let { return it }
+        color(token)?.let { return it }
         val normalized = token.trim().uppercase()
         // OpenCPN HPGL color references commonly prefix display-context letters
         // such as A/D/E/U before the S-52 color token: ACHMGD -> CHMGD,
         // ADEPSC -> DEPSC, ALANDF -> LANDF, UTRFCF -> TRFCF.
         if (normalized.length > 1) {
-            presLib.colors.color(palette, normalized.drop(1))?.let { return it }
+            color(normalized.drop(1))?.let { return it }
         }
         return null
+    }
+
+    private fun color(token: String): S52Color? {
+        val key = token.trim().uppercase()
+        if (colorCache.containsKey(key)) return colorCache[key]
+        val resolved = presLib.colors.color(palette, key)
+        colorCache[key] = resolved
+        return resolved
     }
 }

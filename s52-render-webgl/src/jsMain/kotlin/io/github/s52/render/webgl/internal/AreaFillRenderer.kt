@@ -18,7 +18,7 @@ internal class AreaFillRenderer(
     fun renderBatch(commands: List<S52DrawCommand.AreaFill>, projector: GeometryProjector, colors: ColorResolver): Int {
         if (commands.isEmpty()) return 0
         val colorToken = commands.first().colorToken
-        val floats = ArrayList<Float>(commands.size * DEFAULT_TRIANGLE_FLOAT_CAPACITY)
+        val floats = FloatArrayBuilder(commands.size * DEFAULT_TRIANGLE_FLOAT_CAPACITY)
         for (command in commands) {
             appendTriangles(command.geometry, projector, floats)
         }
@@ -30,7 +30,7 @@ internal class AreaFillRenderer(
         )
     }
 
-    private fun appendTriangles(geometry: EncGeometry, projector: GeometryProjector, out: MutableList<Float>) {
+    private fun appendTriangles(geometry: EncGeometry, projector: GeometryProjector, out: FloatArrayBuilder) {
         val polygon = geometry as? EncGeometry.Polygon ?: return
         if (polygon.outer.size < 3) return
 
@@ -43,9 +43,9 @@ internal class AreaFillRenderer(
 
         val triangles = PolygonTriangulator.triangulate(outer, holes)
         for (triangle in triangles) {
-            out.add(triangle.a.x.toFloat()); out.add(triangle.a.y.toFloat())
-            out.add(triangle.b.x.toFloat()); out.add(triangle.b.y.toFloat())
-            out.add(triangle.c.x.toFloat()); out.add(triangle.c.y.toFloat())
+            out.add(triangle.a.x.toFloat(), triangle.a.y.toFloat())
+            out.add(triangle.b.x.toFloat(), triangle.b.y.toFloat())
+            out.add(triangle.c.x.toFloat(), triangle.c.y.toFloat())
         }
     }
 

@@ -89,7 +89,7 @@ internal class AreaPatternRenderer(
         val v0 = ((bitmap.y + 0.5) / atlasH).toFloat()
         val v1 = ((bitmap.y + bitmap.height - 0.5).coerceAtLeast(bitmap.y + 0.5) / atlasH).toFloat()
 
-        val floats = ArrayList<Float>()
+        val floats = FloatArrayBuilder()
         var yTop = bounds.maxY
         var row = 0
         while (yTop >= bounds.minY - tileHClip && row < MAX_TILE_ROWS) {
@@ -103,12 +103,8 @@ internal class AreaPatternRenderer(
                     val x1 = xLeft + tileWClip
                     val y0 = yTop
                     val y1 = yTop - tileHClip
-                    floats.add(x0); floats.add(y0); floats.add(u0); floats.add(v0)
-                    floats.add(x1); floats.add(y0); floats.add(u1); floats.add(v0)
-                    floats.add(x1); floats.add(y1); floats.add(u1); floats.add(v1)
-                    floats.add(x0); floats.add(y0); floats.add(u0); floats.add(v0)
-                    floats.add(x1); floats.add(y1); floats.add(u1); floats.add(v1)
-                    floats.add(x0); floats.add(y1); floats.add(u0); floats.add(v1)
+                    floats.addTexturedTriangle(x0, y0, u0, v0, x1, y0, u1, v0, x1, y1, u1, v1)
+                    floats.addTexturedTriangle(x0, y0, u0, v0, x1, y1, u1, v1, x0, y1, u0, v1)
                 }
                 xLeft += tileWClip
                 col++
@@ -138,7 +134,7 @@ internal class AreaPatternRenderer(
         val tileHClip = (tileHeightPx * sy).toFloat()
         val originX = if (pattern.width > 0.0) pattern.pivotX else bounds.minX
         val originY = if (pattern.height > 0.0) pattern.pivotY else bounds.centerY
-        val floats = ArrayList<Float>()
+        val floats = FloatArrayBuilder()
 
         var yCenter = clipBounds.maxY - tileHClip * 0.5f
         var row = 0
@@ -169,7 +165,7 @@ internal class AreaPatternRenderer(
     }
 
     private fun appendPatternTile(
-        out: MutableList<Float>,
+        out: FloatArrayBuilder,
         hpglSegments: List<HpglLineSegment>,
         originX: Double,
         originY: Double,
@@ -190,8 +186,7 @@ internal class AreaPatternRenderer(
         for (segment in hpglSegments) {
             val a = point(segment.x1, segment.y1)
             val b = point(segment.x2, segment.y2)
-            out.add(a.x); out.add(a.y)
-            out.add(b.x); out.add(b.y)
+            out.addLine(a, b)
         }
     }
 
@@ -219,7 +214,7 @@ internal class AreaPatternRenderer(
         val bounds = ClipBounds.of(projected.allPoints) ?: return FloatArray(0)
         val sy = projector.pixelToClipY(HATCH_SPACING_PX).toFloat().coerceAtLeast(0.0001f)
         val inset = projector.pixelToClipX(0.75).toFloat()
-        val floats = ArrayList<Float>(64)
+        val floats = FloatArrayBuilder(64)
 
         var y = bounds.minY + sy
         var row = 0
@@ -229,8 +224,8 @@ internal class AreaPatternRenderer(
                 val x0 = interval.first + inset
                 val x1 = interval.second - inset
                 if (x1 > x0) {
-                    floats.add(x0); floats.add(y)
-                    floats.add(x1); floats.add(y)
+                    floats.add(x0, y)
+                    floats.add(x1, y)
                 }
             }
             y += sy

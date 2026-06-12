@@ -106,7 +106,7 @@ internal class SymbolRenderer(
         projector: GeometryProjector,
         rotationDegrees: Double
     ): FloatArray {
-        val floats = ArrayList<Float>()
+        val floats = FloatArrayBuilder()
         appendVectorCommands(floats, definition, anchor, projector, rotationDegrees)
         if (floats.isEmpty()) {
             appendHpglFallback(floats, definition, anchor, projector, rotationDegrees)
@@ -115,7 +115,7 @@ internal class SymbolRenderer(
     }
 
     private fun appendVectorCommands(
-        floats: MutableList<Float>,
+        floats: FloatArrayBuilder,
         definition: SymbolDefinition,
         anchor: ClipPoint,
         projector: GeometryProjector,
@@ -133,8 +133,7 @@ internal class SymbolRenderer(
                     val next = transformLocal(command.x - definition.pivotX, command.y - definition.pivotY, anchor, projector, rotationDegrees)
                     val previous = current
                     if (previous != null) {
-                        floats.add(previous.x); floats.add(previous.y)
-                        floats.add(next.x); floats.add(next.y)
+                        floats.addLine(previous, next)
                     }
                     current = next
                 }
@@ -142,8 +141,7 @@ internal class SymbolRenderer(
                     val previous = current
                     val first = start
                     if (previous != null && first != null) {
-                        floats.add(previous.x); floats.add(previous.y)
-                        floats.add(first.x); floats.add(first.y)
+                        floats.addLine(previous, first)
                     }
                     start = null
                     current = null
@@ -153,7 +151,7 @@ internal class SymbolRenderer(
     }
 
     private fun appendHpglFallback(
-        floats: MutableList<Float>,
+        floats: FloatArrayBuilder,
         definition: SymbolDefinition,
         anchor: ClipPoint,
         projector: GeometryProjector,
@@ -176,8 +174,7 @@ internal class SymbolRenderer(
                 projector,
                 rotationDegrees
             )
-            floats.add(a.x); floats.add(a.y)
-            floats.add(b.x); floats.add(b.y)
+            floats.addLine(a, b)
         }
     }
 
