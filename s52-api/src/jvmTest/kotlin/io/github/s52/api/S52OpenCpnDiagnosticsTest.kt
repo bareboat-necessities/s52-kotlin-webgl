@@ -10,8 +10,12 @@ class S52OpenCpnDiagnosticsTest {
     @Test
     fun openCpnDiagnosticsExposeGeneratedPayloadCounts() {
         val report = S52OpenCpnDiagnostics.report()
+        val runtimeLookupCount = OpenCpnGeneratedPresLib.LOOKUP_COUNT + 2
 
-        assertEquals(OpenCpnGeneratedPresLib.LOOKUP_COUNT, report.lookupCount)
+        // Diagnostics report the normalized runtime pack. The raw generated
+        // OpenCPN inventory stays at LOOKUP_COUNT, while the runtime pack adds
+        // two compatibility rows for client-log coverage: ACHARE/Line and OBJL_0/Line.
+        assertEquals(runtimeLookupCount, report.lookupCount)
         assertEquals(OpenCpnGeneratedPresLib.SYMBOL_COUNT, report.symbolCount)
         assertEquals(OpenCpnGeneratedPresLib.LINE_STYLE_COUNT, report.lineStyleCount)
         assertEquals(OpenCpnGeneratedPresLib.PATTERN_COUNT, report.patternCount)
@@ -27,9 +31,10 @@ class S52OpenCpnDiagnosticsTest {
 
     @Test
     fun openCpnDiagnosticsCanBeRenderedAsText() {
+        val runtimeLookupCount = OpenCpnGeneratedPresLib.LOOKUP_COUNT + 2
         val text = S52OpenCpnDiagnostics.report().toPlainText(maxItems = 4)
 
-        assertTrue("lookups=3057" in text)
+        assertTrue("lookups=$runtimeLookupCount" in text)
         assertTrue("symbols=1093" in text)
         assertTrue("presentationTables=" in text)
         assertTrue("unresolvedCsps=" in text)
