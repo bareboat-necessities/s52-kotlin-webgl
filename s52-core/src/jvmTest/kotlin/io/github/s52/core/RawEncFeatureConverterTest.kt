@@ -120,6 +120,47 @@ class RawEncFeatureConverterTest {
         assertEquals(6, feature.attributes.int(S57Attribute.CATSPM))
     }
 
+    @Test
+    fun convertsRemainingClientLogAttributes() {
+        val raw = RawEncFeature(
+            id = 16,
+            objectClassAcronym = "SBDARE",
+            primitive = PrimitiveType.Point,
+            rawAttributes = mapOf(
+                "NATQUA" to S57Value.ListValue(listOf(S57Value.Integer(1), S57Value.Integer(2))),
+                "NATSUR" to S57Value.Integer(4)
+            ),
+            geometry = EncGeometry.Point(Coordinate(-74.0, 40.0))
+        )
+
+        val feature = raw.toTypedFeature()
+
+        assertEquals(listOf(1, 2), feature.attributes.ints(S57Attribute.NATQUA))
+        assertEquals(4, feature.attributes.int(S57Attribute.NATSUR))
+    }
+
+    @Test
+    fun convertsRemainingClientLogLandAndSlopeAttributes() {
+        val land = RawEncFeature(
+            id = 17,
+            objectClassAcronym = "LNDRGN",
+            primitive = PrimitiveType.Area,
+            rawAttributes = mapOf("CATLND" to S57Value.Integer(1)),
+            geometry = samplePolygon()
+        ).toTypedFeature()
+
+        val slope = RawEncFeature(
+            id = 18,
+            objectClassAcronym = "SLOTOP",
+            primitive = PrimitiveType.Line,
+            rawAttributes = mapOf("CATSLO" to S57Value.Integer(2)),
+            geometry = EncGeometry.LineString(listOf(Coordinate(-74.0, 40.0), Coordinate(-73.9, 40.1)))
+        ).toTypedFeature()
+
+        assertEquals(1, land.attributes.int(S57Attribute.CATLND))
+        assertEquals(2, slope.attributes.int(S57Attribute.CATSLO))
+    }
+
     private fun samplePolygon(): EncGeometry.Polygon = EncGeometry.Polygon(
         outer = listOf(
             Coordinate(-74.0, 40.0),

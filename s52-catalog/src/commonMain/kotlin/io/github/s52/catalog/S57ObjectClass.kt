@@ -13,7 +13,7 @@ enum class S57ObjectClass(
     val code: Int?,
     val primitives: Set<PrimitiveType>
 ) {
-    ACHARE("ACHARE", null, area()),
+    ACHARE("ACHARE", null, setOf(PrimitiveType.Line, PrimitiveType.Area)),
     ACHBRT("ACHBRT", null, setOf(PrimitiveType.Point, PrimitiveType.Area)),
     ADMARE("ADMARE", null, area()),
     AIRARE("AIRARE", null, area()),
@@ -82,6 +82,7 @@ enum class S57ObjectClass(
     MIPARE("MIPARE", null, area()),
     MORFAC("MORFAC", null, setOf(PrimitiveType.Point, PrimitiveType.Line, PrimitiveType.Area)),
     NAVLNE("NAVLNE", null, line()),
+    OBJL_0("OBJL_0", 0, setOf(PrimitiveType.Point, PrimitiveType.Line, PrimitiveType.Area)),
     OBSTRN("OBSTRN", 86, setOf(PrimitiveType.Point, PrimitiveType.Line, PrimitiveType.Area)),
     OFSPLF("OFSPLF", null, setOf(PrimitiveType.Point, PrimitiveType.Area)),
     OILBAR("OILBAR", null, area()),
