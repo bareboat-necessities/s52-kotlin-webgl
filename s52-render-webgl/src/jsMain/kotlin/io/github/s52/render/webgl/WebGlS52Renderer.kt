@@ -15,11 +15,12 @@ import io.github.s52.render.webgl.internal.SolidColorProgram
 import io.github.s52.render.webgl.internal.SymbolRenderer
 import io.github.s52.render.webgl.internal.TextureProgram
 import io.github.s52.render.webgl.internal.TextRenderer
+import kotlin.js.unsafeCast
 import org.khronos.webgl.WebGLRenderingContext
 import org.w3c.dom.HTMLCanvasElement
 
 /**
- * Phase 8 WebGL2 backend for renderer-independent S-52 draw commands.
+ * Phase 8 WebGL backend for renderer-independent S-52 draw commands.
  *
  * This class deliberately accepts only [S52DrawCommand] values. It does not
  * inspect S-57 object classes, attributes, lookup records, or CSP names. That
@@ -31,9 +32,7 @@ class WebGlS52Renderer(
     private val presLib: PresLibPack,
     private val onResourcesChanged: (() -> Unit)? = null
 ) {
-    private val gl: WebGLRenderingContext =
-        canvas.getContext("webgl2") as? WebGLRenderingContext
-            ?: error("WebGL2 is not available in this browser")
+    private val gl: WebGLRenderingContext = requireWebGl2(canvas)
 
     private val solidProgram = SolidColorProgram(gl)
     private val textureProgram = TextureProgram(gl)
@@ -50,15 +49,24 @@ class WebGlS52Renderer(
         viewport: RenderViewport = RenderViewport.auto(commands)
     ): RenderStats {
         resizeToDisplaySize()
+
         gl.viewport(0, 0, canvas.width, canvas.height)
         gl.disable(WebGLRenderingContext.DEPTH_TEST)
         gl.enable(WebGLRenderingContext.BLEND)
-        gl.blendFunc(WebGLRenderingContext.SRC_ALPHA, WebGLRenderingContext.ONE_MINUS_SRC_ALPHA)
+        gl.blendFunc(
+            WebGLRenderingContext.SRC_ALPHA,
+            WebGLRenderingContext.ONE_MINUS_SRC_ALPHA
+        )
 
         val colors = ColorResolver(presLib, settings.palette)
         val background = presLib.colors.color(settings.palette, "DEPDW")
         if (background != null) {
-            gl.clearColor(background.r / 255.0f, background.g / 255.0f, background.b / 255.0f, 1.0f)
+            gl.clearColor(
+                background.r / 255.0f,
+                background.g / 255.0f,
+                background.b / 255.0f,
+                1.0f
+            )
         } else {
             gl.clearColor(0.9f, 0.95f, 1.0f, 1.0f)
         }
@@ -68,38 +76,96 @@ class WebGlS52Renderer(
         val batchReport = DrawCommandBatcher.report(commands)
         val builder = RenderStatsBuilder()
 
-        var index = 0
-        while (index < commands.size) {
-            val command = commands[index]
-            if (command is S52DrawCommand.AreaFill) {
-                val start = index
-                val colorToken = command.colorToken
-                index++
-                while (index < commands.size) {
-                    val next = commands[index]
-                    if (next !is S52DrawCommand.AreaFill || next.colorToken != colorToken) break
-                    index++
-                }
-                val batch = ArrayList<S52DrawCommand.AreaFill>(index - start)
-                for (batchIndex in start until index) batch += commands[batchIndex] as S52DrawCommand.AreaFill
-                val drawCalls = areaFillRenderer.renderBatch(batch, projector, colors)
-                builder.addMany(DrawCommandKind.AreaFill, batch.size, drawCalls)
-                continue
+        /*
+         * Important performance detail:
+         *
+         * Area fills are often emitted as long adjacent runs. Rendering each one
+         * separately causes many small Float32Array uploads and draw calls.
+         *
+         * Keep rendering order intact by batching only adjacent AreaFill commands.
+         * Any non-area command flushes the pending area-fill run before rendering.
+         *
+         * AreaFillRenderer.renderBatch(...) is expected to preserve command order
+         * inside the run and may internally group compatible fills by color.
+         */
+        val areaFillRun = ArrayList<S52DrawCommand.AreaFill>()
+        fun flushAreaFillRun() {
+            if (areaFillRun.isEmpty()) return
+
+            val drawCalls = if (areaFillRun.size == 1) {
+                areaFillRenderer.render(areaFillRun[0], projector, colors)
+            } else {
+                areaFillRenderer.renderBatch(areaFillRun, projector, colors)
             }
 
-            val drawCalls = when (command) {
-                is S52DrawCommand.AreaFill -> areaFillRenderer.render(command, projector, colors)
-                is S52DrawCommand.AreaPattern -> areaPatternRenderer.render(command, projector, colors, settings.palette)
-                is S52DrawCommand.LineSimple -> lineRenderer.renderSimple(command, projector, colors)
-                is S52DrawCommand.LineComplex -> lineRenderer.renderComplex(command, projector, colors)
-                is S52DrawCommand.PointSymbol -> symbolRenderer.render(command, projector, colors, settings.palette)
-                is S52DrawCommand.Text -> textRenderer.renderText(command, projector, colors)
-                is S52DrawCommand.Sounding -> textRenderer.renderSounding(command, projector, colors)
-            }
-            builder.add(command.kind, drawCalls)
-            index++
+            builder.addMany(
+                kind = DrawCommandKind.AreaFill,
+                commandCount = areaFillRun.size,
+                drawCalls = drawCalls
+            )
+            areaFillRun.clear()
         }
-        return builder.build(batchReport.batchCount, batchReport.averageCommandsPerBatch)
+
+        for (command in commands) {
+            when (command) {
+                is S52DrawCommand.AreaFill -> {
+                    areaFillRun += command
+                }
+
+                is S52DrawCommand.AreaPattern -> {
+                    flushAreaFillRun()
+                    val drawCalls = areaPatternRenderer.render(
+                        command,
+                        projector,
+                        colors,
+                        settings.palette
+                    )
+                    builder.add(command.kind, drawCalls)
+                }
+
+                is S52DrawCommand.LineSimple -> {
+                    flushAreaFillRun()
+                    val drawCalls = lineRenderer.renderSimple(command, projector, colors)
+                    builder.add(command.kind, drawCalls)
+                }
+
+                is S52DrawCommand.LineComplex -> {
+                    flushAreaFillRun()
+                    val drawCalls = lineRenderer.renderComplex(command, projector, colors)
+                    builder.add(command.kind, drawCalls)
+                }
+
+                is S52DrawCommand.PointSymbol -> {
+                    flushAreaFillRun()
+                    val drawCalls = symbolRenderer.render(
+                        command,
+                        projector,
+                        colors,
+                        settings.palette
+                    )
+                    builder.add(command.kind, drawCalls)
+                }
+
+                is S52DrawCommand.Text -> {
+                    flushAreaFillRun()
+                    val drawCalls = textRenderer.renderText(command, projector, colors)
+                    builder.add(command.kind, drawCalls)
+                }
+
+                is S52DrawCommand.Sounding -> {
+                    flushAreaFillRun()
+                    val drawCalls = textRenderer.renderSounding(command, projector, colors)
+                    builder.add(command.kind, drawCalls)
+                }
+            }
+        }
+
+        flushAreaFillRun()
+
+        return builder.build(
+            batchCount = batchReport.batchCount,
+            averageCommandsPerBatch = batchReport.averageCommandsPerBatch
+        )
     }
 
     private fun resizeToDisplaySize() {
@@ -108,6 +174,26 @@ class WebGlS52Renderer(
         if (canvas.width != displayWidth || canvas.height != displayHeight) {
             canvas.width = displayWidth
             canvas.height = displayHeight
+        }
+    }
+
+    private companion object {
+        private fun requireWebGl2(canvas: HTMLCanvasElement): WebGLRenderingContext {
+            val context = canvas.getContext("webgl2")
+                ?: error("WebGL2 is not available in this browser")
+
+            /*
+             * Kotlin/JS safe-cast is wrong here:
+             *
+             *     canvas.getContext("webgl2") as? WebGLRenderingContext
+             *
+             * A browser returns a WebGL2RenderingContext object. It is usable by
+             * this renderer because this renderer only calls WebGLRenderingContext
+             * APIs, but Kotlin's runtime safe-cast can reject it.
+             *
+             * The null check above proves WebGL2 exists; after that, use unsafeCast.
+             */
+            return context.unsafeCast<WebGLRenderingContext>()
         }
     }
 }
@@ -134,22 +220,35 @@ private class RenderStatsBuilder {
     private var drawCalls = 0
 
     fun add(kind: DrawCommandKind, calls: Int) {
-        addMany(kind, 1, calls)
+        addMany(
+            kind = kind,
+            commandCount = 1,
+            drawCalls = calls
+        )
     }
 
-    fun addMany(kind: DrawCommandKind, count: Int, calls: Int) {
+    fun addMany(
+        kind: DrawCommandKind,
+        commandCount: Int,
+        drawCalls: Int
+    ) {
         when (kind) {
-            DrawCommandKind.AreaFill -> areaFillCount += count
-            DrawCommandKind.AreaPattern -> areaPatternCount += count
-            DrawCommandKind.LineSimple, DrawCommandKind.LineComplex -> lineCount += count
-            DrawCommandKind.PointSymbol -> symbolCount += count
-            DrawCommandKind.Text -> textCount += count
-            DrawCommandKind.Sounding -> soundingCount += count
+            DrawCommandKind.AreaFill -> areaFillCount += commandCount
+            DrawCommandKind.AreaPattern -> areaPatternCount += commandCount
+            DrawCommandKind.LineSimple,
+            DrawCommandKind.LineComplex -> lineCount += commandCount
+            DrawCommandKind.PointSymbol -> symbolCount += commandCount
+            DrawCommandKind.Text -> textCount += commandCount
+            DrawCommandKind.Sounding -> soundingCount += commandCount
         }
-        drawCalls += calls
+
+        this.drawCalls += drawCalls
     }
 
-    fun build(batchCount: Int, averageCommandsPerBatch: Double): RenderStats = RenderStats(
+    fun build(
+        batchCount: Int,
+        averageCommandsPerBatch: Double
+    ): RenderStats = RenderStats(
         areaFillCount = areaFillCount,
         areaPatternCount = areaPatternCount,
         lineCount = lineCount,
