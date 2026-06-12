@@ -10,6 +10,7 @@ import io.github.s52.preslib.esri.generated.EsriGeneratedPatternRegistry
 import io.github.s52.preslib.esri.generated.EsriGeneratedPresLib
 import io.github.s52.preslib.esri.generated.EsriGeneratedRuleRegistry
 import io.github.s52.preslib.esri.generated.EsriGeneratedSymbolRegistry
+import io.github.s52.preslib.esri.rules.EsriChart1FallbackRules
 import io.github.s52.preslib.esri.rules.EsriPortrayalRule
 import io.github.s52.preslib.esri.rules.EsriRuleAction
 import io.github.s52.preslib.esri.rules.EsriRuleFeature
@@ -30,7 +31,7 @@ object EsriInt1Profile {
     val symbols: Map<String, EsriVectorSymbol> get() = EsriGeneratedSymbolRegistry.symbols
     val lines: Map<String, EsriVectorLineStyle> get() = EsriGeneratedLineRegistry.lines
     val patterns: Map<String, EsriVectorAreaPattern> get() = EsriGeneratedPatternRegistry.patterns
-    val directRules: List<EsriPortrayalRule> get() = EsriGeneratedRuleRegistry.rules
+    val directRules: List<EsriPortrayalRule> get() = EsriGeneratedRuleRegistry.rules + EsriChart1FallbackRules.rules
 
     fun symbol(name: String): EsriVectorSymbol? = symbols[name] ?: symbols[name.removeSuffix(".svg")]
     fun line(name: String): EsriVectorLineStyle? = lines[name] ?: lines[name.removeSuffix(".svg")]

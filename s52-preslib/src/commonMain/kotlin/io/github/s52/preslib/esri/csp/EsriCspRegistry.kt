@@ -10,7 +10,29 @@ object EsriCspRegistry {
         EsriBridgeCsp,
         EsriCableCsp,
         EsriSeabedAreaCsp,
-        EsriLandAreaCsp
+        EsriLandAreaCsp,
+        EsriDepthContourCsp,
+        EsriUnsurveyedAreaCsp,
+        EsriCoastlineCsp,
+        EsriShoreConstructionCsp,
+        EsriWaterFeaturesCsp,
+        EsriRoadCsp,
+        EsriTunnelCsp,
+        EsriVegetationCsp,
+        EsriUnderwaterHazardCsp,
+        EsriSpoilGroundCsp,
+        EsriCablesPipelinesCsp,
+        EsriOffshoreInstallationCsp,
+        EsriAnchoragesBerthsCsp,
+        EsriPortsCsp,
+        EsriFishingAquacultureCsp,
+        EsriRoutesCsp,
+        EsriBuoyCsp,
+        EsriBeaconCsp,
+        EsriLandmarkCsp,
+        EsriControlMagneticCsp,
+        EsriTidesCurrentsCsp,
+        EsriServicesPointsCsp
     ).flatMap { procedure -> procedure.names.map { it.lowercase() to procedure } }.toMap()
 
     val names: Set<String> = procedures.keys.sorted().toSet()

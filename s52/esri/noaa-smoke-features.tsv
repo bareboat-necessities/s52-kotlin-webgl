@@ -9,3 +9,12 @@ CBLSUB	2	cblsub02	CATCBL=1			false
 BRIDGE	2	bridge02	VERCLR=15.0			false
 SBDARE	3	sbdare01	NATSUR=4			false
 LNDARE	3	lndare01				false
+DEPCNT	2	chart1_depth_contour	VALDCO=30	30		false
+COALNE	2	chart1_coastline	QUAPOS=1			false
+SLCONS	2	chart1_shore_construction	CATSLC=6			false
+BOYLAT	1	chart1_buoy	CATLAM=2;BOYSHP=1			false
+BCNLAT	1	chart1_beacon	CATLAM=1			false
+LNDMRK	1	chart1_landmark	CATLMK=5;CONVIS=1			false
+UWTROC	1	chart1_underwater_hazard	VALSOU=4	4	40	false
+NAVLNE	2	chart1_routes	ORIENT=270			false
+FOGSIG	1	chart1_services_points	CATFOG=4			false
