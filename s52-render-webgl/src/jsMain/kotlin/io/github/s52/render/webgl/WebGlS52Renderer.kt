@@ -15,6 +15,7 @@ import io.github.s52.render.webgl.internal.SolidColorProgram
 import io.github.s52.render.webgl.internal.SymbolRenderer
 import io.github.s52.render.webgl.internal.TextureProgram
 import io.github.s52.render.webgl.internal.TextRenderer
+import kotlin.js.unsafeCast
 import org.khronos.webgl.WebGLRenderingContext
 import org.w3c.dom.HTMLCanvasElement
 
@@ -31,9 +32,7 @@ class WebGlS52Renderer(
     private val presLib: PresLibPack,
     private val onResourcesChanged: (() -> Unit)? = null
 ) {
-    private val gl: WebGLRenderingContext =
-        canvas.getContext("webgl2") as? WebGLRenderingContext
-            ?: error("WebGL2 is not available in this browser")
+    private val gl: WebGLRenderingContext = requireWebGl2(canvas)
 
     private val solidProgram = SolidColorProgram(gl)
     private val textureProgram = TextureProgram(gl)
@@ -80,6 +79,7 @@ class WebGlS52Renderer(
             }
             builder.add(command.kind, drawCalls)
         }
+
         return builder.build(batchReport.batchCount, batchReport.averageCommandsPerBatch)
     }
 
@@ -89,6 +89,25 @@ class WebGlS52Renderer(
         if (canvas.width != displayWidth || canvas.height != displayHeight) {
             canvas.width = displayWidth
             canvas.height = displayHeight
+        }
+    }
+
+    private companion object {
+        private fun requireWebGl2(canvas: HTMLCanvasElement): WebGLRenderingContext {
+            val context = canvas.getContext("webgl2")
+                ?: error("WebGL2 is not available in this browser")
+
+            /*
+             * Kotlin/JS safe-cast is wrong here:
+             *
+             *     canvas.getContext("webgl2") as? WebGLRenderingContext
+             *
+             * A browser returns a WebGL2RenderingContext object. It is usable by
+             * this renderer because the renderer only calls WebGLRenderingContext
+             * APIs, but Kotlin's runtime safe-cast can reject it. The null check
+             * above proves WebGL2 exists; after that, use unsafeCast.
+             */
+            return context.unsafeCast<WebGLRenderingContext>()
         }
     }
 }
