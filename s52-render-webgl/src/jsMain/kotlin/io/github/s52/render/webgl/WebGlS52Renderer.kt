@@ -65,6 +65,7 @@ class WebGlS52Renderer(
         gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT)
 
         val projector = GeometryProjector(viewport, canvas.width, canvas.height)
+        textRenderer.beginFrame()
         val builder = RenderStatsBuilder()
         var renderBatchCount = 0
 
