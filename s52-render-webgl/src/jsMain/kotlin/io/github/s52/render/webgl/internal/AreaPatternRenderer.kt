@@ -1,13 +1,11 @@
 package io.github.s52.render.webgl.internal
 
 import io.github.s52.core.draw.S52DrawCommand
-import io.github.s52.core.geometry.Coordinate
 import io.github.s52.core.geometry.EncGeometry
 import io.github.s52.core.settings.S52Palette
 import io.github.s52.preslib.PatternDefinition
 import io.github.s52.preslib.PresLibPack
 import io.github.s52.preslib.RasterBitmapDefinition
-import io.github.s52.render.webgl.coordinates
 import org.khronos.webgl.WebGLRenderingContext
 
 internal class AreaPatternRenderer(
@@ -32,9 +30,7 @@ internal class AreaPatternRenderer(
             if (vectorCalls > 0) return vectorCalls
         }
 
-        val geometryCoordinates = command.geometry.coordinates()
-        if (geometryCoordinates.isEmpty()) return 0
-        val vertices = hatchLines(geometryCoordinates, projector)
+        val vertices = hatchLines(command.geometry, projector)
         if (vertices.isEmpty()) return 0
         return solidProgram.draw(WebGLRenderingContext.LINES, vertices, colors.resolve(command.backgroundColorToken, fallback = "CHMGD"))
     }
@@ -86,10 +82,12 @@ internal class AreaPatternRenderer(
         val tileHClip = (bitmap.height * sy).toFloat().coerceAtLeast((8.0 * sy).toFloat())
         if (tileWClip <= 0f || tileHClip <= 0f) return FloatArray(0)
 
-        val u0 = (bitmap.x / atlasWidth.coerceAtLeast(1)).toFloat()
-        val u1 = ((bitmap.x + bitmap.width) / atlasWidth.coerceAtLeast(1)).toFloat()
-        val v0 = (bitmap.y / atlasHeight.coerceAtLeast(1)).toFloat()
-        val v1 = ((bitmap.y + bitmap.height) / atlasHeight.coerceAtLeast(1)).toFloat()
+        val atlasW = atlasWidth.coerceAtLeast(1).toDouble()
+        val atlasH = atlasHeight.coerceAtLeast(1).toDouble()
+        val u0 = ((bitmap.x + 0.5) / atlasW).toFloat()
+        val u1 = ((bitmap.x + bitmap.width - 0.5).coerceAtLeast(bitmap.x + 0.5) / atlasW).toFloat()
+        val v0 = ((bitmap.y + 0.5) / atlasH).toFloat()
+        val v1 = ((bitmap.y + bitmap.height - 0.5).coerceAtLeast(bitmap.y + 0.5) / atlasH).toFloat()
 
         val floats = ArrayList<Float>()
         var yTop = bounds.maxY
@@ -215,29 +213,61 @@ internal class AreaPatternRenderer(
         return (sourceHeight * HPGL_TO_PIXEL).coerceIn(12.0, 128.0)
     }
 
-    private fun hatchLines(coordinates: List<Coordinate>, projector: GeometryProjector): FloatArray {
-        var minLon = coordinates.first().lon
-        var maxLon = coordinates.first().lon
-        var minLat = coordinates.first().lat
-        var maxLat = coordinates.first().lat
-        for (coordinate in coordinates.drop(1)) {
-            minLon = minOf(minLon, coordinate.lon)
-            maxLon = maxOf(maxLon, coordinate.lon)
-            minLat = minOf(minLat, coordinate.lat)
-            maxLat = maxOf(maxLat, coordinate.lat)
-        }
+    private fun hatchLines(geometry: EncGeometry, projector: GeometryProjector): FloatArray {
+        val polygon = geometry as? EncGeometry.Polygon ?: return FloatArray(0)
+        val projected = ProjectedPolygonClip.from(polygon, projector) ?: return FloatArray(0)
+        val bounds = ClipBounds.of(projected.allPoints) ?: return FloatArray(0)
+        val sy = projector.pixelToClipY(HATCH_SPACING_PX).toFloat().coerceAtLeast(0.0001f)
+        val inset = projector.pixelToClipX(0.75).toFloat()
+        val floats = ArrayList<Float>(64)
 
-        val count = 8
-        val floats = ArrayList<Float>(count * 4)
-        for (i in 1..count) {
-            val t = i.toDouble() / (count + 1)
-            val y = minLat + (maxLat - minLat) * t
-            val a = projector.project(Coordinate(minLon, y))
-            val b = projector.project(Coordinate(maxLon, y))
-            floats.add(a.x); floats.add(a.y)
-            floats.add(b.x); floats.add(b.y)
+        var y = bounds.minY + sy
+        var row = 0
+        while (y < bounds.maxY && row < MAX_HATCH_ROWS) {
+            val intervals = horizontalIntervals(projected, y)
+            for (interval in intervals) {
+                val x0 = interval.first + inset
+                val x1 = interval.second - inset
+                if (x1 > x0) {
+                    floats.add(x0); floats.add(y)
+                    floats.add(x1); floats.add(y)
+                }
+            }
+            y += sy
+            row++
         }
         return floats.toFloatArray()
+    }
+
+    private fun horizontalIntervals(projected: ProjectedPolygonClip, y: Float): List<Pair<Float, Float>> {
+        val xs = ArrayList<Float>()
+        appendHorizontalCrossings(projected.outer, y, xs)
+        for (hole in projected.holes) appendHorizontalCrossings(hole, y, xs)
+        if (xs.size < 2) return emptyList()
+        xs.sort()
+        val intervals = ArrayList<Pair<Float, Float>>(xs.size / 2)
+        var i = 0
+        while (i + 1 < xs.size) {
+            val left = xs[i]
+            val right = xs[i + 1]
+            if (right > left) intervals += left to right
+            i += 2
+        }
+        return intervals
+    }
+
+    private fun appendHorizontalCrossings(ring: List<ClipPoint>, y: Float, out: MutableList<Float>) {
+        if (ring.size < 2) return
+        var previous = ring.last()
+        for (current in ring) {
+            val minY = minOf(previous.y, current.y)
+            val maxY = maxOf(previous.y, current.y)
+            if (maxY > minY && y >= minY && y < maxY) {
+                val t = (y - previous.y) / (current.y - previous.y)
+                out += previous.x + t * (current.x - previous.x)
+            }
+            previous = current
+        }
     }
 
     private data class ClipBounds(val minX: Float, val maxX: Float, val minY: Float, val maxY: Float) {
@@ -263,5 +293,7 @@ internal class AreaPatternRenderer(
         private const val HPGL_TO_PIXEL: Double = 0.04
         private const val MAX_TILE_ROWS: Int = 128
         private const val MAX_TILE_COLS: Int = 128
+        private const val MAX_HATCH_ROWS: Int = 96
+        private const val HATCH_SPACING_PX: Double = 18.0
     }
 }

@@ -78,8 +78,12 @@ internal class RasterAtlasCache(
             gl.bindTexture(WebGLRenderingContext.TEXTURE_2D, texture)
             gl.texParameteri(WebGLRenderingContext.TEXTURE_2D, WebGLRenderingContext.TEXTURE_WRAP_S, WebGLRenderingContext.CLAMP_TO_EDGE)
             gl.texParameteri(WebGLRenderingContext.TEXTURE_2D, WebGLRenderingContext.TEXTURE_WRAP_T, WebGLRenderingContext.CLAMP_TO_EDGE)
-            gl.texParameteri(WebGLRenderingContext.TEXTURE_2D, WebGLRenderingContext.TEXTURE_MIN_FILTER, WebGLRenderingContext.LINEAR)
-            gl.texParameteri(WebGLRenderingContext.TEXTURE_2D, WebGLRenderingContext.TEXTURE_MAG_FILTER, WebGLRenderingContext.LINEAR)
+            // Nautical symbols live in a tightly packed raster atlas.  Linear filtering
+            // blends with neighbouring atlas cells and can show up as stray horizontal
+            // or vertical color streaks around patterns and soundings.  Use exact texel
+            // sampling; S-52 rasters are pixel art, not photographic textures.
+            gl.texParameteri(WebGLRenderingContext.TEXTURE_2D, WebGLRenderingContext.TEXTURE_MIN_FILTER, WebGLRenderingContext.NEAREST)
+            gl.texParameteri(WebGLRenderingContext.TEXTURE_2D, WebGLRenderingContext.TEXTURE_MAG_FILTER, WebGLRenderingContext.NEAREST)
 
             val image = document.createElement("img") as HTMLImageElement
             image.onload = { _ ->

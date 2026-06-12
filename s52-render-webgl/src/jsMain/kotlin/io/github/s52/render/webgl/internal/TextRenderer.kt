@@ -19,7 +19,7 @@ internal class TextRenderer(
 
     fun renderSounding(command: S52DrawCommand.Sounding, projector: GeometryProjector, colors: ColorResolver): Int {
         val anchor = anchor(command.geometry, projector) ?: return 0
-        val vertices = LineGlyphFont.lineVertices(command.depthLabel, anchor, projector, pixelSize = 12.0)
+        val vertices = LineGlyphFont.soundingVertices(command.depthLabel, anchor, projector)
         if (vertices.isEmpty()) return 0
         gl.lineWidth(1.0f)
         return program.draw(WebGLRenderingContext.LINES, vertices, colors.resolve(command.colorToken, fallback = "SNDG1"))

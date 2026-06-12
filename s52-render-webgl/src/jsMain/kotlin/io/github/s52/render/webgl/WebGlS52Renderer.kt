@@ -15,7 +15,6 @@ import io.github.s52.render.webgl.internal.SolidColorProgram
 import io.github.s52.render.webgl.internal.SymbolRenderer
 import io.github.s52.render.webgl.internal.TextureProgram
 import io.github.s52.render.webgl.internal.TextRenderer
-import kotlin.js.unsafeCast
 import org.khronos.webgl.WebGLRenderingContext
 import org.w3c.dom.HTMLCanvasElement
 
@@ -32,7 +31,9 @@ class WebGlS52Renderer(
     private val presLib: PresLibPack,
     private val onResourcesChanged: (() -> Unit)? = null
 ) {
-    private val gl: WebGLRenderingContext = requireWebGl2(canvas)
+    private val gl: WebGLRenderingContext =
+        canvas.getContext("webgl2") as? WebGLRenderingContext
+            ?: error("WebGL2 is not available in this browser")
 
     private val solidProgram = SolidColorProgram(gl)
     private val textureProgram = TextureProgram(gl)
@@ -67,7 +68,25 @@ class WebGlS52Renderer(
         val batchReport = DrawCommandBatcher.report(commands)
         val builder = RenderStatsBuilder()
 
-        for (command in commands) {
+        var index = 0
+        while (index < commands.size) {
+            val command = commands[index]
+            if (command is S52DrawCommand.AreaFill) {
+                val start = index
+                val colorToken = command.colorToken
+                index++
+                while (index < commands.size) {
+                    val next = commands[index]
+                    if (next !is S52DrawCommand.AreaFill || next.colorToken != colorToken) break
+                    index++
+                }
+                val batch = ArrayList<S52DrawCommand.AreaFill>(index - start)
+                for (batchIndex in start until index) batch += commands[batchIndex] as S52DrawCommand.AreaFill
+                val drawCalls = areaFillRenderer.renderBatch(batch, projector, colors)
+                builder.addMany(DrawCommandKind.AreaFill, batch.size, drawCalls)
+                continue
+            }
+
             val drawCalls = when (command) {
                 is S52DrawCommand.AreaFill -> areaFillRenderer.render(command, projector, colors)
                 is S52DrawCommand.AreaPattern -> areaPatternRenderer.render(command, projector, colors, settings.palette)
@@ -78,8 +97,8 @@ class WebGlS52Renderer(
                 is S52DrawCommand.Sounding -> textRenderer.renderSounding(command, projector, colors)
             }
             builder.add(command.kind, drawCalls)
+            index++
         }
-
         return builder.build(batchReport.batchCount, batchReport.averageCommandsPerBatch)
     }
 
@@ -89,25 +108,6 @@ class WebGlS52Renderer(
         if (canvas.width != displayWidth || canvas.height != displayHeight) {
             canvas.width = displayWidth
             canvas.height = displayHeight
-        }
-    }
-
-    private companion object {
-        private fun requireWebGl2(canvas: HTMLCanvasElement): WebGLRenderingContext {
-            val context = canvas.getContext("webgl2")
-                ?: error("WebGL2 is not available in this browser")
-
-            /*
-             * Kotlin/JS safe-cast is wrong here:
-             *
-             *     canvas.getContext("webgl2") as? WebGLRenderingContext
-             *
-             * A browser returns a WebGL2RenderingContext object. It is usable by
-             * this renderer because the renderer only calls WebGLRenderingContext
-             * APIs, but Kotlin's runtime safe-cast can reject it. The null check
-             * above proves WebGL2 exists; after that, use unsafeCast.
-             */
-            return context.unsafeCast<WebGLRenderingContext>()
         }
     }
 }
@@ -134,13 +134,17 @@ private class RenderStatsBuilder {
     private var drawCalls = 0
 
     fun add(kind: DrawCommandKind, calls: Int) {
+        addMany(kind, 1, calls)
+    }
+
+    fun addMany(kind: DrawCommandKind, count: Int, calls: Int) {
         when (kind) {
-            DrawCommandKind.AreaFill -> areaFillCount++
-            DrawCommandKind.AreaPattern -> areaPatternCount++
-            DrawCommandKind.LineSimple, DrawCommandKind.LineComplex -> lineCount++
-            DrawCommandKind.PointSymbol -> symbolCount++
-            DrawCommandKind.Text -> textCount++
-            DrawCommandKind.Sounding -> soundingCount++
+            DrawCommandKind.AreaFill -> areaFillCount += count
+            DrawCommandKind.AreaPattern -> areaPatternCount += count
+            DrawCommandKind.LineSimple, DrawCommandKind.LineComplex -> lineCount += count
+            DrawCommandKind.PointSymbol -> symbolCount += count
+            DrawCommandKind.Text -> textCount += count
+            DrawCommandKind.Sounding -> soundingCount += count
         }
         drawCalls += calls
     }
