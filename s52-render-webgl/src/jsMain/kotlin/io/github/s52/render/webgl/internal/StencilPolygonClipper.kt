@@ -6,15 +6,10 @@ import kotlin.math.max
 /**
  * GPU even/odd polygon fill and clip helper.
  *
- * The old CPU trapezoid decomposition emits long horizontal bands.  It is
- * deterministic, but for very complex ENC polygons those bands are expensive to
- * build and precision mistakes are visually obvious as horizontal colour leaks.
- *
- * When the WebGL context has a stencil buffer, this helper renders every ring as
- * an invisible TRIANGLE_FAN with INVERT stencil op, then renders either the
- * polygon bounding rectangle or a caller-supplied pattern pass through
- * stencil != 0.  The technique is the standard even/odd stencil fill for
- * concave polygons and holes and avoids CPU triangulation on the hot path.
+ * Phase 4 adds a per-polygon scissor rectangle.  Clearing the whole stencil
+ * buffer for every ENC area is very expensive on dense harbour cells; limiting
+ * stencil clear, ring writes, and pattern draws to the projected polygon bounds
+ * avoids most of that cost and reduces fill bleed at the canvas edges.
  */
 internal class StencilPolygonClipper(
     private val gl: WebGLRenderingContext,
@@ -24,10 +19,10 @@ internal class StencilPolygonClipper(
 
     fun isAvailable(): Boolean = stencilAvailable
 
-    fun fill(projected: ProjectedPolygonClip, color: GlColor): Int {
+    fun fill(projected: ProjectedPolygonClip, projector: GeometryProjector, color: GlColor): Int {
         if (!stencilAvailable) return 0
         val bounds = projected.bounds ?: return 0
-        val stencilCalls = writeStencil(projected)
+        val stencilCalls = writeStencil(projected, projector)
         if (stencilCalls == 0) return 0
 
         gl.colorMask(true, true, true, true)
@@ -55,9 +50,9 @@ internal class StencilPolygonClipper(
         return stencilCalls + fillCalls
     }
 
-    fun clip(projected: ProjectedPolygonClip, drawInside: () -> Int): Int {
+    fun clip(projected: ProjectedPolygonClip, projector: GeometryProjector, drawInside: () -> Int): Int {
         if (!stencilAvailable) return drawInside()
-        val stencilCalls = writeStencil(projected)
+        val stencilCalls = writeStencil(projected, projector)
         if (stencilCalls == 0) return 0
 
         gl.colorMask(true, true, true, true)
@@ -73,9 +68,13 @@ internal class StencilPolygonClipper(
         return stencilCalls + drawCalls
     }
 
-    private fun writeStencil(projected: ProjectedPolygonClip): Int {
+    private fun writeStencil(projected: ProjectedPolygonClip, projector: GeometryProjector): Int {
         if (projected.outer.size < 3) return 0
+        val bounds = projected.bounds ?: return 0
+        val scissor = projector.scissorFor(bounds) ?: return 0
 
+        gl.enable(WebGLRenderingContext.SCISSOR_TEST)
+        gl.scissor(scissor.x, scissor.y, scissor.width, scissor.height)
         gl.enable(WebGLRenderingContext.STENCIL_TEST)
         gl.clearStencil(0)
         gl.stencilMask(0xFF)
@@ -104,6 +103,7 @@ internal class StencilPolygonClipper(
     private fun finishStencilPass() {
         gl.stencilMask(0xFF)
         gl.disable(WebGLRenderingContext.STENCIL_TEST)
+        gl.disable(WebGLRenderingContext.SCISSOR_TEST)
         gl.colorMask(true, true, true, true)
     }
 

@@ -13,6 +13,7 @@ internal class LineRenderer(
     private val program: SolidColorProgram,
     private val presLib: PresLibPack
 ) {
+    private val hpglCache = mutableMapOf<String, CachedHpgl>()
     fun renderSimple(command: S52DrawCommand.LineSimple, projector: GeometryProjector, colors: ColorResolver): Int {
         return drawGeometry(command.geometry, projector, colors.resolve(command.colorToken), lineWidth = command.width)
     }
@@ -33,27 +34,34 @@ internal class LineRenderer(
             return drawGeometry(command.geometry, projector, colors.resolve(null, fallback = "CHBLK"), lineWidth = 1.0)
         }
 
-        val segments = HpglLineParser.parseSegments(hpgl)
-        val bounds = HpglLineParser.bounds(segments)
-        if (segments.isEmpty() || bounds == null) {
+        val cachedHpgl = cachedHpgl(style.name, hpgl)
+        val bounds = cachedHpgl.bounds
+        if (cachedHpgl.segments.isEmpty() || bounds == null) {
             return drawGeometry(command.geometry, projector, colors.resolve(style.colorRefs.firstOrNull(), fallback = "CHBLK"), lineWidth = 1.0)
         }
 
-        val vertices = complexLineVertices(command.geometry, projector, style, segments, bounds)
+        val vertices = complexLineVertices(command.geometry, projector, style, cachedHpgl.segments, bounds)
         if (vertices.isEmpty()) return 0
         gl.lineWidth(1.5f)
         return program.draw(WebGLRenderingContext.LINES, vertices, colors.resolve(style.colorRefs.firstOrNull(), fallback = "CHBLK"))
     }
 
+
+    private fun cachedHpgl(name: String, hpgl: String): CachedHpgl =
+        hpglCache.getOrPut(name) {
+            val segments = HpglLineParser.parseSegments(hpgl)
+            CachedHpgl(segments, HpglLineParser.bounds(segments))
+        }
     private fun drawGeometry(geometry: EncGeometry, projector: GeometryProjector, color: GlColor, lineWidth: Double): Int {
-        val vertices = when (geometry) {
-            is EncGeometry.LineString -> geometry.coordinates.toVertices(projector)
-            is EncGeometry.Polygon -> geometry.outer.toVertices(projector)
-            else -> FloatArray(0)
+        val vertices = FloatArrayBuilder()
+        when (geometry) {
+            is EncGeometry.LineString -> appendLineStripSegments(geometry.coordinates, projector, vertices)
+            is EncGeometry.Polygon -> appendLineStripSegments(geometry.outer, projector, vertices)
+            else -> Unit
         }
         if (vertices.isEmpty()) return 0
         gl.lineWidth(lineWidth.toFloat().coerceAtLeast(1.0f))
-        return program.draw(WebGLRenderingContext.LINE_STRIP, vertices, color)
+        return program.draw(WebGLRenderingContext.LINES, vertices, color)
     }
 
     private fun complexLineVertices(
@@ -62,27 +70,32 @@ internal class LineRenderer(
         style: LineStyleDefinition,
         hpglSegments: List<HpglLineSegment>,
         bounds: HpglBounds
-    ): FloatArray {
+    ): FloatArrayBuilder {
         val coordinates = when (geometry) {
             is EncGeometry.LineString -> geometry.coordinates
             is EncGeometry.Polygon -> geometry.outer
-            else -> return FloatArray(0)
+            else -> return FloatArrayBuilder(0)
         }
-        if (coordinates.size < 2) return FloatArray(0)
+        if (coordinates.size < 2) return FloatArrayBuilder(0)
 
         val sx = projector.pixelToClipX(1.0).toDouble()
         val sy = projector.pixelToClipY(1.0).toDouble()
-        if (sx <= 0.0 || sy <= 0.0) return FloatArray(0)
+        if (sx <= 0.0 || sy <= 0.0) return FloatArrayBuilder(0)
 
         val tileWidthPx = tileWidthPx(style, bounds)
         val tileHeightPx = tileHeightPx(style, bounds)
         val originX = bounds.minX
         val originY = if (style.height > 0.0) style.pivotY else bounds.centerY
         val floats = FloatArrayBuilder()
+        val limitX = projector.clipLimitX()
+        val limitY = projector.clipLimitY()
 
         for (i in 0 until coordinates.lastIndex) {
-            val a = projector.project(coordinates[i])
-            val b = projector.project(coordinates[i + 1])
+            val rawA = projector.project(coordinates[i])
+            val rawB = projector.project(coordinates[i + 1])
+            val clipped = clipSegmentToViewport(rawA, rawB, limitX, limitY) ?: continue
+            val a = clipped.first
+            val b = clipped.second
             val dxPx = (b.x.toDouble() - a.x.toDouble()) / sx
             val dyPx = -(b.y.toDouble() - a.y.toDouble()) / sy
             val lengthPx = hypot(dxPx, dyPx)
@@ -117,7 +130,7 @@ internal class LineRenderer(
                 placed++
             }
         }
-        return floats.toFloatArray()
+        return floats
     }
 
     private fun appendLineStyleTile(
@@ -168,16 +181,7 @@ internal class LineRenderer(
         return (sourceHeight * HPGL_TO_PIXEL).coerceIn(2.0, 80.0)
     }
 
-    private fun List<Coordinate>.toVertices(projector: GeometryProjector): FloatArray {
-        val floats = FloatArrayBuilder(size * 2)
-        for (coordinate in this) {
-            val point = projector.project(coordinate)
-            floats.add(point.x, point.y)
-        }
-        return floats.toFloatArray()
-    }
-
-    private fun lineSegments(commands: List<S52DrawCommand.LineSimple>, projector: GeometryProjector): FloatArray {
+    private fun lineSegments(commands: List<S52DrawCommand.LineSimple>, projector: GeometryProjector): FloatArrayBuilder {
         val floats = FloatArrayBuilder(commands.size * 8)
         for (command in commands) {
             when (val geometry = command.geometry) {
@@ -186,7 +190,7 @@ internal class LineRenderer(
                 else -> Unit
             }
         }
-        return floats.toFloatArray()
+        return floats
     }
 
     private fun appendLineStripSegments(
@@ -195,10 +199,13 @@ internal class LineRenderer(
         out: FloatArrayBuilder
     ) {
         if (coordinates.size < 2) return
+        val limitX = projector.clipLimitX()
+        val limitY = projector.clipLimitY()
         var previous = projector.project(coordinates[0])
         for (i in 1 until coordinates.size) {
             val next = projector.project(coordinates[i])
-            out.addLine(previous, next)
+            val clipped = clipSegmentToViewport(previous, next, limitX, limitY)
+            if (clipped != null) out.addLine(clipped.first, clipped.second)
             previous = next
         }
     }
@@ -208,3 +215,5 @@ internal class LineRenderer(
         private const val MAX_TILES_PER_SEGMENT: Int = 512
     }
 }
+
+private data class CachedHpgl(val segments: List<HpglLineSegment>, val bounds: HpglBounds?)

@@ -32,7 +32,7 @@ internal class AreaFillRenderer(
         for (command in commands) {
             val polygon = command.geometry as? EncGeometry.Polygon ?: continue
             val projected = ProjectedPolygonClip.from(polygon, projector) ?: continue
-            calls += stencilClipper.fill(projected, colors.resolve(command.colorToken, fallback = "DEPDW"))
+            calls += stencilClipper.fill(projected, projector, colors.resolve(command.colorToken, fallback = "DEPDW"))
         }
         return calls
     }

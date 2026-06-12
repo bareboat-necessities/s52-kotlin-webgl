@@ -16,6 +16,7 @@ internal class AreaPatternRenderer(
     private val presLib: PresLibPack,
     private val stencilClipper: StencilPolygonClipper
 ) {
+    private val vectorHpglCache = mutableMapOf<String, CachedPatternHpgl>()
     fun render(
         command: S52DrawCommand.AreaPattern,
         projector: GeometryProjector,
@@ -35,7 +36,7 @@ internal class AreaPatternRenderer(
 
         val vertices = hatchLines(projected, projector)
         if (vertices.isEmpty()) return 0
-        return clipped(projected) {
+        return clipped(projected, projector) {
             solidProgram.draw(WebGLRenderingContext.LINES, vertices, colors.resolve(command.backgroundColorToken, fallback = "CHMGD"))
         }
     }
@@ -51,7 +52,7 @@ internal class AreaPatternRenderer(
         val atlas = rasterAtlases.textureFor(palette, bitmap.atlasFileName) ?: return 0
         val vertices = bitmapTileVertices(projected, projector, bitmap, atlas.width, atlas.height)
         if (vertices.isEmpty()) return 0
-        return clipped(projected) {
+        return clipped(projected, projector) {
             textureProgram.drawTriangles(atlas.texture, vertices, alpha = 1.0f)
         }
     }
@@ -63,20 +64,26 @@ internal class AreaPatternRenderer(
         colors: ColorResolver
     ): Int {
         val hpgl = pattern.vectorHpgl ?: return 0
-        val segments = HpglLineParser.parseSegments(hpgl)
-        val bounds = HpglLineParser.bounds(segments) ?: return 0
-        if (segments.isEmpty()) return 0
+        val cachedHpgl = cachedPatternHpgl(pattern.name, hpgl)
+        val bounds = cachedHpgl.bounds ?: return 0
+        if (cachedHpgl.segments.isEmpty()) return 0
 
-        val vertices = vectorTileVertices(projected, projector, pattern, segments, bounds)
+        val vertices = vectorTileVertices(projected, projector, pattern, cachedHpgl.segments, bounds)
         if (vertices.isEmpty()) return 0
         gl.lineWidth(1.0f)
-        return clipped(projected) {
+        return clipped(projected, projector) {
             solidProgram.draw(WebGLRenderingContext.LINES, vertices, colors.resolve(pattern.colorRefs.firstOrNull(), fallback = "CHMGD"))
         }
     }
 
-    private fun clipped(projected: ProjectedPolygonClip, drawInside: () -> Int): Int =
-        if (stencilClipper.isAvailable()) stencilClipper.clip(projected, drawInside) else drawInside()
+
+    private fun cachedPatternHpgl(name: String, hpgl: String): CachedPatternHpgl =
+        vectorHpglCache.getOrPut(name) {
+            val segments = HpglLineParser.parseSegments(hpgl)
+            CachedPatternHpgl(segments, HpglLineParser.bounds(segments))
+        }
+    private fun clipped(projected: ProjectedPolygonClip, projector: GeometryProjector, drawInside: () -> Int): Int =
+        if (stencilClipper.isAvailable()) stencilClipper.clip(projected, projector, drawInside) else drawInside()
 
     private fun bitmapTileVertices(
         projected: ProjectedPolygonClip,
@@ -273,3 +280,5 @@ internal class AreaPatternRenderer(
         private const val HATCH_SPACING_PX: Double = 18.0
     }
 }
+
+private data class CachedPatternHpgl(val segments: List<HpglLineSegment>, val bounds: HpglBounds?)

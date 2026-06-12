@@ -9,8 +9,7 @@ internal data class ProjectedPolygonClip(
     val outer: List<ClipPoint>,
     val holes: List<List<ClipPoint>>
 ) {
-    val allPoints: List<ClipPoint> = outer + holes.flatten()
-    val bounds: ClipBounds? = ClipBounds.of(allPoints)
+    val bounds: ClipBounds? = ClipBounds.of(outer, holes)
 
     fun contains(x: Float, y: Float): Boolean {
         if (outer.size < 3) return false
@@ -28,8 +27,13 @@ internal data class ProjectedPolygonClip(
         if (contains(minX, minY) || contains(maxX, minY) || contains(maxX, maxY) || contains(minX, maxY)) {
             return true
         }
-        for (point in allPoints) {
+        for (point in outer) {
             if (point.x >= minX && point.x <= maxX && point.y >= minY && point.y <= maxY) return true
+        }
+        for (hole in holes) {
+            for (point in hole) {
+                if (point.x >= minX && point.x <= maxX && point.y >= minY && point.y <= maxY) return true
+            }
         }
         if (ringIntersectsRect(outer, minX, maxX, minY, maxY)) return true
         for (hole in holes) if (ringIntersectsRect(hole, minX, maxX, minY, maxY)) return true
@@ -40,11 +44,23 @@ internal data class ProjectedPolygonClip(
         fun from(polygon: EncGeometry.Polygon, projector: GeometryProjector): ProjectedPolygonClip? {
             if (polygon.outer.size < 3) return null
             val tolerance = projector.ringSimplifyTolerance()
-            val projectedOuter = polygon.outer.map(projector::project).simplifyRing(tolerance)
+            val limitX = projector.clipLimitX()
+            val limitY = projector.clipLimitY()
+
+            val projectedOuter = polygon.outer
+                .map(projector::project)
+                .clipRingToRect(limitX, limitY)
+                .simplifyRing(tolerance)
             if (projectedOuter.size < 3) return null
+
             val projectedHoles = polygon.holes
-                .map { hole -> hole.map(projector::project).simplifyRing(tolerance) }
+                .map { hole ->
+                    hole.map(projector::project)
+                        .clipRingToRect(limitX, limitY)
+                        .simplifyRing(tolerance)
+                }
                 .filter { it.size >= 3 }
+
             return ProjectedPolygonClip(projectedOuter, projectedHoles)
         }
     }
@@ -52,20 +68,32 @@ internal data class ProjectedPolygonClip(
 
 internal data class ClipBounds(val minX: Float, val maxX: Float, val minY: Float, val maxY: Float) {
     companion object {
-        fun of(points: List<ClipPoint>): ClipBounds? {
-            if (points.isEmpty()) return null
-            var minX = points.first().x
-            var maxX = points.first().x
-            var minY = points.first().y
-            var maxY = points.first().y
-            for (i in 1 until points.size) {
-                val p = points[i]
-                minX = min(minX, p.x)
-                maxX = max(maxX, p.x)
-                minY = min(minY, p.y)
-                maxY = max(maxY, p.y)
+        fun of(outer: List<ClipPoint>, holes: List<List<ClipPoint>> = emptyList()): ClipBounds? {
+            if (outer.isEmpty() && holes.all { it.isEmpty() }) return null
+            var initialized = false
+            var minX = 0.0f
+            var maxX = 0.0f
+            var minY = 0.0f
+            var maxY = 0.0f
+
+            fun include(point: ClipPoint) {
+                if (!initialized) {
+                    minX = point.x
+                    maxX = point.x
+                    minY = point.y
+                    maxY = point.y
+                    initialized = true
+                } else {
+                    minX = min(minX, point.x)
+                    maxX = max(maxX, point.x)
+                    minY = min(minY, point.y)
+                    maxY = max(maxY, point.y)
+                }
             }
-            return ClipBounds(minX, maxX, minY, maxY)
+
+            for (point in outer) include(point)
+            for (hole in holes) for (point in hole) include(point)
+            return if (initialized) ClipBounds(minX, maxX, minY, maxY) else null
         }
     }
 }
@@ -106,6 +134,88 @@ internal fun List<ClipPoint>.simplifyRing(tolerance: Double): List<ClipPoint> {
         }
     }
     return simplified
+}
+
+
+private fun List<ClipPoint>.clipRingToRect(limitX: Float, limitY: Float): List<ClipPoint> {
+    if (size < 3) return this
+    var out = this
+    out = out.clipAgainstBoundary(
+        inside = { p -> p.x >= -limitX },
+        intersect = { a, b ->
+            val dx = b.x - a.x
+            if (abs(dx) <= EPSILON_FLOAT) {
+                ClipPoint(-limitX, a.y)
+            } else {
+                val t = (-limitX - a.x) / dx
+                ClipPoint(-limitX, a.y + (b.y - a.y) * t)
+            }
+        }
+    )
+    if (out.size < 3) return emptyList()
+    out = out.clipAgainstBoundary(
+        inside = { p -> p.x <= limitX },
+        intersect = { a, b ->
+            val dx = b.x - a.x
+            if (abs(dx) <= EPSILON_FLOAT) {
+                ClipPoint(limitX, a.y)
+            } else {
+                val t = (limitX - a.x) / dx
+                ClipPoint(limitX, a.y + (b.y - a.y) * t)
+            }
+        }
+    )
+    if (out.size < 3) return emptyList()
+    out = out.clipAgainstBoundary(
+        inside = { p -> p.y >= -limitY },
+        intersect = { a, b ->
+            val dy = b.y - a.y
+            if (abs(dy) <= EPSILON_FLOAT) {
+                ClipPoint(a.x, -limitY)
+            } else {
+                val t = (-limitY - a.y) / dy
+                ClipPoint(a.x + (b.x - a.x) * t, -limitY)
+            }
+        }
+    )
+    if (out.size < 3) return emptyList()
+    out = out.clipAgainstBoundary(
+        inside = { p -> p.y <= limitY },
+        intersect = { a, b ->
+            val dy = b.y - a.y
+            if (abs(dy) <= EPSILON_FLOAT) {
+                ClipPoint(a.x, limitY)
+            } else {
+                val t = (limitY - a.y) / dy
+                ClipPoint(a.x + (b.x - a.x) * t, limitY)
+            }
+        }
+    )
+    return out
+}
+
+private inline fun List<ClipPoint>.clipAgainstBoundary(
+    inside: (ClipPoint) -> Boolean,
+    intersect: (ClipPoint, ClipPoint) -> ClipPoint
+): List<ClipPoint> {
+    if (isEmpty()) return emptyList()
+    val result = ArrayList<ClipPoint>(size + 4)
+    var previous = last()
+    var previousInside = inside(previous)
+    for (current in this) {
+        val currentInside = inside(current)
+        when {
+            currentInside && previousInside -> result += current
+            currentInside && !previousInside -> {
+                result += intersect(previous, current)
+                result += current
+            }
+            !currentInside && previousInside -> result += intersect(previous, current)
+        }
+        previous = current
+        previousInside = currentInside
+    }
+    return result
 }
 
 private fun pointInRing(ring: List<ClipPoint>, x: Float, y: Float): Boolean {
