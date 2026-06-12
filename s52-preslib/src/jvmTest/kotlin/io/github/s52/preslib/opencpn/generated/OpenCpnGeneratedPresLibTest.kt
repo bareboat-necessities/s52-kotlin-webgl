@@ -23,8 +23,10 @@ class OpenCpnGeneratedPresLibTest {
 
     @Test
     fun runtimePackExposesOpenCpnRegistriesWithoutChangingRendererDefaults() {
+        val source = OpenCpnGeneratedPresLib.sourcePack()
         val pack = OpenCpnGeneratedPresLib.pack()
-        assertEquals(3057, pack.lookupTable.records().size)
+        assertEquals(3057, source.lookupRecords.size)
+        assertEquals(source.lookupRecords.size + 2, pack.lookupTable.records().size)
         assertEquals(1093, pack.symbols.names().size)
         assertEquals(57, pack.lineStyles.names().size)
         assertEquals(30, pack.patterns.names().size)
