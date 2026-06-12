@@ -26,7 +26,22 @@ internal class TextureProgram(
     fun drawTriangles(texture: WebGLTexture, vertices: FloatArray, alpha: Float = 1.0f): Int {
         if (vertices.size < 24) return 0
         require(vertices.size % 4 == 0) { "TextureProgram expects interleaved x/y/u/v vertices" }
-        val vertexCount = vertices.size / 4
+        return drawPrepared(texture, vertices.size, vertices.toFloat32Array(), alpha)
+    }
+
+    fun drawTriangles(texture: WebGLTexture, vertices: FloatArrayBuilder, alpha: Float = 1.0f): Int {
+        if (vertices.size < 24) return 0
+        require(vertices.size % 4 == 0) { "TextureProgram expects interleaved x/y/u/v vertices" }
+        return drawPrepared(texture, vertices.size, vertices.toFloat32Array(), alpha)
+    }
+
+    private fun drawPrepared(
+        texture: WebGLTexture,
+        floatCount: Int,
+        vertices: org.khronos.webgl.Float32Array,
+        alpha: Float
+    ): Int {
+        val vertexCount = floatCount / 4
 
         gl.useProgram(program)
         gl.activeTexture(WebGLRenderingContext.TEXTURE0)
@@ -35,7 +50,7 @@ internal class TextureProgram(
         gl.uniform1f(alphaLocation, alpha)
 
         gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, buffer)
-        gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, vertices.toFloat32Array(), WebGLRenderingContext.STREAM_DRAW)
+        gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, vertices, WebGLRenderingContext.STREAM_DRAW)
 
         gl.enableVertexAttribArray(positionLocation)
         gl.vertexAttribPointer(positionLocation, 2, WebGLRenderingContext.FLOAT, false, 16, 0)

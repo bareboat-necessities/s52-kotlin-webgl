@@ -1,5 +1,7 @@
 package io.github.s52.render.webgl.internal
 
+import org.khronos.webgl.Float32Array
+
 /**
  * Small growable primitive-float buffer for WebGL vertex assembly.
  *
@@ -66,6 +68,16 @@ internal class FloatArrayBuilder(initialCapacity: Int = DEFAULT_INITIAL_CAPACITY
     }
 
     fun toFloatArray(): FloatArray = data.copyOf(size)
+
+    fun toFloat32Array(): Float32Array {
+        val out = Float32Array(size)
+        for (i in 0 until size) writeFloat32(out, i, data[i])
+        return out
+    }
+
+    private fun writeFloat32(array: Float32Array, index: Int, value: Float) {
+        js("array[index] = value")
+    }
 
     private fun ensureCapacity(required: Int) {
         if (required <= data.size) return

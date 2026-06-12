@@ -18,11 +18,21 @@ internal class SolidColorProgram(
     fun draw(mode: Int, vertices: FloatArray, color: GlColor): Int {
         if (vertices.size < 2) return 0
         require(vertices.size % 2 == 0) { "SolidColorProgram expects x/y vertex pairs" }
-        val vertexCount = vertices.size / 2
+        return drawPrepared(mode, vertices.size, vertices.toFloat32Array(), color)
+    }
+
+    fun draw(mode: Int, vertices: FloatArrayBuilder, color: GlColor): Int {
+        if (vertices.size < 2) return 0
+        require(vertices.size % 2 == 0) { "SolidColorProgram expects x/y vertex pairs" }
+        return drawPrepared(mode, vertices.size, vertices.toFloat32Array(), color)
+    }
+
+    private fun drawPrepared(mode: Int, floatCount: Int, vertices: org.khronos.webgl.Float32Array, color: GlColor): Int {
+        val vertexCount = floatCount / 2
 
         gl.useProgram(program)
         gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, buffer)
-        gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, vertices.toFloat32Array(), WebGLRenderingContext.STREAM_DRAW)
+        gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, vertices, WebGLRenderingContext.STREAM_DRAW)
         gl.enableVertexAttribArray(positionLocation)
         gl.vertexAttribPointer(positionLocation, 2, WebGLRenderingContext.FLOAT, false, 0, 0)
         gl.uniform4f(colorLocation, color.r, color.g, color.b, color.a)

@@ -11,6 +11,7 @@ import io.github.s52.render.webgl.internal.GeometryProjector
 import io.github.s52.render.webgl.internal.LineRenderer
 import io.github.s52.render.webgl.internal.RasterAtlasCache
 import io.github.s52.render.webgl.internal.SolidColorProgram
+import io.github.s52.render.webgl.internal.StencilPolygonClipper
 import io.github.s52.render.webgl.internal.SymbolRenderer
 import io.github.s52.render.webgl.internal.TextureProgram
 import io.github.s52.render.webgl.internal.TextRenderer
@@ -36,8 +37,9 @@ class WebGlS52Renderer(
     private val solidProgram = SolidColorProgram(gl)
     private val textureProgram = TextureProgram(gl)
     private val rasterAtlasCache = RasterAtlasCache(gl, onAtlasReady = onResourcesChanged)
-    private val areaFillRenderer = AreaFillRenderer(gl, solidProgram)
-    private val areaPatternRenderer = AreaPatternRenderer(gl, solidProgram, textureProgram, rasterAtlasCache, presLib)
+    private val stencilClipper = StencilPolygonClipper(gl, solidProgram)
+    private val areaFillRenderer = AreaFillRenderer(gl, solidProgram, stencilClipper)
+    private val areaPatternRenderer = AreaPatternRenderer(gl, solidProgram, textureProgram, rasterAtlasCache, presLib, stencilClipper)
     private val lineRenderer = LineRenderer(gl, solidProgram, presLib)
     private val symbolRenderer = SymbolRenderer(gl, solidProgram, textureProgram, rasterAtlasCache, presLib)
     private val textRenderer = TextRenderer(gl, solidProgram)
@@ -166,7 +168,8 @@ class WebGlS52Renderer(
 
     private companion object {
         private fun requireWebGl2(canvas: HTMLCanvasElement): WebGLRenderingContext {
-            val context = canvas.getContext("webgl2")
+            val context = getWebGl2ContextWithStencil(canvas)
+                ?: canvas.getContext("webgl2")
                 ?: error("WebGL2 is not available in this browser")
 
             /*
@@ -181,6 +184,9 @@ class WebGlS52Renderer(
              */
             return context.unsafeCast<WebGLRenderingContext>()
         }
+
+        private fun getWebGl2ContextWithStencil(canvas: HTMLCanvasElement): Any? =
+            js("canvas.getContext('webgl2', { alpha: true, antialias: true, stencil: true })")
     }
 }
 
