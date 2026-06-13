@@ -9,7 +9,7 @@ import kotlin.test.assertTrue
 class PresLibPackTest {
     @Test
     fun packContainsSmokeAssets() {
-        val pack = PresLibPack.phase0Minimal()
+        val pack = PresLibPack.minimal()
         assertNotNull(pack.colors.color(S52Palette.DayBright, "LANDA"))
         assertNotNull(pack.symbols.find("BOYLAT01"))
         assertTrue(pack.lookupTable.records().any { it.objectClass == S57ObjectClass.DEPARE })

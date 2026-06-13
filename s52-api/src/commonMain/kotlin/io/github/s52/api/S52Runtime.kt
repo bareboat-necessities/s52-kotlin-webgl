@@ -87,8 +87,8 @@ class S52Runtime private constructor(
          * or locally supplied [PresLibPack] when they integrate official data.
          */
         fun synthetic(): S52Runtime = from(
-            presLib = PresLibPack.phase2Synthetic(),
-            cspRegistry = DefaultCspRegistry.phase6Complete()
+            presLib = PresLibPack.synthetic(),
+            cspRegistry = DefaultCspRegistry.complete()
         )
 
         /** Runtime backed by the generated OpenCPN Presentation Library pack. */
@@ -100,7 +100,7 @@ class S52Runtime private constructor(
         /** Build a runtime from explicit Presentation Library and CSP inputs. */
         fun from(
             presLib: PresLibPack,
-            cspRegistry: CspRegistry = DefaultCspRegistry.phase6Complete()
+            cspRegistry: CspRegistry = DefaultCspRegistry.complete()
         ): S52Runtime = S52Runtime(
             presLib = presLib,
             cspRegistry = cspRegistry,

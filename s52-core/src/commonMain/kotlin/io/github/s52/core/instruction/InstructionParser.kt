@@ -8,7 +8,7 @@ class InstructionParseException(
 /**
  * Parser for S-52 Presentation Library instruction strings.
  *
- * The compatibility API returns AST nodes only. Phase 3 also exposes detailed
+ * The compatibility API returns AST nodes only. Also exposes detailed
  * parse results with source ranges, raw argument text, and canonical formatting.
  */
 object InstructionParser {

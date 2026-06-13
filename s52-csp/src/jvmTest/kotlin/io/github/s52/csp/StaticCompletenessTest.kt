@@ -20,10 +20,10 @@ class StaticCompletenessTest {
     }
 
     @Test
-    fun sourcePresentationLibraryHasZeroStaticCompletenessDiagnosticsWithPhase6Registry() {
+    fun sourcePresentationLibraryHasZeroStaticCompletenessDiagnosticsWithRegistry() {
         val report = StaticCompletenessValidator.validateSource(
-            source = GeneratedPhase2PresLib.sourcePack(),
-            implementedCsps = CspId.completePhase6Names()
+            source = GeneratedPresLib.sourcePack(),
+            implementedCsps = CspId.completeNames()
         )
 
         assertFalse(report.hasErrors, report.toMarkdown())

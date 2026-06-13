@@ -19,13 +19,13 @@ import io.github.s52.core.settings.SymbolStyle
 object S52 {
     val version: S52Version = S52Version.Current
 
-    /** Build the default Phase 14 runtime using the synthetic pack and complete CSP registry. */
+    /** Build the default runtime using the synthetic pack and complete CSP registry. */
     fun defaultRuntime(): S52Runtime = S52Runtime.synthetic()
 
-    /** Build the Phase 16+ session facade using the synthetic pack and complete CSP registry. */
+    /** Build the session facade using the synthetic pack and complete CSP registry. */
     fun synthetic(): S52PortrayalSession = S52PortrayalSession.synthetic()
 
-    /** Build the Phase 20 session facade using the s52lib-compatible synthetic pack. */
+    /** Build the session facade using the s52lib-compatible synthetic pack. */
     fun s52LibCompat(): S52PortrayalSession = S52PortrayalSession.s52LibCompat()
 
     /** Build a runtime backed by the generated OpenCPN Presentation Library pack. */

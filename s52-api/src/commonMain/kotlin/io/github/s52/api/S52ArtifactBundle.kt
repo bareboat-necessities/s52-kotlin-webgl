@@ -1,7 +1,7 @@
 package io.github.s52.api
 
 /**
- * Phase 19 portable text artifact produced by the public facade.
+ * Portable text artifact produced by the public facade.
  *
  * Artifacts are intentionally dependency-free and text-only so they can be
  * attached to GitHub issues, uploaded as CI artifacts, written by browser
@@ -40,7 +40,7 @@ data class S52Artifact(
     }
 }
 
-/** Collection of named Phase 19 artifacts with stable index formats. */
+/** Collection of named artifacts with stable index formats. */
 data class S52ArtifactBundle(
     val name: String,
     val artifacts: List<S52Artifact>

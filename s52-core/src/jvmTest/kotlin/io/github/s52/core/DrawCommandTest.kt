@@ -29,7 +29,7 @@ class DrawCommandTest {
 
     @Test
     fun commandKindsAreStableAndValidationAcceptsS52Tokens() {
-        val commands = portrayPhase7Fixture()
+        val commands = portrayFixture()
         val kinds = commands.map { it.kind }
 
         assertEquals(
@@ -47,7 +47,7 @@ class DrawCommandTest {
 
     @Test
     fun soundgTextInstructionBecomesDedicatedSoundingCommand() {
-        val commands = portrayPhase7Fixture()
+        val commands = portrayFixture()
         val sounding = commands.filterIsInstance<S52DrawCommand.Sounding>().single()
 
         assertEquals("3.2", sounding.depthLabel)
@@ -57,7 +57,7 @@ class DrawCommandTest {
 
     @Test
     fun commandTranscriptIsDeterministicAndRendererIndependent() {
-        val commands = portrayPhase7Fixture()
+        val commands = portrayFixture()
         val transcript = S52DrawCommandTranscript.serialize(commands)
 
         assertTrue(transcript.contains("\"kind\":\"area-fill\""), transcript)

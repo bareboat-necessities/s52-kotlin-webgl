@@ -36,7 +36,7 @@ class CompleteCspTest {
     }
 
     @Test
-    fun everyPhase6CspHasAGoldenInstructionTranscript() {
+    fun everyCspHasAGoldenInstructionTranscript() {
         val settings = MarinerSettings(
             displayCategory = DisplayCategory.Other,
             safetyDepthMeters = 5.0,

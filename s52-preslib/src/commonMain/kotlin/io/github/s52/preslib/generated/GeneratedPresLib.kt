@@ -17,7 +17,7 @@ import io.github.s52.preslib.source.SourceSymbol
 import io.github.s52.preslib.source.SourceVectorCommand
 
 /**
- * Generated-style Phase 2 Presentation Library fixture.
+ * Generated-style Presentation Library fixture.
  *
  * This is deliberately small and synthetic. It proves the importer, builder,
  * registry, and validation architecture without bundling official IHO assets.
@@ -25,10 +25,10 @@ import io.github.s52.preslib.source.SourceVectorCommand
 object GeneratedPresLib {
     fun sourcePack(): PresLibSourcePack = PresLibSourcePack(
         metadata = PresLibMetadata(
-            name = "Phase 2 synthetic S-52 Presentation Library pack",
-            edition = "phase2-synthetic",
+            name = "synthetic S-52 Presentation Library pack",
+            edition = "synthetic",
             sourceDescription = "Synthetic data for repository tests. Official IHO Presentation Library assets are not bundled.",
-            generatedBy = "GeneratedPhase2PresLib"
+            generatedBy = "GeneratedPresLib"
         ),
         colorTables = S52Palette.entries.map { palette -> SourceColorTable(palette, colorsFor(palette)) },
         symbols = listOf(

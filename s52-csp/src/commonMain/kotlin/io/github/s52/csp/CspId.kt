@@ -3,7 +3,7 @@ package io.github.s52.csp
 import io.github.s52.core.csp.ConditionalSymbologyProcedure
 
 /**
- * Phase 6 CSP identifiers and their starter implementations.
+ * CSP identifiers and their starter implementations.
  *
  * The enum stores behavior for S-52 procedure identifiers, not for S-57 object
  * classes. This keeps S-57 catalogues data-only while allowing complete static

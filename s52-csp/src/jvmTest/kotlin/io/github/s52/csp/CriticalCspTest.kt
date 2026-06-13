@@ -32,9 +32,9 @@ class CriticalCspTest {
     @Test
     fun generatedPackReferencesAllCriticalProcedures() {
         val pack = PresLibPack.synthetic()
-        val report = CspCoverageValidator.validate(pack.lookupTable, DefaultCspRegistry.phase6Complete())
+        val report = CspCoverageValidator.validate(pack.lookupTable, DefaultCspRegistry.complete())
         assertFalse(report.hasErrors, report.toMarkdown())
-        assertTrue(report.referenced.containsAll(CspId.criticalPhase5Names()))
+        assertTrue(report.referenced.containsAll(CspId.criticalNames()))
     }
 
     @Test
@@ -114,8 +114,8 @@ class CriticalCspTest {
 
     @Test
     fun engineExpandsCriticalCspIntoDrawCommands() {
-        val pack = PresLibPack.phase2Synthetic()
-        val engine = S52PortrayalEngine(pack.lookupTable, DefaultCspRegistry.phase5Critical())
+        val pack = PresLibPack.synthetic()
+        val engine = S52PortrayalEngine(pack.lookupTable, DefaultCspRegistry.critical())
         val commands = engine.portray(
             listOf(
                 pointFeature(S57ObjectClass.SOUNDG, S57Attributes.of(S57Attribute.VALSOU to S57Value.Decimal(3.0))),

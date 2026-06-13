@@ -35,7 +35,7 @@ import kotlin.math.sin
 /**
  * JVM-only CI exporter for generated symbology SVGs.
  *
- * Phase 26 exports OpenCPN chartsymbols.xml assets as color-aware,
+ * Exports OpenCPN chartsymbols.xml assets as color-aware,
  * contour-aware, and bounds-safe SVG. It also renders line-style assets as
  * repeated samples, instead of a single generic placeholder line.
  */

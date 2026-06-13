@@ -9,7 +9,7 @@ import kotlin.math.max
 /**
  * Renderer viewport in chart coordinates.
  *
- * Phase 8 intentionally uses an equirectangular lon/lat projection because the
+ * Intentionally uses an equirectangular lon/lat projection because the
  * renderer consumes already-assembled chart geometry. A future chart engine can
  * pass a viewport computed by its own map projection layer.
  */

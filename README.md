@@ -69,7 +69,7 @@ demo              Kotlin/JS browser demo
 
 ## Legal boundary
 
-Official IHO Presentation Library assets should be treated as external input unless redistribution rights are clear. Phase 2 provides the generator/builder/validation structure so a developer can provide local standards-derived assets and generate runtime tables without committing restricted source material.
+Official IHO Presentation Library assets should be treated as external input unless redistribution rights are clear. Provides the generator/builder/validation structure so a developer can provide local standards-derived assets and generate runtime tables without committing restricted source material.
 
 OpenCPN-derived symbology import and bundled OpenCPN-compatible symbology inputs require the project’s GPL-2.0-or-later licensing boundary.
 

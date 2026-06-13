@@ -4,7 +4,7 @@ import io.github.s52.core.draw.DrawCommandKind
 import io.github.s52.core.draw.S52DrawCommand
 
 /**
- * Phase 17 diagnostic handoff bundle.
+ * Diagnostic handoff bundle.
  *
  * The bundle is intentionally renderer-independent and dependency-light. It is
  * suitable for issue reports, CI artifacts, validation handoff, and downstream
@@ -89,7 +89,7 @@ data class S52DiagnosticBundle(
     }
 }
 
-/** Public helper for producing Phase 17 diagnostics from the Phase 16 facade. */
+/** Public helper for producing diagnostics from the facade. */
 object S52Diagnostics {
     fun create(
         session: S52PortrayalSession,

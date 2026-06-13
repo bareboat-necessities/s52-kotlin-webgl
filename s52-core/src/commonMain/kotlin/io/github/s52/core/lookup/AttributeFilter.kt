@@ -10,7 +10,7 @@ import kotlin.math.abs
  * Typed lookup-table attribute predicate.
  *
  * The official Presentation Library lookup table contains attribute-condition
- * columns in addition to object class and primitive. Phase 4 keeps those
+ * columns in addition to object class and primitive. Keeps those
  * conditions as typed filter nodes so they can be indexed, scored, tested, and
  * generated. Use [Predicate] only for local experiments; generated lookup rows
  * should prefer the serializable structural filters below.

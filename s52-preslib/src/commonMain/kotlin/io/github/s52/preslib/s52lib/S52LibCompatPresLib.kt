@@ -2,7 +2,7 @@ package io.github.s52.preslib.s52lib
 
 import io.github.s52.core.settings.S52Palette
 import io.github.s52.preslib.PresLibPack
-import io.github.s52.preslib.generated.GeneratedPhase2PresLib
+import io.github.s52.preslib.generated.GeneratedPresLib
 import io.github.s52.preslib.source.PresLibMetadata
 import io.github.s52.preslib.source.PresLibPackBuilder
 import io.github.s52.preslib.source.PresLibSourcePack

@@ -12,7 +12,7 @@ import io.github.s52.preslib.validation.StaticCompletenessReport
 import io.github.s52.preslib.validation.StaticCompletenessValidator
 
 /**
- * Phase 16 consumer-facing facade.
+ * Consumer-facing facade.
  *
  * The facade deliberately remains small: it wires a Presentation Library pack,
  * a CSP registry, the core portrayal engine, command validation, and stable
@@ -75,8 +75,8 @@ class S52PortrayalSession(
         fun synthetic(
             failOnStaticCompletenessErrors: Boolean = true
         ): S52PortrayalSession = S52PortrayalSession(
-            presLib = PresLibPack.phase2Synthetic(),
-            cspRegistry = DefaultCspRegistry.phase6Complete(),
+            presLib = PresLibPack.synthetic(),
+            cspRegistry = DefaultCspRegistry.complete(),
             failOnStaticCompletenessErrors = failOnStaticCompletenessErrors
         )
 
@@ -84,7 +84,7 @@ class S52PortrayalSession(
             failOnStaticCompletenessErrors: Boolean = true
         ): S52PortrayalSession = S52PortrayalSession(
             presLib = PresLibPack.s52LibCompat(),
-            cspRegistry = DefaultCspRegistry.phase6Complete(),
+            cspRegistry = DefaultCspRegistry.complete(),
             failOnStaticCompletenessErrors = failOnStaticCompletenessErrors
         )
 
