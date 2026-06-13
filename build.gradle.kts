@@ -82,20 +82,17 @@ tasks.register("phase4Check") {
     dependsOn("phase3Check")
 }
 
-
 tasks.register("phase5Check") {
     group = "verification"
     description = "Runs critical CSP framework checks and all previous phase checks."
     dependsOn("phase4Check")
 }
 
-
 tasks.register("phase6Check") {
     group = "verification"
     description = "Runs complete CSP coverage checks and all previous phase checks."
     dependsOn("phase5Check")
 }
-
 
 tasks.register("phase7Check") {
     group = "verification"
@@ -328,7 +325,6 @@ tasks.register("Check") {
     description = "Runs artifact bundle checks and all previous phase checks."
     dependsOn("Check", "ArtifactsAudit", ":s52-api:build", ":s52-api:jvmTest", ":s52-tests:jvmTest")
 }
-
 
 tasks.register("GalleryAudit") {
     group = "verification"
