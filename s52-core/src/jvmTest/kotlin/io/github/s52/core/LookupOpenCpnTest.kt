@@ -24,7 +24,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class LookupPhase29OpenCpnTest {
+class LookupOpenCpnTest {
     @Test
     fun filtersPointRowsByOpenCpnSymbolStyleTableName() {
         val table = LookupTable(
