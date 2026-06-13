@@ -19,7 +19,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class Phase5CriticalCspTest {
+class CriticalCspTest {
     private val context = PortrayalContext(compilationScale = 50_000.0, displayScale = 50_000.0)
 
     @Test

@@ -39,10 +39,3 @@ The `s52-tests` module includes a small external fixture format used by `S64Comm
 
 The WebGL renderer is exercised by the demo and JS build. It renders commands; it does not prove S-52 semantic correctness. Semantic correctness belongs to command-level tests and validation fixtures.
 
-## Recommended CI gate
-
-```bash
-gradle phase14Check
-```
-
-That gate runs every previous phase plus the Phase 14 documentation/example checks.

@@ -6,7 +6,7 @@ import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class Phase9StaticCompletenessTest {
+class StaticCompletenessTest {
     @Test
     fun generatedPresentationLibraryHasZeroStaticCompletenessDiagnosticsWithPhase6Registry() {
         val report = StaticCompletenessValidator.validatePack(

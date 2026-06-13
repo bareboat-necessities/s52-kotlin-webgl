@@ -12,13 +12,7 @@ Do not add S-57 parsing, S-63 decryption, AIS, GPS, route planning, alarms, or c
 
 ## Development checks
 
-Run:
-
-```bash
-gradle phase15Check
-```
-
-For renderer work, also run the browser demo build through the existing phase checks.
+For renderer work, also run the browser demo build through the existing checks.
 
 ## Presentation Library assets
 

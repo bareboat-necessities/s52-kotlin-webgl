@@ -8,7 +8,7 @@ import kotlin.test.assertTrue
 
 class PresLibPackTest {
     @Test
-    fun phase0PackContainsSmokeAssets() {
+    fun packContainsSmokeAssets() {
         val pack = PresLibPack.phase0Minimal()
         assertNotNull(pack.colors.color(S52Palette.DayBright, "LANDA"))
         assertNotNull(pack.symbols.find("BOYLAT01"))

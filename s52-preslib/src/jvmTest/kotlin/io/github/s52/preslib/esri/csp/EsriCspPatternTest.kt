@@ -3,7 +3,7 @@ package io.github.s52.preslib.esri.csp
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
-class EsriPhase79CspPatternTest {
+class EsriCspPatternTest {
     @Test
     fun restrictedAreaAreaPrimitiveEmitsAreaPatternForPhase9() {
         val emit = EsriInstructionEmitter()
