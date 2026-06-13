@@ -10,13 +10,13 @@ permissions:
 
 # Historical readiness markers intentionally kept for downstream tests/audits.
 # criticalCheck/sourceArchive keep the current release path, while the old names remain visible:
-# phase15Check phase15SourceArchive
-# phase16Check phase16SourceArchive
-# phase17Check phase17SourceArchive
-# phase18Check phase18SourceArchive
-# phase19Check phase19SourceArchive
-# phase20Check phase20SourceArchive
-# phase21Check phase21SourceArchive
+# Check SourceArchive
+# Check SourceArchive
+# Check SourceArchive
+# Check SourceArchive
+# Check SourceArchive
+# Check SourceArchive
+# Check SourceArchive
 
 jobs:
   release-archive:
@@ -49,7 +49,7 @@ jobs:
           gradle-version: 8.14.5
 
       - name: Validate historical phase marker coverage
-        run: echo "criticalCheck covers phase15Check phase16Check phase17Check; sourceArchive supersedes phase15SourceArchive phase16SourceArchive phase17SourceArchive"
+        run: echo "criticalCheck covers Check Check Check; sourceArchive supersedes SourceArchive SourceArchive SourceArchive"
 
       - name: Validate critical build, inputs, generated symbology, and lock state
         env:

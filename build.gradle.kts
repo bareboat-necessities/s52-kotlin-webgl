@@ -121,19 +121,19 @@ tasks.register("phase9Check") {
 }
 
 
-tasks.register("phase10Check") {
+tasks.register("Check") {
     group = "verification"
     description = "Runs Phase 10 command-level golden portrayal tests and all previous phase checks."
     dependsOn("phase9Check", ":s52-tests:jvmTest")
 }
 
-tasks.register("phase11Check") {
+tasks.register("Check") {
     group = "verification"
     description = "Runs Phase 11 S-64 / Chart-1 command validation harness checks and all previous phase checks."
-    dependsOn("phase10Check", ":s52-tests:jvmTest")
+    dependsOn("Check", ":s52-tests:jvmTest")
 }
 
-tasks.register("phase15ReleaseAudit") {
+tasks.register("ReleaseAudit") {
     group = "verification"
     description = "Checks Phase 15 release-readiness files and safety boundary."
 
@@ -157,7 +157,7 @@ tasks.register("phase15ReleaseAudit") {
     }
 }
 
-tasks.register<Zip>("phase15SourceArchive") {
+tasks.register<Zip>("SourceArchive") {
     group = "distribution"
     description = "Builds a source archive for Phase 15 release handoff."
     archiveBaseName.set("s52-kotlin-webgl")
@@ -172,13 +172,13 @@ tasks.register<Zip>("phase15SourceArchive") {
     }
 }
 
-tasks.register("phase15Check") {
+tasks.register("Check") {
     group = "verification"
     description = "Runs Phase 15 release-readiness checks and all previous phase checks."
-    dependsOn("phase11Check", "phase15ReleaseAudit", ":s52-tests:jvmTest")
+    dependsOn("Check", "ReleaseAudit", ":s52-tests:jvmTest")
 }
 
-tasks.register("phase16ApiAudit") {
+tasks.register("ApiAudit") {
     group = "verification"
     description = "Checks Phase 16 consumer API facade and integration documentation."
 
@@ -193,15 +193,15 @@ tasks.register("phase16ApiAudit") {
 
         val readme = layout.projectDirectory.file("README.md").asFile.readText()
         check("s52-api" in readme) { "README.md must document the Phase 16 s52-api facade module." }
-        check("phase16Check" in readme) { "README.md must document the Phase 16 check task." }
+        check("Check" in readme) { "README.md must document the Phase 16 check task." }
     }
 }
 
-tasks.register<Zip>("phase16SourceArchive") {
+tasks.register<Zip>("SourceArchive") {
     group = "distribution"
     description = "Builds a source archive for Phase 16 release handoff."
     archiveBaseName.set("s52-kotlin-webgl")
-    archiveClassifier.set("phase16-source")
+    archiveClassifier.set("-source")
     archiveVersion.set(project.version.toString())
 
     from(layout.projectDirectory) {
@@ -212,14 +212,14 @@ tasks.register<Zip>("phase16SourceArchive") {
     }
 }
 
-tasks.register("phase16Check") {
+tasks.register("Check") {
     group = "verification"
     description = "Runs Phase 16 consumer API facade checks and all previous phase checks."
-    dependsOn("phase15Check", "phase16ApiAudit", ":s52-api:build", ":s52-tests:jvmTest")
+    dependsOn("Check", "ApiAudit", ":s52-api:build", ":s52-tests:jvmTest")
 }
 
 
-tasks.register("phase17DiagnosticsAudit") {
+tasks.register("DiagnosticsAudit") {
     group = "verification"
     description = "Checks Phase 17 diagnostic bundle API and integration documentation."
 
@@ -227,7 +227,7 @@ tasks.register("phase17DiagnosticsAudit") {
         val requiredFiles = listOf(
             "s52-api/src/commonMain/kotlin/io/github/s52/api/S52DiagnosticBundle.kt",
             "s52-api/src/jvmTest/kotlin/io/github/s52/api/S52DiagnosticBundleTest.kt",
-            "docs/DIAGNOSTICS_PHASE17.md",
+            "docs/DIAGNOSTICS_.md",
             "samples/integration/diagnostics/README.md"
         )
         val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
@@ -235,15 +235,15 @@ tasks.register("phase17DiagnosticsAudit") {
 
         val readme = layout.projectDirectory.file("README.md").asFile.readText()
         //check("S52DiagnosticBundle" in readme) { "README.md must document the Phase 17 diagnostic bundle." }
-        //check("phase17Check" in readme) { "README.md must document the Phase 17 check task." }
+        //check("Check" in readme) { "README.md must document the Phase 17 check task." }
     }
 }
 
-tasks.register<Zip>("phase17SourceArchive") {
+tasks.register<Zip>("SourceArchive") {
     group = "distribution"
     description = "Builds a source archive for Phase 17 release handoff."
     archiveBaseName.set("s52-kotlin-webgl")
-    archiveClassifier.set("phase17-source")
+    archiveClassifier.set("-source")
     archiveVersion.set(project.version.toString())
 
     from(layout.projectDirectory) {
@@ -254,13 +254,13 @@ tasks.register<Zip>("phase17SourceArchive") {
     }
 }
 
-tasks.register("phase17Check") {
+tasks.register("Check") {
     group = "verification"
     description = "Runs Phase 17 diagnostic bundle checks and all previous phase checks."
-    dependsOn("phase16Check", "phase17DiagnosticsAudit", ":s52-api:build", ":s52-tests:jvmTest")
+    dependsOn("Check", "DiagnosticsAudit", ":s52-api:build", ":s52-tests:jvmTest")
 }
 
-tasks.register("phase18ProfilesAudit") {
+tasks.register("ProfilesAudit") {
     group = "verification"
     description = "Checks Phase 18 built-in portrayal profile API and integration documentation."
 
@@ -268,7 +268,7 @@ tasks.register("phase18ProfilesAudit") {
         val requiredFiles = listOf(
             "s52-api/src/commonMain/kotlin/io/github/s52/api/S52Profile.kt",
             "s52-api/src/jvmTest/kotlin/io/github/s52/api/S52ProfileTest.kt",
-            "docs/PROFILES_PHASE18.md",
+            "docs/PROFILES_.md",
             "samples/integration/profiles/README.md"
         )
         val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
@@ -276,16 +276,16 @@ tasks.register("phase18ProfilesAudit") {
 
         val readme = layout.projectDirectory.file("README.md").asFile.readText()
         check("S52ProfileCatalog" in readme) { "README.md must document the Phase 18 profile API." }
-        //check("phase18Check" in readme) { "README.md must document the Phase 18 check task." }
+        //check("Check" in readme) { "README.md must document the Phase 18 check task." }
         //check("Not for navigation" in readme) { "README.md must keep the not-for-navigation boundary." }
     }
 }
 
-tasks.register<Zip>("phase18SourceArchive") {
+tasks.register<Zip>("SourceArchive") {
     group = "distribution"
     description = "Builds a source archive for Phase 18 release handoff."
     archiveBaseName.set("s52-kotlin-webgl")
-    archiveClassifier.set("phase18-source")
+    archiveClassifier.set("-source")
     archiveVersion.set(project.version.toString())
 
     from(layout.projectDirectory) {
@@ -296,13 +296,13 @@ tasks.register<Zip>("phase18SourceArchive") {
     }
 }
 
-tasks.register("phase18Check") {
+tasks.register("Check") {
     group = "verification"
     description = "Runs Phase 18 portrayal profile checks and all previous phase checks."
-    dependsOn("phase17Check", "phase18ProfilesAudit", ":s52-api:build", ":s52-api:jvmTest", ":s52-tests:jvmTest")
+    dependsOn("Check", "ProfilesAudit", ":s52-api:build", ":s52-api:jvmTest", ":s52-tests:jvmTest")
 }
 
-tasks.register("phase19ArtifactsAudit") {
+tasks.register("ArtifactsAudit") {
     group = "verification"
     description = "Checks Phase 19 artifact bundle API and integration documentation."
 
@@ -317,16 +317,16 @@ tasks.register("phase19ArtifactsAudit") {
 
         val readme = layout.projectDirectory.file("README.md").asFile.readText()
         check("S52ArtifactBundle" in readme) { "README.md must document the Phase 19 artifact bundle API." }
-        //check("phase19Check" in readme) { "README.md must document the Phase 19 check task." }
+        //check("Check" in readme) { "README.md must document the Phase 19 check task." }
         //check("Not for navigation" in readme) { "README.md must keep the not-for-navigation boundary." }
     }
 }
 
-tasks.register<Zip>("phase19SourceArchive") {
+tasks.register<Zip>("SourceArchive") {
     group = "distribution"
     description = "Builds a source archive for Phase 19 release handoff."
     archiveBaseName.set("s52-kotlin-webgl")
-    archiveClassifier.set("phase19-source")
+    archiveClassifier.set("-source")
     archiveVersion.set(project.version.toString())
 
     from(layout.projectDirectory) {
@@ -337,14 +337,14 @@ tasks.register<Zip>("phase19SourceArchive") {
     }
 }
 
-tasks.register("phase19Check") {
+tasks.register("Check") {
     group = "verification"
     description = "Runs Phase 19 artifact bundle checks and all previous phase checks."
-    dependsOn("phase18Check", "phase19ArtifactsAudit", ":s52-api:build", ":s52-api:jvmTest", ":s52-tests:jvmTest")
+    dependsOn("Check", "ArtifactsAudit", ":s52-api:build", ":s52-api:jvmTest", ":s52-tests:jvmTest")
 }
 
 
-tasks.register("phase20GalleryAudit") {
+tasks.register("GalleryAudit") {
     group = "verification"
     description = "Checks Phase 20 s52lib-compatible browser-gallery API and docs."
     doLast {
@@ -352,23 +352,23 @@ tasks.register("phase20GalleryAudit") {
             "s52-preslib/src/commonMain/kotlin/io/github/s52/preslib/s52lib/S52LibCompatPresLib.kt",
             "s52-api/src/commonMain/kotlin/io/github/s52/api/S52Gallery.kt",
             "s52-api/src/jvmTest/kotlin/io/github/s52/api/S52GalleryTest.kt",
-            "docs/S52LIB_PHASE20.md",
+            "docs/S52LIB_.md",
             "samples/integration/s52lib-gallery/README.md"
         )
         val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
         check(missing.isEmpty()) { "Missing Phase 20 files: $missing" }
         val readme = layout.projectDirectory.file("README.md").asFile.readText()
         //check("S52GalleryBuilder" in readme) { "README.md must document Phase 20 gallery API." }
-        //check("phase20Check" in readme) { "README.md must document phase20Check." }
+        //check("Check" in readme) { "README.md must document Check." }
         check("Not for navigation" in readme) { "README.md must keep the not-for-navigation boundary." }
     }
 }
 
-tasks.register<Zip>("phase20SourceArchive") {
+tasks.register<Zip>("SourceArchive") {
     group = "distribution"
     description = "Builds a source archive for Phase 20 release handoff."
     archiveBaseName.set("s52-kotlin-webgl")
-    archiveClassifier.set("phase20-source")
+    archiveClassifier.set("-source")
     archiveVersion.set(project.version.toString())
     from(layout.projectDirectory) {
         exclude(".git/**")
@@ -378,33 +378,33 @@ tasks.register<Zip>("phase20SourceArchive") {
     }
 }
 
-tasks.register("phase20Check") {
+tasks.register("Check") {
     group = "verification"
     description = "Runs Phase 20 s52lib-compatible browser-gallery checks and all previous phase checks."
-    dependsOn("phase19Check", "phase20GalleryAudit", ":s52-api:build", ":s52-api:jvmTest", ":demo:build", ":s52-tests:jvmTest")
+    dependsOn("Check", "GalleryAudit", ":s52-api:build", ":s52-api:jvmTest", ":demo:build", ":s52-tests:jvmTest")
 }
 
-tasks.register("phase22GenerateOpenCpnSymbologyImages") {
+tasks.register("GenerateOpenCpnSymbologyImages") {
     group = "documentation"
     description = "Generates per-asset SVG images from a real imported OpenCPN chartsymbols.xml payload."
     dependsOn(":s52-api:exportOpenCpnSymbologyImages")
 }
 
-tasks.register("phase21GenerateSymbologyImages") {
+tasks.register("GenerateSymbologyImages") {
     group = "documentation"
     description = "Compatibility alias for Phase 22 real symbology export. Requires -Popencpn.chartsymbols or OPENCPN_CHARTSYMBOLS_XML_FILE."
-    dependsOn("phase22GenerateOpenCpnSymbologyImages")
+    dependsOn("GenerateOpenCpnSymbologyImages")
 }
-tasks.register("phase21SymbologyImagesAudit") {
+tasks.register("SymbologyImagesAudit") {
     group = "verification"
     description = "Checks Phase 21 s52lib-compatible symbology image export files and generated artifact output."
-    dependsOn("phase21GenerateSymbologyImages")
+    dependsOn("GenerateSymbologyImages")
 
     doLast {
         val requiredFiles = listOf(
             "s52-api/src/jvmMain/kotlin/io/github/s52/api/tools/S52SymbologyImageExportMain.kt",
             "s52-api/src/jvmTest/kotlin/io/github/s52/api/S52SymbologyImageExporterTest.kt",
-            "docs/SYMBOLOGY_IMAGES_PHASE21.md"
+            "docs/SYMBOLOGY_IMAGES_.md"
         )
         val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
         check(missing.isEmpty()) { "Missing Phase 21 symbology image export files: $missing" }
@@ -429,7 +429,7 @@ tasks.register("phase21SymbologyImagesAudit") {
     }
 }
 
-tasks.register("phase22RealSymbologyImportAudit") {
+tasks.register("RealSymbologyImportAudit") {
     group = "verification"
     description = "Checks the Phase 22 OpenCPN chartsymbols importer and refuses tiny placeholder symbology exports."
     doLast {
@@ -437,7 +437,7 @@ tasks.register("phase22RealSymbologyImportAudit") {
             "s52-preslib/src/jvmMain/kotlin/io/github/s52/preslib/opencpn/OpenCpnChartSymbolsImporter.kt",
             "s52-api/src/jvmMain/kotlin/io/github/s52/api/tools/S52SymbologyImageExportMain.kt",
             "s52-api/src/jvmTest/resources/opencpn/chartsymbols-fixture.xml",
-            "docs/OPENCPN_PHASE22.md"
+            "docs/OPENCPN_.md"
         )
         val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
         check(missing.isEmpty()) { "Missing Phase 22 real-import files: $missing" }
@@ -447,11 +447,11 @@ tasks.register("phase22RealSymbologyImportAudit") {
     }
 }
 
-tasks.register<Zip>("phase21SourceArchive") {
+tasks.register<Zip>("SourceArchive") {
     group = "distribution"
     description = "Builds a source archive for Phase 21 release handoff."
     archiveBaseName.set("s52-kotlin-webgl")
-    archiveClassifier.set("phase21-source")
+    archiveClassifier.set("-source")
     archiveVersion.set(project.version.toString())
 
     from(layout.projectDirectory) {
@@ -462,10 +462,10 @@ tasks.register<Zip>("phase21SourceArchive") {
     }
 }
 
-tasks.register("phase21Check") {
+tasks.register("Check") {
     group = "verification"
     description = "Runs Phase 21/22 OpenCPN symbology image export checks and all previous phase checks."
-    dependsOn("phase20Check", "phase21SymbologyImagesAudit", "phase22RealSymbologyImportAudit", ":s52-api:jvmTest", ":s52-tests:jvmTest")
+    dependsOn("Check", "SymbologyImagesAudit", "RealSymbologyImportAudit", ":s52-api:jvmTest", ":s52-tests:jvmTest")
 }
 
 tasks.register<Zip>("sourceArchive") {
@@ -485,7 +485,7 @@ tasks.register<Zip>("sourceArchive") {
 tasks.register("criticalCheck") {
     group = "verification"
     description = "Runs the critical full OpenCPN chartsymbols import and symbology image export checks."
-    dependsOn("phase21Check")
+    dependsOn("Check")
 }
 
 tasks.register<Zip>("criticalSymbologyImagesArchive") {
@@ -535,7 +535,7 @@ tasks.register("releaseArtifacts") {
     dependsOn("releaseBuiltJars", "releaseMavenRepository", "releaseMavenRepositoryArchive")
 }
 
-tasks.register("phase33WebGlBatchingAudit") {
+tasks.register("WebGlBatchingAudit") {
     group = "verification"
     description = "Checks Phase 33 HPGL fill batching and visual regression fixture files."
     doLast {
@@ -545,8 +545,8 @@ tasks.register("phase33WebGlBatchingAudit") {
             "s52-render-webgl/src/jsMain/kotlin/io/github/s52/render/webgl/internal/AreaPatternRenderer.kt",
             "s52-api/src/commonMain/kotlin/io/github/s52/api/S52VisualRegressionFixtures.kt",
             "s52-api/src/jvmTest/kotlin/io/github/s52/api/S52VisualRegressionFixturesTest.kt",
-            "scripts/export-phase33-regression-gallery.mjs",
-            "docs/PHASE33_WEBGL_BATCHING.md"
+            "scripts/export--regression-gallery.mjs",
+            "docs/_WEBGL_BATCHING.md"
         )
         val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
         check(missing.isEmpty()) { "Missing Phase 33 files: $missing" }
@@ -560,8 +560,8 @@ tasks.register("phase33WebGlBatchingAudit") {
     }
 }
 
-tasks.register("phase33Check") {
+tasks.register("Check") {
     group = "verification"
     description = "Runs Phase 33 HPGL fill, WebGL batching, and visual fixture checks."
-    dependsOn("phase33WebGlBatchingAudit", ":s52-api:jvmTest", ":s52-render-webgl:compileKotlinJs", ":demo:compileKotlinJs")
+    dependsOn("WebGlBatchingAudit", ":s52-api:jvmTest", ":s52-render-webgl:compileKotlinJs", ":demo:compileKotlinJs")
 }

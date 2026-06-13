@@ -32,12 +32,12 @@ class S52DiagnosticBundleTest {
 
         val bundle = session.diagnosticBundle(
             request = request,
-            name = "phase17-test",
+            name = "-test",
             transcriptPreviewLineLimit = 1
         )
 
         assertFalse(bundle.hasErrors, bundle.toMarkdown())
-        assertEquals("phase17-test", bundle.manifest.name)
+        assertEquals("-test", bundle.manifest.name)
         assertEquals(2, bundle.featureCount)
         assertTrue(bundle.commandCount >= 2)
         assertTrue((bundle.commandCountsByKind[DrawCommandKind.AreaFill] ?: 0) >= 1)

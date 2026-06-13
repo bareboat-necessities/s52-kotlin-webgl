@@ -6,7 +6,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class OpenCpnCspCoveragePhase29Test {
+class OpenCpnCspCoverageTest {
     @Test
     fun openCpnRegistryCoversAllGeneratedOpenCpnCspReferences() {
         val pack = PresLibPack.openCpn()

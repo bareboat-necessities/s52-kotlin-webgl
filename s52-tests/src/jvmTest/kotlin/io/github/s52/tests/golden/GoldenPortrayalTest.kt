@@ -11,7 +11,7 @@ class GoldenPortrayalTest {
 
     @Test
     fun everyGoldenCaseMatchesCheckedInTranscript() {
-        Phase10GoldenCases.all().forEach { case ->
+        GoldenCases.all().forEach { case ->
             val expected = readResource(case.expectedResource)
             val actual = runner.transcript(case)
             val comparison = GoldenTranscriptComparison(expected, actual)
@@ -21,7 +21,7 @@ class GoldenPortrayalTest {
 
     @Test
     fun goldenCaseIdsAreStableAndUnique() {
-        val ids = Phase10GoldenCases.all().map { it.id }
+        val ids = GoldenCases.all().map { it.id }
 
         assertEquals(ids.sorted(), ids.sorted())
         assertEquals(ids.size, ids.toSet().size)
@@ -30,7 +30,7 @@ class GoldenPortrayalTest {
 
     @Test
     fun visibilityCaseSuppressesSoundingAndLightTextButKeepsLightGraphics() {
-        val commands = runner.portray(Phase10GoldenCases.visibilitySettings())
+        val commands = runner.portray(GoldenCases.visibilitySettings())
 
         assertFalse(commands.any { it is S52DrawCommand.Sounding })
         assertFalse(commands.any { it is S52DrawCommand.Text })

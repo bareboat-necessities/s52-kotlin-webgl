@@ -10,8 +10,8 @@ import kotlin.test.assertTrue
 
 class S52VisualRegressionFixturesTest {
     @Test
-    fun phase33FixtureKeepsConcavePolygonWithHole() {
-        val commands = S52VisualRegressionFixtures.phase33Commands(includeLabels = false)
+    fun FixtureKeepsConcavePolygonWithHole() {
+        val commands = S52VisualRegressionFixtures.Commands(includeLabels = false)
         val patterned = commands.filterIsInstance<S52DrawCommand.AreaPattern>()
         val concave = patterned.first().geometry as EncGeometry.Polygon
 
@@ -21,7 +21,7 @@ class S52VisualRegressionFixturesTest {
     }
 
     @Test
-    fun phase33FixtureReferencesRenderableOpenCpnAssets() {
+    fun FixtureReferencesRenderableOpenCpnAssets() {
         val pack = PresLibPack.openCpn()
         S52VisualRegressionFixtures.requiredSymbolNames.forEach { name ->
             assertNotNull(pack.symbols.find(name), "missing symbol $name")
@@ -32,8 +32,8 @@ class S52VisualRegressionFixturesTest {
     }
 
     @Test
-    fun phase33FixtureIncludesFailureModeSymbolsAndHpglPatterns() {
-        val commands = S52VisualRegressionFixtures.phase33Commands(includeLabels = false)
+    fun FixtureIncludesFailureModeSymbolsAndHpglPatterns() {
+        val commands = S52VisualRegressionFixtures.Commands(includeLabels = false)
         val symbols = commands.filterIsInstance<S52DrawCommand.PointSymbol>().map { it.symbolName }.toSet()
         val patterns = commands.filterIsInstance<S52DrawCommand.AreaPattern>().map { it.patternName }.toSet()
 

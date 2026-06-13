@@ -63,13 +63,13 @@ fun main() {
                 status.textContent = lines.joinToString("\n") + "\n" + stats + "\nRoutes: #opencpn-symbols #opencpn-lines #opencpn-patterns #opencpn-regression #opencpn-diagnostics"
             }
             route == "opencpn-regression" -> {
-                val commands = S52VisualRegressionFixtures.phase33Commands(includeLabels = true)
+                val commands = S52VisualRegressionFixtures.Commands(includeLabels = true)
                 val stats = renderer.render(commands, settings)
                 status.textContent = "OpenCPN phase 33 visual regression fixture: ${commands.size} commands, $stats. Expected checks: concave area hole, HPGL pattern tiles without rounded preview boxes, TOPMAR/WRECK/OBSTRN/LIGHTS/QUESMRK symbols."
             }
             section == S52GallerySection.Chart -> {
                 val engine = S52PortrayalEngine(presLib.lookupTable, if (useOpenCpn) DefaultCspRegistry.openCpn() else DefaultCspRegistry.phase6Complete())
-                val commands = engine.portray(phase20SyntheticFeatures(), settings, context)
+                val commands = engine.portray(SyntheticFeatures(), settings, context)
                 val stats = renderer.render(commands, settings)
                 status.textContent = "${if (useOpenCpn) "OpenCPN" else "Compat"} chart demo: ${commands.size} commands, $stats. Routes: #chart #symbols #opencpn-symbols #opencpn-colors #opencpn-lookups #opencpn-regression #opencpn-diagnostics"
             }
@@ -101,7 +101,7 @@ private fun textPanel(lines: List<String>): List<S52DrawCommand> = lines.mapInde
     )
 }
 
-private fun phase20SyntheticFeatures(): List<EncFeature> = listOf(
+private fun SyntheticFeatures(): List<EncFeature> = listOf(
     EncFeature(1, S57ObjectClass.DEPARE, PrimitiveType.Area, S57Attributes.of(S57Attribute.DRVAL1 to S57Value.Decimal(0.0), S57Attribute.DRVAL2 to S57Value.Decimal(4.0)), EncGeometry.Polygon(listOf(Coordinate(-74.10,39.90),Coordinate(-73.78,39.90),Coordinate(-73.78,40.20),Coordinate(-74.10,40.20),Coordinate(-74.10,39.90)))) ,
     EncFeature(2, S57ObjectClass.LNDARE, PrimitiveType.Area, S57Attributes.Empty, EncGeometry.Polygon(listOf(Coordinate(-74.10,40.12),Coordinate(-73.78,40.12),Coordinate(-73.78,40.20),Coordinate(-74.10,40.20),Coordinate(-74.10,40.12)))) ,
     EncFeature(3, S57ObjectClass.COALNE, PrimitiveType.Line, S57Attributes.Empty, EncGeometry.LineString(listOf(Coordinate(-74.10,40.12),Coordinate(-74.00,40.16),Coordinate(-73.90,40.14),Coordinate(-73.78,40.12)))) ,

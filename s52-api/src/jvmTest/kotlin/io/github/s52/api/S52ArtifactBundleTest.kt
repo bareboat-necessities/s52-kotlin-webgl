@@ -20,7 +20,7 @@ class S52ArtifactBundleTest {
         val bundle = S52.synthetic().artifactBundle(
             features = listOf(depthArea(), sounding()),
             profile = S52ProfileCatalog.safetyDay,
-            name = "phase19-artifact-test"
+            name = "-artifact-test"
         )
 
         assertFalse(bundle.hasErrors, bundle.toMarkdownIndex())
@@ -41,7 +41,7 @@ class S52ArtifactBundleTest {
         val bundle = S52.synthetic().artifactBundle(
             features = listOf(depthArea(), sounding()),
             profile = S52ProfileCatalog.safetyDay,
-            name = "phase19-compact-test",
+            name = "-compact-test",
             options = S52ArtifactExportOptions.compact
         )
 

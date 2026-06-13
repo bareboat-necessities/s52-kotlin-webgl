@@ -6,7 +6,7 @@ settings.displayCategory=Other
 settings.showText=true
 context.compilationScale=50000.0
 context.displayScale=50000.0
-context.viewportId=phase11-s64-overlay-quality
+context.viewportId=-s64-overlay-quality
 feature=3001|M_COVR|Area|CATCOV=I:2|POLYGON(-74,40;-73.99,40;-73.99,40.01;-74,40)
 feature=3002|RESARE|Area|RESTRN=L:I:1,I:7|POLYGON(-74,40;-73.99,40;-73.99,40.01;-74,40)
 feature=3003|M_QUAL|Area|CATZOC=I:5|POLYGON(-74,40;-73.99,40;-73.99,40.01;-74,40)

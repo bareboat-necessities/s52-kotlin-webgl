@@ -9,7 +9,7 @@ settings.deepContourMeters=30.0
 settings.showSoundings=true
 context.compilationScale=50000.0
 context.displayScale=50000.0
-context.viewportId=phase11-chart1-depth-danger
+context.viewportId=-chart1-depth-danger
 feature=1001|DEPARE|Area|DRVAL1=D:0.0;DRVAL2=D:4.0|POLYGON(-74,40;-73.99,40;-73.99,40.01;-74,40)
 feature=1002|DEPCNT|Line|VALDCO=D:10.0|LINESTRING(-74,40;-73.99,40.01)
 feature=1003|SOUNDG|Point|VALSOU=D:3.2|POINT(-73.995,40.005)

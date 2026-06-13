@@ -28,7 +28,7 @@ class S52ApiTest {
     fun transcriptIsDeterministicThroughFacade() {
         val runtime = S52.defaultRuntime()
         val settings = S52.defaultSettings(safetyContourMeters = 6.0, safetyDepthMeters = 6.0)
-        val context = S52.defaultContext(settings, viewportId = "phase12-test")
+        val context = S52.defaultContext(settings, viewportId = "-test")
 
         val first = runtime.transcript(listOf(depthArea(), sounding()), settings, context)
         val second = runtime.transcript(listOf(depthArea(), sounding()), settings, context)

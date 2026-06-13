@@ -21,5 +21,5 @@ gradle :demo:browserDevelopmentWebpack
 Run the full project gate with:
 
 ```bash
-gradle phase14Check
+gradle Check
 ```

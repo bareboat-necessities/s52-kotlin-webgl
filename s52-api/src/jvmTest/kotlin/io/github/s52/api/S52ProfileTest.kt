@@ -74,12 +74,12 @@ class S52ProfileTest {
         val bundle = S52.synthetic().diagnosticBundle(
             features = listOf(depthArea(), sounding()),
             profile = S52ProfileCatalog.diagnosticsAll,
-            name = "phase18-profile-test",
+            name = "-profile-test",
             transcriptPreviewLineLimit = 2
         )
 
         assertFalse(bundle.hasErrors, bundle.toMarkdown())
-        assertEquals("phase18-profile-test", bundle.manifest.name)
+        assertEquals("-profile-test", bundle.manifest.name)
         assertEquals(2, bundle.featureCount)
         assertTrue(bundle.toProperties().contains("commandKind."))
     }

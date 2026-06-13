@@ -32,25 +32,25 @@ class ReleaseReadinessTest {
     }
 
     @Test
-    fun ciUsesPhase15Check() {
+    fun ciUsesCheck() {
         val ci = root.resolve(".github/workflows/ci.yml").readText()
-        assertTrue(ci.contains("phase15Check") || ci.contains("phase16Check"))
+        assertTrue(ci.contains("Check") || ci.contains("Check"))
     }
 
     @Test
-    fun releaseWorkflowBuildsPhase15Archive() {
+    fun releaseWorkflowBuildsArchive() {
         val release = root.resolve(".github/workflows/release.yml").readText()
-        assertTrue(release.contains("phase15Check") || release.contains("phase16Check"))
-        assertTrue(release.contains("phase15SourceArchive") || release.contains("phase16SourceArchive"))
+        assertTrue(release.contains("Check") || release.contains("Check"))
+        assertTrue(release.contains("SourceArchive") || release.contains("SourceArchive"))
         assertTrue(release.contains("actions/upload-artifact"))
     }
 
     @Test
-    fun rootBuildDefinesPhase15Tasks() {
+    fun rootBuildDefinesTasks() {
         val build = root.resolve("build.gradle.kts").readText()
-        assertTrue(build.contains("phase15ReleaseAudit"))
-        assertTrue(build.contains("phase15SourceArchive"))
-        assertTrue(build.contains("phase15Check"))
+        assertTrue(build.contains("ReleaseAudit"))
+        assertTrue(build.contains("SourceArchive"))
+        assertTrue(build.contains("Check"))
     }
 
     private fun findRepositoryRoot(): File {

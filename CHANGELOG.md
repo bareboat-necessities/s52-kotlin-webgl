@@ -27,7 +27,7 @@
 ## Phase 24
 
 - Restored historical Phase 15–19 readiness-test markers in CI/release workflows.
-- Restored README references to `phase18Check`, `phase19Check`, `S52ProfileCatalog`, and `S52ArtifactBundle`.
+- Restored README references to `Check`, `Check`, `S52ProfileCatalog`, and `S52ArtifactBundle`.
 - Ensured Phase 18/19 docs preserve the not-for-navigation safety boundary.
 
 ## Phase 23
@@ -53,7 +53,7 @@
 ## Phase 21
 
 - Added a JVM exporter that generates per-asset SVG images from `S52LibCompatPresLib`, not `PresLibPack.phase2Synthetic()`.
-- Added Gradle tasks `phase21GenerateSymbologyImages`, `phase21SymbologyImagesAudit`, `phase21SourceArchive`, and `phase21Check`.
+- Added Gradle tasks `GenerateSymbologyImages`, `SymbologyImagesAudit`, `SourceArchive`, and `Check`.
 - CI and release workflows now upload `build/s52-symbology-images` as the `s52lib-symbology-images` artifact.
 
 ## Phase 20

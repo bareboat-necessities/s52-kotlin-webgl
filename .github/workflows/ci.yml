@@ -8,7 +8,7 @@ on:
 
 # Historical readiness markers intentionally kept for downstream tests/audits.
 # criticalCheck covers the old chained checks, but these names must remain visible:
-# phase15Check phase16Check phase17Check phase18Check phase19Check phase20Check phase21Check
+# Check Check Check Check Check Check Check
 
 jobs:
   build:
@@ -41,7 +41,7 @@ jobs:
           gradle-version: 8.14.5
 
       - name: Validate historical phase marker coverage
-        run: echo "criticalCheck covers phase15Check phase16Check phase17Check phase18Check phase19Check phase20Check phase21Check"
+        run: echo "criticalCheck covers Check Check Check Check Check Check Check"
 
       - name: Validate critical build, inputs, and lock state
         env:

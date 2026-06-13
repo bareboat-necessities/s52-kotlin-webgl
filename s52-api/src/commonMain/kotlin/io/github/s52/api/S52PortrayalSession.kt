@@ -72,7 +72,7 @@ class S52PortrayalSession(
     }
 
     companion object {
-        fun syntheticPhase16(
+        fun synthetic(
             failOnStaticCompletenessErrors: Boolean = true
         ): S52PortrayalSession = S52PortrayalSession(
             presLib = PresLibPack.phase2Synthetic(),

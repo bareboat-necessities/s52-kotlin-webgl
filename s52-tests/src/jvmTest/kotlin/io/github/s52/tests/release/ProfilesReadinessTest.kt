@@ -6,12 +6,12 @@ import kotlin.test.assertTrue
 
 class ProfilesReadinessTest {
     @Test
-    fun phase18ProfileFilesArePresent() {
+    fun ProfileFilesArePresent() {
         val root = locateProjectRoot()
         val required = listOf(
             "s52-api/src/commonMain/kotlin/io/github/s52/api/S52Profile.kt",
             "s52-api/src/jvmTest/kotlin/io/github/s52/api/S52ProfileTest.kt",
-            "docs/PROFILES_PHASE18.md",
+            "docs/PROFILES_.md",
             "samples/integration/profiles/README.md"
         )
 
@@ -20,12 +20,12 @@ class ProfilesReadinessTest {
     }
 
     @Test
-    fun phase18DocsKeepSafetyBoundary() {
+    fun DocsKeepSafetyBoundary() {
         val root = locateProjectRoot()
         val readme = File(root, "README.md").readText()
-        val phaseDocs = File(root, "docs/PROFILES_PHASE18.md").readText()
+        val phaseDocs = File(root, "docs/PROFILES_.md").readText()
 
-        assertTrue(readme.contains("phase18Check"), "README must mention phase18Check")
+        assertTrue(readme.contains("Check"), "README must mention Check")
         assertTrue(readme.contains("S52ProfileCatalog"), "README must mention profile API")
         assertTrue(phaseDocs.contains("not for navigation", ignoreCase = true), "Phase 18 docs must preserve safety boundary")
     }

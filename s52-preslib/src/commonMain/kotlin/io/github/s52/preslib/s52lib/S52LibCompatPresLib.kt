@@ -25,7 +25,7 @@ object S52LibCompatPresLib {
         return base.copy(
             metadata = PresLibMetadata(
                 name = "s52lib-compatible Presentation Library pack",
-                edition = "phase20-s52lib-compat",
+                edition = "-s52lib-compat",
                 sourceDescription = "Public sduclos/S52-compatible fallback: S52raz color tokens plus all bundled/imported symbols, line styles, patterns, and lookup rows.",
                 generatedBy = "S52LibCompatPresLib"
             ),

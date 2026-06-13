@@ -17,7 +17,7 @@ object S52VisualRegressionFixtures {
     val requiredSymbolNames: List<String> = listOf("TOPMAR88", "WRECKS05", "OBSTRN11", "LIGHTS11", "QUESMRK1")
     val requiredPatternNames: List<String> = listOf("MARSHES1", "FSHFAC04", "QUESMRK1")
 
-    fun phase33Commands(includeLabels: Boolean = true): List<S52DrawCommand> {
+    fun Commands(includeLabels: Boolean = true): List<S52DrawCommand> {
         val commands = mutableListOf<S52DrawCommand>()
         var featureId = 33_000L
 

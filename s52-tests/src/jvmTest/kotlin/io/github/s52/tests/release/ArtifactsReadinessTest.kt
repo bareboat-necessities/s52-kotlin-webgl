@@ -6,7 +6,7 @@ import kotlin.test.assertTrue
 
 class ArtifactsReadinessTest {
     @Test
-    fun phase19ArtifactFilesArePresent() {
+    fun ArtifactFilesArePresent() {
         val root = locateProjectRoot()
         val required = listOf(
             "s52-api/src/commonMain/kotlin/io/github/s52/api/S52ArtifactBundle.kt",

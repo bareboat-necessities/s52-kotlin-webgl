@@ -4,7 +4,7 @@ import { existsSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 
 const url = process.argv[2] ?? 'http://localhost:8080/#opencpn-regression';
-const output = resolve(process.argv[3] ?? 'build/phase33-regression.png');
+const output = resolve(process.argv[3] ?? 'build/-regression.png');
 const candidates = [
   process.env.CHROME_BIN,
   'chromium',

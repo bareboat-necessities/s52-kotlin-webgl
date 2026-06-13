@@ -13,7 +13,7 @@ class S64CommandValidationTest {
     )
 
     @Test
-    fun phase11ValidationFixturesParse() {
+    fun ValidationFixturesParse() {
         val fixtures = loadFixtures()
 
         assertEquals(3, fixtures.size)
@@ -24,7 +24,7 @@ class S64CommandValidationTest {
     }
 
     @Test
-    fun phase11ValidationFixturesPassCommandLevelValidation() {
+    fun ValidationFixturesPassCommandLevelValidation() {
         val report = S64CommandValidationRunner().report(loadFixtures())
 
         assertTrue(report.isSuccess, report.toMarkdown() + "\n" + report.results.joinToString("\n") { it.failureMessage() })

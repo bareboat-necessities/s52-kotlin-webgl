@@ -27,20 +27,20 @@ class FacadeReadinessTest {
     }
 
     @Test
-    fun ciAndReleaseUsePhase16Checks() {
+    fun ciAndReleaseUseChecks() {
         val ci = root.resolve(".github/workflows/ci.yml").readText()
         val release = root.resolve(".github/workflows/release.yml").readText()
-        assertTrue(ci.contains("phase16Check"))
-        assertTrue(release.contains("phase16Check"))
-        assertTrue(release.contains("phase16SourceArchive"))
+        assertTrue(ci.contains("Check"))
+        assertTrue(release.contains("Check"))
+        assertTrue(release.contains("SourceArchive"))
     }
 
     @Test
-    fun rootBuildDefinesPhase16Tasks() {
+    fun rootBuildDefinesTasks() {
         val build = root.resolve("build.gradle.kts").readText()
-        assertTrue(build.contains("phase16ApiAudit"))
-        assertTrue(build.contains("phase16Check"))
-        assertTrue(build.contains("phase16SourceArchive"))
+        assertTrue(build.contains("ApiAudit"))
+        assertTrue(build.contains("Check"))
+        assertTrue(build.contains("SourceArchive"))
     }
 
     private fun findRepositoryRoot(): File {

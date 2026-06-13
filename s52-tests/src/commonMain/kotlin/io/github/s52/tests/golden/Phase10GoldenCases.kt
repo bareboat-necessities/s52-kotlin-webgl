@@ -12,7 +12,7 @@ import io.github.s52.core.settings.DisplayCategory
 import io.github.s52.core.settings.MarinerSettings
 
 /** Synthetic Chart-1-like command-level golden fixtures for Phase 10. */
-object Phase10GoldenCases {
+object GoldenCases {
     fun all(): List<GoldenPortrayalCase> = listOf(
         depthSafety(),
         dangerSymbols(),

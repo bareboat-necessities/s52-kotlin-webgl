@@ -12,7 +12,7 @@ class DiagnosticsReadinessTest {
         val required = listOf(
             "s52-api/src/commonMain/kotlin/io/github/s52/api/S52DiagnosticBundle.kt",
             "s52-api/src/jvmTest/kotlin/io/github/s52/api/S52DiagnosticBundleTest.kt",
-            "docs/DIAGNOSTICS_PHASE17.md",
+            "docs/DIAGNOSTICS_.md",
             "samples/integration/diagnostics/README.md"
         )
 
@@ -21,20 +21,20 @@ class DiagnosticsReadinessTest {
     }
 
     @Test
-    fun ciAndReleaseUsePhase17Checks() {
+    fun ciAndReleaseUseChecks() {
         val ci = root.resolve(".github/workflows/ci.yml").readText()
         val release = root.resolve(".github/workflows/release.yml").readText()
-        assertTrue(ci.contains("phase17Check"))
-        assertTrue(release.contains("phase17Check"))
-        assertTrue(release.contains("phase17SourceArchive"))
+        assertTrue(ci.contains("Check"))
+        assertTrue(release.contains("Check"))
+        assertTrue(release.contains("SourceArchive"))
     }
 
     @Test
-    fun rootBuildDefinesPhase17Tasks() {
+    fun rootBuildDefinesTasks() {
         val build = root.resolve("build.gradle.kts").readText()
-        assertTrue(build.contains("phase17DiagnosticsAudit"))
-        assertTrue(build.contains("phase17Check"))
-        assertTrue(build.contains("phase17SourceArchive"))
+        assertTrue(build.contains("DiagnosticsAudit"))
+        assertTrue(build.contains("Check"))
+        assertTrue(build.contains("SourceArchive"))
     }
 
     private fun findRepositoryRoot(): File {

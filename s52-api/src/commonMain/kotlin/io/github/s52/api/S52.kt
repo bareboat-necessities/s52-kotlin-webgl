@@ -23,7 +23,7 @@ object S52 {
     fun defaultRuntime(): S52Runtime = S52Runtime.synthetic()
 
     /** Build the Phase 16+ session facade using the synthetic pack and complete CSP registry. */
-    fun synthetic(): S52PortrayalSession = S52PortrayalSession.syntheticPhase16()
+    fun synthetic(): S52PortrayalSession = S52PortrayalSession.synthetic()
 
     /** Build the Phase 20 session facade using the s52lib-compatible synthetic pack. */
     fun s52LibCompat(): S52PortrayalSession = S52PortrayalSession.s52LibCompat()
