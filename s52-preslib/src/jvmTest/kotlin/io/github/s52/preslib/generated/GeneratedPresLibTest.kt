@@ -9,7 +9,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class GeneratedPhase2PresLibTest {
+class GeneratedPresLibTest {
     @Test
     fun generatedPhase2PackIsInternallyValid() {
         val pack = GeneratedPhase2PresLib.pack()

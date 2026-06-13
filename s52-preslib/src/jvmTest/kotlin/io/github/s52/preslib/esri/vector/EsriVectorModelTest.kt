@@ -4,7 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class EsriVectorModelPhase89Test {
+class EsriVectorModelTest {
     @Test
     fun lineStyleIsRenderableOnlyWithRepeatAndMeshes() {
         val mesh = EsriMesh(
