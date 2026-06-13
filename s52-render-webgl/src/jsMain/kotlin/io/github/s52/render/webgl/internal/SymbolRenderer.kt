@@ -25,41 +25,65 @@ internal class SymbolRenderer(
         projector: GeometryProjector,
         colors: ColorResolver,
         palette: S52Palette
-    ): Int {
-        val geometry = command.geometry as? EncGeometry.Point ?: return 0
-        val definition = resolveSymbol(command.symbolName) ?: return 0
-        val anchor = projector.project(geometry.coordinate)
-        val rotationDegrees = command.rotationDegrees ?: 0.0
+    ): Int = renderBatch(listOf(command), projector, colors, palette)
 
-        val bitmap = definition.bitmap
-        if (bitmap != null && bitmap.width > 0.0 && bitmap.height > 0.0) {
-            val atlas = rasterAtlases.textureFor(palette, bitmap.atlasFileName)
-            if (atlas != null) {
-                val vertices = bitmapQuadVertices(
-                    bitmap = bitmap,
-                    anchor = anchor,
-                    projector = projector,
-                    rotationDegrees = rotationDegrees,
-                    atlasWidth = atlas.width,
-                    atlasHeight = atlas.height
-                )
-                return textureProgram.drawTriangles(atlas.texture, vertices)
+    fun renderBatch(
+        commands: List<S52DrawCommand.PointSymbol>,
+        projector: GeometryProjector,
+        colors: ColorResolver,
+        palette: S52Palette
+    ): Int {
+        if (commands.isEmpty()) return 0
+        var calls = 0
+        var index = 0
+        while (index < commands.size) {
+            val first = prepare(commands[index], projector)
+            if (first == null) {
+                index++
+                continue
+            }
+
+            val firstAtlas = atlasFor(first.definition, palette)
+            if (firstAtlas != null) {
+                val atlasUrl = firstAtlas.url
+                val vertices = FloatArrayBuilder(commands.size * 24)
+                while (index < commands.size) {
+                    val prepared = prepare(commands[index], projector)
+                    if (prepared == null) {
+                        index++
+                        continue
+                    }
+                    val bitmap = prepared.definition.bitmap
+                    val atlas = atlasFor(prepared.definition, palette)
+                    if (bitmap == null || atlas == null || atlas.url != atlasUrl) break
+                    appendBitmapQuadVertices(
+                        out = vertices,
+                        bitmap = bitmap,
+                        anchor = prepared.anchor,
+                        projector = projector,
+                        rotationDegrees = prepared.rotationDegrees,
+                        atlasWidth = atlas.width,
+                        atlasHeight = atlas.height
+                    )
+                    index++
+                }
+                calls += textureProgram.drawTriangles(firstAtlas.texture, vertices, alpha = 1.0f)
+            } else {
+                val vectorChunk = ArrayList<PreparedSymbol>()
+                while (index < commands.size) {
+                    val prepared = prepare(commands[index], projector)
+                    if (prepared == null) {
+                        index++
+                        continue
+                    }
+                    if (atlasFor(prepared.definition, palette) != null) break
+                    vectorChunk += prepared
+                    index++
+                }
+                calls += renderPreparedVectorBatch(vectorChunk, projector, colors)
             }
         }
-
-        renderHpglDisplayList(definition, anchor, projector, colors, rotationDegrees).let { calls ->
-            if (calls > 0) return calls
-        }
-
-        val vertices = symbolLineSegments(
-            definition = definition,
-            anchor = anchor,
-            projector = projector,
-            rotationDegrees = rotationDegrees
-        )
-        if (vertices.isEmpty()) return 0
-        gl.lineWidth(1.5f)
-        return solidProgram.draw(WebGLRenderingContext.LINES, vertices, colors.resolve(definition.colorRefs.firstOrNull(), fallback = "CHBLK"))
+        return calls
     }
 
     private fun resolveSymbol(name: String): SymbolDefinition? {
@@ -70,6 +94,22 @@ internal class SymbolRenderer(
         return null
     }
 
+    private fun prepare(command: S52DrawCommand.PointSymbol, projector: GeometryProjector): PreparedSymbol? {
+        val geometry = command.geometry as? EncGeometry.Point ?: return null
+        val definition = resolveSymbol(command.symbolName) ?: return null
+        return PreparedSymbol(
+            definition = definition,
+            anchor = projector.project(geometry.coordinate),
+            rotationDegrees = command.rotationDegrees ?: 0.0
+        )
+    }
+
+    private fun atlasFor(definition: SymbolDefinition, palette: S52Palette): RasterAtlasTexture? {
+        val bitmap = definition.bitmap ?: return null
+        if (bitmap.width <= 0.0 || bitmap.height <= 0.0) return null
+        return rasterAtlases.textureFor(palette, bitmap.atlasFileName)
+    }
+
     private fun bitmapQuadVertices(
         bitmap: RasterBitmapDefinition,
         anchor: ClipPoint,
@@ -78,6 +118,20 @@ internal class SymbolRenderer(
         atlasWidth: Int,
         atlasHeight: Int
     ): FloatArray {
+        val out = FloatArrayBuilder(24)
+        appendBitmapQuadVertices(out, bitmap, anchor, projector, rotationDegrees, atlasWidth, atlasHeight)
+        return out.toFloatArray()
+    }
+
+    private fun appendBitmapQuadVertices(
+        out: FloatArrayBuilder,
+        bitmap: RasterBitmapDefinition,
+        anchor: ClipPoint,
+        projector: GeometryProjector,
+        rotationDegrees: Double,
+        atlasWidth: Int,
+        atlasHeight: Int
+    ) {
         val points = arrayOf(
             transformBitmapPoint(0.0, 0.0, bitmap, anchor, projector, rotationDegrees),
             transformBitmapPoint(bitmap.width, 0.0, bitmap, anchor, projector, rotationDegrees),
@@ -92,14 +146,8 @@ internal class SymbolRenderer(
         val v0 = ((bitmap.y + 0.5) / atlasH).toFloat()
         val v1 = ((bitmap.y + bitmap.height - 0.5).coerceAtLeast(bitmap.y + 0.5) / atlasH).toFloat()
 
-        return floatArrayOf(
-            points[0].x, points[0].y, u0, v0,
-            points[1].x, points[1].y, u1, v0,
-            points[2].x, points[2].y, u1, v1,
-            points[0].x, points[0].y, u0, v0,
-            points[2].x, points[2].y, u1, v1,
-            points[3].x, points[3].y, u0, v1
-        )
+        out.addTexturedTriangle(points[0].x, points[0].y, u0, v0, points[1].x, points[1].y, u1, v0, points[2].x, points[2].y, u1, v1)
+        out.addTexturedTriangle(points[0].x, points[0].y, u0, v0, points[2].x, points[2].y, u1, v1, points[3].x, points[3].y, u0, v1)
     }
 
     private fun transformBitmapPoint(
@@ -113,6 +161,65 @@ internal class SymbolRenderer(
         val px = bitmap.pivotX
         val py = bitmap.pivotY
         return transformLocal(x - px, y - py, anchor, projector, rotationDegrees)
+    }
+
+    private fun renderPreparedVectorBatch(
+        symbols: List<PreparedSymbol>,
+        projector: GeometryProjector,
+        colors: ColorResolver
+    ): Int {
+        if (symbols.isEmpty()) return 0
+        val fillsByColor = linkedMapOf<String?, FloatArrayBuilder>()
+        val strokesByState = linkedMapOf<VectorStrokeKey, FloatArrayBuilder>()
+
+        fun fillVertices(colorToken: String?): FloatArrayBuilder =
+            fillsByColor.getOrPut(colorToken) { FloatArrayBuilder(96) }
+
+        fun strokeVertices(colorToken: String?, lineWidth: Float = SYMBOL_LINE_WIDTH): FloatArrayBuilder =
+            strokesByState.getOrPut(VectorStrokeKey(colorToken, lineWidth)) { FloatArrayBuilder(96) }
+
+        for (symbol in symbols) {
+            val definition = symbol.definition
+            val hpgl = definition.vectorHpgl
+            if (!hpgl.isNullOrBlank()) {
+                val displayList = symbolHpglCache.getOrPut(definition.name) { HpglDisplayListCompiler.compile(hpgl) }
+                for (geometry in displayList.geometries) {
+                    val colorToken = displayList.colorTokenForPen(geometry.pen, definition.colorRefs)
+                    val fillOut = fillVertices(colorToken)
+                    for (triangle in geometry.fills) {
+                        fillOut.addTriangle(
+                            transformHpglPoint(triangle.a, definition, symbol.anchor, projector, symbol.rotationDegrees),
+                            transformHpglPoint(triangle.b, definition, symbol.anchor, projector, symbol.rotationDegrees),
+                            transformHpglPoint(triangle.c, definition, symbol.anchor, projector, symbol.rotationDegrees)
+                        )
+                    }
+                    val strokeOut = strokeVertices(colorToken)
+                    for (segment in geometry.strokes) {
+                        strokeOut.addLine(
+                            transformHpglPoint(HpglPoint(segment.x1, segment.y1), definition, symbol.anchor, projector, symbol.rotationDegrees),
+                            transformHpglPoint(HpglPoint(segment.x2, segment.y2), definition, symbol.anchor, projector, symbol.rotationDegrees)
+                        )
+                    }
+                }
+            } else {
+                val strokeOut = strokeVertices(definition.colorRefs.firstOrNull())
+                appendVectorCommands(strokeOut, definition, symbol.anchor, projector, symbol.rotationDegrees)
+            }
+        }
+
+        var calls = 0
+        for ((colorToken, vertices) in fillsByColor) {
+            if (vertices.isNotEmpty()) {
+                calls += solidProgram.draw(WebGLRenderingContext.TRIANGLES, vertices, colors.resolve(colorToken, fallback = "CHBLK"))
+            }
+        }
+        for ((state, vertices) in strokesByState) {
+            if (vertices.isNotEmpty()) {
+                gl.lineWidth(state.lineWidth)
+                calls += solidProgram.draw(WebGLRenderingContext.LINES, vertices, colors.resolve(state.colorToken, fallback = "CHBLK"))
+            }
+        }
+        return calls
     }
 
     private fun renderHpglDisplayList(
@@ -152,7 +259,7 @@ internal class SymbolRenderer(
                         transformHpglPoint(HpglPoint(segment.x2, segment.y2), definition, anchor, projector, rotationDegrees)
                     )
                 }
-                gl.lineWidth(1.5f)
+                gl.lineWidth(SYMBOL_LINE_WIDTH)
                 calls += solidProgram.draw(
                     WebGLRenderingContext.LINES,
                     strokeVertices,
@@ -275,9 +382,21 @@ internal class SymbolRenderer(
         )
     }
 
+    private data class PreparedSymbol(
+        val definition: SymbolDefinition,
+        val anchor: ClipPoint,
+        val rotationDegrees: Double
+    )
+
+    private data class VectorStrokeKey(
+        val colorToken: String?,
+        val lineWidth: Float
+    )
+
     private companion object {
         /** OpenCPN vector HPGL units are much finer than atlas pixels. */
         private const val HPGL_TO_PIXEL: Double = 0.04
+        private const val SYMBOL_LINE_WIDTH: Float = 1.5f
 
         /**
          * Compatibility aliases for renderer-independent CSP outputs whose

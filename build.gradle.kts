@@ -538,3 +538,34 @@ tasks.register("releaseArtifacts") {
     description = "Builds all release upload areas, including raw JAR artifacts and the local Maven repository layout."
     dependsOn("releaseBuiltJars", "releaseMavenRepository", "releaseMavenRepositoryArchive")
 }
+
+tasks.register("phase33WebGlBatchingAudit") {
+    group = "verification"
+    description = "Checks Phase 33 HPGL fill batching and visual regression fixture files."
+    doLast {
+        val requiredFiles = listOf(
+            "s52-render-webgl/src/jsMain/kotlin/io/github/s52/render/webgl/internal/HpglDisplayList.kt",
+            "s52-render-webgl/src/jsMain/kotlin/io/github/s52/render/webgl/internal/SymbolRenderer.kt",
+            "s52-render-webgl/src/jsMain/kotlin/io/github/s52/render/webgl/internal/AreaPatternRenderer.kt",
+            "s52-api/src/commonMain/kotlin/io/github/s52/api/S52VisualRegressionFixtures.kt",
+            "s52-api/src/jvmTest/kotlin/io/github/s52/api/S52VisualRegressionFixturesTest.kt",
+            "scripts/export-phase33-regression-gallery.mjs",
+            "docs/PHASE33_WEBGL_BATCHING.md"
+        )
+        val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
+        check(missing.isEmpty()) { "Missing Phase 33 files: $missing" }
+
+        val demo = layout.projectDirectory.file("demo/src/jsMain/kotlin/io/github/s52/demo/Main.kt").asFile.readText()
+        check("opencpn-regression" in demo) { "Demo must expose the #opencpn-regression visual fixture route." }
+
+        val renderer = layout.projectDirectory.file("s52-render-webgl/src/jsMain/kotlin/io/github/s52/render/webgl/WebGlS52Renderer.kt").asFile.readText()
+        check("symbolRenderer.renderBatch" in renderer) { "Point symbols must go through the Phase 33 batch renderer." }
+        check("areaPatternRenderer.renderBatch" in renderer) { "Area patterns must go through the Phase 33 batch renderer." }
+    }
+}
+
+tasks.register("phase33Check") {
+    group = "verification"
+    description = "Runs Phase 33 HPGL fill, WebGL batching, and visual fixture checks."
+    dependsOn("phase33WebGlBatchingAudit", ":s52-api:jvmTest", ":s52-render-webgl:compileKotlinJs", ":demo:compileKotlinJs")
+}

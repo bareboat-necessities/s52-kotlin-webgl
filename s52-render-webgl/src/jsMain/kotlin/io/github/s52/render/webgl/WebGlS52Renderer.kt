@@ -119,9 +119,16 @@ class WebGlS52Renderer(
                 }
 
                 is S52DrawCommand.AreaPattern -> {
-                    val drawCalls = areaPatternRenderer.render(command, projector, colors, settings.palette)
-                    builder.add(command.kind, drawCalls)
+                    val start = index
                     index++
+                    while (index < commands.size && commands[index] is S52DrawCommand.AreaPattern) {
+                        index++
+                    }
+                    val batchSize = index - start
+                    val batch = ArrayList<S52DrawCommand.AreaPattern>(batchSize)
+                    for (batchIndex in start until index) batch += commands[batchIndex] as S52DrawCommand.AreaPattern
+                    val drawCalls = areaPatternRenderer.renderBatch(batch, projector, colors, settings.palette)
+                    builder.addMany(DrawCommandKind.AreaPattern, batchSize, drawCalls)
                     renderBatchCount++
                 }
 
@@ -133,9 +140,16 @@ class WebGlS52Renderer(
                 }
 
                 is S52DrawCommand.PointSymbol -> {
-                    val drawCalls = symbolRenderer.render(command, projector, colors, settings.palette)
-                    builder.add(command.kind, drawCalls)
+                    val start = index
                     index++
+                    while (index < commands.size && commands[index] is S52DrawCommand.PointSymbol) {
+                        index++
+                    }
+                    val batchSize = index - start
+                    val batch = ArrayList<S52DrawCommand.PointSymbol>(batchSize)
+                    for (batchIndex in start until index) batch += commands[batchIndex] as S52DrawCommand.PointSymbol
+                    val drawCalls = symbolRenderer.renderBatch(batch, projector, colors, settings.palette)
+                    builder.addMany(DrawCommandKind.PointSymbol, batchSize, drawCalls)
                     renderBatchCount++
                 }
 

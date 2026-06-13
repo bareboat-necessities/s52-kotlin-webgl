@@ -76,35 +76,64 @@ internal object HpglDisplayListCompiler {
     fun compile(hpgl: String): HpglDisplayList {
         if (hpgl.isBlank()) return HpglDisplayList(emptyList(), null)
 
-        val strokesByPen = linkedMapOf<String?, MutableList<HpglLineSegment>>()
-        val fillsByPen = linkedMapOf<String?, MutableList<HpglTriangle>>()
+        class GeometryBuilder(
+            val pen: String?,
+            val strokes: MutableList<HpglLineSegment> = mutableListOf(),
+            val fills: MutableList<HpglTriangle> = mutableListOf()
+        ) {
+            val isEmpty: Boolean get() = strokes.isEmpty() && fills.isEmpty()
+            fun toGeometry(): HpglGeometry = HpglGeometry(pen = pen, strokes = strokes.toList(), fills = fills.toList())
+        }
+
+        val batches = mutableListOf<GeometryBuilder>()
         var currentPen: String? = null
+        var currentBatch = GeometryBuilder(currentPen).also { batches += it }
         var x = 0.0
         var y = 0.0
         var polygonContours: MutableList<MutableList<HpglPoint>>? = null
         var currentContour: MutableList<HpglPoint>? = null
+        var collectingPolygon = false
 
-        fun strokes(): MutableList<HpglLineSegment> = strokesByPen.getOrPut(currentPen) { mutableListOf() }
-        fun fills(): MutableList<HpglTriangle> = fillsByPen.getOrPut(currentPen) { mutableListOf() }
+        fun selectPen(rawPen: String) {
+            val normalized = rawPen.trim().uppercase().takeIf { it.isNotEmpty() }
+            if (normalized == currentPen) return
+            currentPen = normalized
+            val next = GeometryBuilder(normalized)
+            if (currentBatch.isEmpty && batches.isNotEmpty()) {
+                batches[batches.lastIndex] = next
+            } else {
+                batches += next
+            }
+            currentBatch = next
+        }
+
+        fun drawingEnabled(): Boolean = currentPen != NO_PEN
+        fun strokes(): MutableList<HpglLineSegment> = currentBatch.strokes
+        fun fills(): MutableList<HpglTriangle> = currentBatch.fills
         fun currentPoint(): HpglPoint = HpglPoint(x, y)
 
         fun beginPolygon() {
             polygonContours = mutableListOf()
             currentContour = mutableListOf(currentPoint()).also { polygonContours?.add(it) }
+            collectingPolygon = true
         }
 
         fun nextPolygonContour() {
             val contours = polygonContours ?: return beginPolygon()
             currentContour = mutableListOf(currentPoint()).also { contours.add(it) }
+            collectingPolygon = true
         }
 
         fun appendPolygonPoint(point: HpglPoint) {
+            if (!collectingPolygon) return
             val contour = currentContour ?: return
             if (contour.lastOrNull() != point) contour += point
         }
 
         fun lineTo(nx: Double, ny: Double) {
-            strokes() += HpglLineSegment(x, y, nx, ny)
+            if (!collectingPolygon && drawingEnabled()) {
+                strokes() += HpglLineSegment(x, y, nx, ny)
+            }
             x = nx
             y = ny
             appendPolygonPoint(currentPoint())
@@ -113,7 +142,7 @@ internal object HpglDisplayListCompiler {
         fun moveTo(nx: Double, ny: Double) {
             x = nx
             y = ny
-            if (polygonContours != null && currentContour?.size == 1) {
+            if (collectingPolygon && currentContour?.size == 1) {
                 currentContour?.set(0, currentPoint())
             }
         }
@@ -129,7 +158,9 @@ internal object HpglDisplayListCompiler {
                 val a = start + (sweep * PI / 180.0) * (i.toDouble() / steps)
                 val nx = cx + cos(a) * radius
                 val ny = cy + sin(a) * radius
-                strokes() += HpglLineSegment(px, py, nx, ny)
+                if (!collectingPolygon && drawingEnabled()) {
+                    strokes() += HpglLineSegment(px, py, nx, ny)
+                }
                 px = nx
                 py = ny
                 x = nx
@@ -143,17 +174,20 @@ internal object HpglDisplayListCompiler {
             val cx = x
             val cy = y
             val points = circlePoints(cx, cy, radius)
+            if (collectingPolygon) {
+                currentContour = points.toMutableList().also { polygonContours?.add(it) }
+                return
+            }
+            if (!drawingEnabled()) return
             for (i in points.indices) {
                 val a = points[i]
                 val b = points[(i + 1) % points.size]
                 strokes() += HpglLineSegment(a.x, a.y, b.x, b.y)
             }
-            if (polygonContours != null) {
-                currentContour = points.toMutableList().also { polygonContours?.add(it) }
-            }
         }
 
         fun appendFilledRect(x0: Double, y0: Double, x1: Double, y1: Double) {
+            if (!drawingEnabled()) return
             val a = HpglPoint(x0, y0)
             val b = HpglPoint(x1, y0)
             val c = HpglPoint(x1, y1)
@@ -163,17 +197,32 @@ internal object HpglDisplayListCompiler {
         }
 
         fun appendRectEdges(x0: Double, y0: Double, x1: Double, y1: Double) {
+            if (!drawingEnabled()) return
             strokes() += HpglLineSegment(x0, y0, x1, y0)
             strokes() += HpglLineSegment(x1, y0, x1, y1)
             strokes() += HpglLineSegment(x1, y1, x0, y1)
             strokes() += HpglLineSegment(x0, y1, x0, y0)
         }
 
+        fun appendContourEdges() {
+            if (!drawingEnabled()) return
+            val contours = polygonContours.orEmpty()
+            for (contour in contours) {
+                val clean = contour.withoutDuplicateClose().filterFinite()
+                if (clean.size < 2) continue
+                for (i in clean.indices) {
+                    val a = clean[i]
+                    val b = clean[(i + 1) % clean.size]
+                    strokes() += HpglLineSegment(a.x, a.y, b.x, b.y)
+                }
+            }
+        }
+
         fun flushPolygonFill() {
             val contours = polygonContours?.map { contour ->
                 contour.withoutDuplicateClose().filterFinite()
             }?.filter { it.size >= 3 }.orEmpty()
-            if (contours.isNotEmpty()) {
+            if (contours.isNotEmpty() && drawingEnabled()) {
                 val outer = contours.first().map { TriangulationPoint(it.x, it.y) }
                 val holes = contours.drop(1).map { contour -> contour.map { TriangulationPoint(it.x, it.y) } }
                 for (triangle in PolygonTriangulator.triangulate(outer, holes)) {
@@ -184,8 +233,7 @@ internal object HpglDisplayListCompiler {
                     )
                 }
             }
-            polygonContours = null
-            currentContour = null
+            collectingPolygon = false
         }
 
         for (raw in hpgl.split(';')) {
@@ -194,7 +242,7 @@ internal object HpglDisplayListCompiler {
             val op = token.take(2).uppercase()
             val args = token.drop(2).trim()
             when (op) {
-                "SP" -> currentPen = args.takeIf { it.isNotBlank() }?.uppercase()
+                "SP" -> selectPen(args)
                 "PU" -> parsePairs(args).lastOrNull()?.let { moveTo(it.first, it.second) }
                 "PD" -> parsePairs(args).forEach { lineTo(it.first, it.second) }
                 "CI" -> args.numberPrefixOrNull()?.let { appendCircle(it) }
@@ -202,10 +250,11 @@ internal object HpglDisplayListCompiler {
                 "PM" -> when (args.numberPrefixOrNull()?.roundToInt() ?: 0) {
                     0 -> beginPolygon()
                     1 -> nextPolygonContour()
-                    2 -> Unit
+                    2 -> collectingPolygon = false
                     else -> Unit
                 }
                 "FP" -> flushPolygonFill()
+                "EP" -> appendContourEdges()
                 "RA" -> parsePairs(args).firstOrNull()?.let { appendFilledRect(x, y, it.first, it.second) }
                 "RR" -> parsePairs(args).firstOrNull()?.let { appendFilledRect(x, y, x + it.first, y + it.second) }
                 "EA" -> parsePairs(args).firstOrNull()?.let { appendRectEdges(x, y, it.first, it.second) }
@@ -213,11 +262,7 @@ internal object HpglDisplayListCompiler {
             }
         }
 
-        val geometries = (strokesByPen.keys + fillsByPen.keys).mapNotNull { pen ->
-            val strokes = strokesByPen[pen].orEmpty()
-            val fills = fillsByPen[pen].orEmpty()
-            if (strokes.isEmpty() && fills.isEmpty()) null else HpglGeometry(pen, strokes, fills)
-        }
+        val geometries = batches.mapNotNull { batch -> if (batch.isEmpty) null else batch.toGeometry() }
         return HpglDisplayList(geometries, bounds(geometries))
     }
 
@@ -294,6 +339,7 @@ internal object HpglDisplayListCompiler {
 
     private fun String.numberPrefixOrNull(): Double? = parseNumbers(this).firstOrNull()
 
+    private const val NO_PEN: String = "0"
     private const val CIRCLE_STEPS: Int = 32
     private const val ARC_DEGREES_PER_STEP: Double = 12.0
 }

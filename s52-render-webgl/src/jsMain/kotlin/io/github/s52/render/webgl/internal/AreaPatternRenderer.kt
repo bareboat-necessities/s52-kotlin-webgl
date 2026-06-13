@@ -45,6 +45,78 @@ internal class AreaPatternRenderer(
         }
     }
 
+    fun renderBatch(
+        commands: List<S52DrawCommand.AreaPattern>,
+        projector: GeometryProjector,
+        colors: ColorResolver,
+        palette: S52Palette
+    ): Int {
+        if (commands.isEmpty()) return 0
+        var calls = 0
+        var index = 0
+        while (index < commands.size) {
+            val key = batchKey(commands[index], projector, palette)
+            val start = index
+            index++
+            while (index < commands.size && batchKey(commands[index], projector, palette) == key) {
+                index++
+            }
+
+            // Stencil masks are intentionally per feature, so this state batch
+            // does not merge polygons into one stencil pass. It keeps pattern
+            // resolution, tile spacing, and GPU program/texture state localized
+            // for adjacent commands that already share the same viewport transform.
+            for (batchIndex in start until index) {
+                calls += render(commands[batchIndex], projector, colors, palette)
+            }
+        }
+        return calls
+    }
+
+    private fun batchKey(
+        command: S52DrawCommand.AreaPattern,
+        projector: GeometryProjector,
+        palette: S52Palette
+    ): PatternBatchKey {
+        val pattern = presLib.patterns.find(command.patternName)
+        if (pattern == null) return PatternBatchKey(command.patternName.uppercase(), command.backgroundColorToken, "hatch", 0, 0)
+
+        val hpgl = pattern.vectorHpgl
+        if (!hpgl.isNullOrBlank()) {
+            val displayList = cachedPatternHpgl(pattern.name, hpgl)
+            val bounds = displayList.bounds
+            if (bounds != null && !displayList.isEmpty) {
+                return PatternBatchKey(
+                    patternName = pattern.name.uppercase(),
+                    colorToken = pattern.colorRefs.joinToString("|"),
+                    source = "hpgl",
+                    tileWidthMilliClip = tileWidthMilliClip(pattern, bounds, projector),
+                    tileHeightMilliClip = tileHeightMilliClip(pattern, bounds, projector)
+                )
+            }
+        }
+
+        val bitmap = pattern.bitmap
+        if (bitmap != null && bitmap.width > 0.0 && bitmap.height > 0.0) {
+            val atlas = rasterAtlases.textureFor(palette, bitmap.atlasFileName)
+            return PatternBatchKey(
+                patternName = pattern.name.uppercase(),
+                colorToken = atlas?.url ?: bitmap.atlasFileName,
+                source = "bitmap",
+                tileWidthMilliClip = ((bitmap.width * projector.pixelToClipX(1.0).toDouble()) * 1000.0).toInt(),
+                tileHeightMilliClip = ((bitmap.height * projector.pixelToClipY(1.0).toDouble()) * 1000.0).toInt()
+            )
+        }
+
+        return PatternBatchKey(pattern.name.uppercase(), command.backgroundColorToken, "hatch", 0, 0)
+    }
+
+    private fun tileWidthMilliClip(pattern: PatternDefinition, bounds: HpglBounds, projector: GeometryProjector): Int =
+        ((tileWidthPx(pattern, bounds) * projector.pixelToClipX(1.0).toDouble()) * 1000.0).toInt()
+
+    private fun tileHeightMilliClip(pattern: PatternDefinition, bounds: HpglBounds, projector: GeometryProjector): Int =
+        ((tileHeightPx(pattern, bounds) * projector.pixelToClipY(1.0).toDouble()) * 1000.0).toInt()
+
     private fun renderBitmapPattern(
         command: S52DrawCommand.AreaPattern,
         pattern: PatternDefinition,
@@ -374,6 +446,14 @@ internal class AreaPatternRenderer(
             previous = current
         }
     }
+
+    private data class PatternBatchKey(
+        val patternName: String,
+        val colorToken: String?,
+        val source: String,
+        val tileWidthMilliClip: Int,
+        val tileHeightMilliClip: Int
+    )
 
     private companion object {
         private const val HPGL_TO_PIXEL: Double = 0.04
