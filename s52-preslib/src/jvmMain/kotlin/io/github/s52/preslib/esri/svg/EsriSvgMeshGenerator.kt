@@ -5,7 +5,7 @@ import kotlin.math.hypot
 /**
  * Converts parsed ESRI SVG paths into a conservative triangle mesh.
  *
- * Phase ESRI-3 intentionally keeps the algorithm simple and deterministic:
+ * Intentionally keeps the algorithm simple and deterministic:
  * - filled paths are triangulated as polygon fans per closed subpath;
  * - stroked paths are expanded to rectangular segment strips;
  * - unsupported SVG path commands have already been rejected by validation.

@@ -7,10 +7,6 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class EsriSymbologyImageExportTest {
-    @Test
-    fun phaseAtlasExporterEntryPointExists() {
-        assertTrue(EsriSymbologyImageExportMain::class.java.name.endsWith("EsriSymbologyImageExportMain"))
-    }
 
     @Test
     fun opencpnNameHelpersPreserveAtlasContract() {

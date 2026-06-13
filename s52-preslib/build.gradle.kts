@@ -219,7 +219,7 @@ val esriReportDirProvider = layout.buildDirectory.dir("reports/esri")
 
 tasks.register<JavaExec>("esriInventory") {
     group = "verification"
-    description = "Inventories ESRI CustomPresentationLibrary XML, Lua, and SVG sources for phases ESRI-0/1."
+    description = "Inventories ESRI CustomPresentationLibrary XML, Lua, and SVG sources."
 
     val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
     dependsOn("jvmMainClasses")
@@ -237,7 +237,7 @@ tasks.register<JavaExec>("esriInventory") {
 
 tasks.register<JavaExec>("validateEsriSvgSubset") {
     group = "verification"
-    description = "Validates that ESRI SVG symbols fit the phase ESRI-2 parser subset."
+    description = "Validates that ESRI SVG symbols fit the parser subset."
 
     val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
     dependsOn("jvmMainClasses")
@@ -255,7 +255,7 @@ tasks.register<JavaExec>("validateEsriSvgSubset") {
 
 tasks.register<JavaExec>("esriCoverageReport") {
     group = "verification"
-    description = "Writes the phase ESRI-1 OpenCPN coverage oracle and initial ESRI direct-rule gap report."
+    description = "Writes the OpenCPN coverage oracle and initial ESRI direct-rule gap report."
 
     val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
     dependsOn("jvmMainClasses")
@@ -320,7 +320,7 @@ tasks.register<JavaExec>("generateEsriDirectRules") {
 
 tasks.register<JavaExec>("checkEsriAliasClosure") {
     group = "verification"
-    description = "Phase ESRI-6: writes ESRI alias closure reports against OpenCPN symbol candidates and generated ESRI symbols."
+    description = "writes ESRI alias closure reports against OpenCPN symbol candidates and generated ESRI symbols."
 
     val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
     dependsOn("jvmMainClasses", "generateEsriVectorSymbols")
@@ -352,7 +352,7 @@ tasks.register<JavaExec>("checkEsriAliasClosure") {
 
 tasks.register<JavaExec>("generateEsriVectorLines") {
     group = "generation"
-    description = "Phase ESRI-8: parses ESRI line SVG assets and generates Kotlin vector line-style registry."
+    description = "parses ESRI line SVG assets and generates Kotlin vector line-style registry."
 
     val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
     dependsOn("jvmMainClasses")
@@ -576,7 +576,7 @@ tasks.register<Zip>("enhancedEsriSvgSetArchive") {
 
 tasks.register("criticalEsriCheck") {
     group = "verification"
-    description = "Runs phases ESRI-0 through ESRI-12: inventory, SVG validation, vector generation, direct rules, aliases, CSP/profile tests, coverage reports, NOAA smoke, and WebGL build."
+    description = "Runs: inventory, SVG validation, vector generation, direct rules, aliases, CSP/profile tests, coverage reports, NOAA smoke, and WebGL build."
     dependsOn(
         "esriInventory",
         "esriCoverageReport",

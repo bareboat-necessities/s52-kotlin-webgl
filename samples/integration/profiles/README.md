@@ -1,6 +1,6 @@
 # Profile integration sample
 
-Phase 18 adds built-in portrayal profiles for downstream apps that want stable settings without manually constructing `MarinerSettings` for every call.
+Adds built-in portrayal profiles for downstream apps that want stable settings without manually constructing `MarinerSettings` for every call.
 
 ```kotlin
 import io.github.s52.api.S52
@@ -18,7 +18,7 @@ val result = session.portray(
 println(result.transcript)
 ```
 
-For support reports, combine profiles with the Phase 17 diagnostic bundle:
+For support reports, combine profiles with the diagnostic bundle:
 
 ```kotlin
 import io.github.s52.api.diagnosticBundle

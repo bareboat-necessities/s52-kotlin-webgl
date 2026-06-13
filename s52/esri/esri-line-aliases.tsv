@@ -4,4 +4,4 @@ CBLSUB01	L30_Cable.svg	medium	Submarine cable equivalent from ESRI line symbols.
 CBLOHD01	L31_1_PowerCable.svg	medium	Power/overhead cable equivalent from ESRI line symbols.
 RESARE01	N2_1_RestrictedArea.svg	medium	Restricted area line motif.
 FSHRES01	N21_1_Fishing_Prohibited.svg	medium	Fishing prohibited restricted-area motif.
-FAIRWY01	M1_NavigationLine.svg	low	Navigation/fairway line fallback for phase ESRI-8 renderer tests.
+FAIRWY01	M1_NavigationLine.svg	low	Navigation/fairway line fallback for ESRI renderer tests.

@@ -1,6 +1,6 @@
 # Artifact bundle integration sample
 
-Phase 19 adds a portable text-artifact export API for issue reports, CI handoff,
+Adds a portable text-artifact export API for issue reports, CI handoff,
 and downstream validation logs.
 
 ```kotlin

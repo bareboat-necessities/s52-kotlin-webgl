@@ -38,7 +38,7 @@ const args = [
 
 const result = spawnSync(chrome, args, { stdio: 'inherit' });
 if (result.status !== 0 || !existsSync(output)) {
-  console.error(`Failed to export phase 33 regression PNG to ${output}`);
+  console.error(`Failed to export regression PNG to ${output}`);
   process.exit(result.status || 1);
 }
 console.log(`Wrote ${output}`);

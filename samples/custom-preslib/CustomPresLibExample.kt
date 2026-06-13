@@ -6,11 +6,11 @@ import io.github.s52.csp.DefaultCspRegistry
 import io.github.s52.preslib.PresLibPack
 
 fun main() {
-    val generatedOrLoadedPack: PresLibPack = PresLibPack.phase2Synthetic()
+    val generatedOrLoadedPack: PresLibPack = PresLibPack.synthetic()
 
     val runtime = S52Runtime.from(
         presLib = generatedOrLoadedPack,
-        cspRegistry = DefaultCspRegistry.phase6Complete()
+        cspRegistry = DefaultCspRegistry.complete()
     )
 
     val settings = S52.defaultSettings()

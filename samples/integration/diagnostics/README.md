@@ -1,6 +1,6 @@
 # Diagnostics integration sample
 
-This sample shows the intended Phase 17 integration pattern for downstream projects.
+This sample shows the intended integration pattern for downstream projects.
 
 ```kotlin
 import io.github.s52.api.S52

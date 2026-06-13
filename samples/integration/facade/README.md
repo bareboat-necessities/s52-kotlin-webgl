@@ -31,5 +31,5 @@ println(session.manifest().toMarkdown())
 ```
 
 The facade does not parse S-57 and does not include official IHO Presentation
-Library assets. It is only a stable convenience layer around the Phase 11/15
+Library assets.
 portrayal modules.

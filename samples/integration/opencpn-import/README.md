@@ -1,4 +1,4 @@
-# Phase 22 OpenCPN symbology import sample
+# OpenCPN symbology import sample
 
 Use a real OpenCPN `chartsymbols.xml` file to generate SVG images for every imported symbol, line style, pattern, and color.
 
