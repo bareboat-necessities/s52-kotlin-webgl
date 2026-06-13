@@ -27,11 +27,15 @@ internal class AreaPatternRenderer(
         val projected = ProjectedPolygonClip.from(polygon, projector) ?: return 0
         val pattern = presLib.patterns.find(command.patternName)
         if (pattern != null) {
-            val bitmapCalls = renderBitmapPattern(command, pattern, projected, projector, palette)
-            if (bitmapCalls > 0) return bitmapCalls
-
+            // OpenCPN chart-symbol patterns often include both HPGL and a raster
+            // atlas cell. Prefer HPGL: the raster cell can be a preview/glyph box
+            // with rounded placeholder edges, which looks like stacked rounded
+            // rectangles when tiled across an ENC area.
             val vectorCalls = renderVectorPattern(pattern, projected, projector, colors)
             if (vectorCalls > 0) return vectorCalls
+
+            val bitmapCalls = renderBitmapPattern(command, pattern, projected, projector, palette)
+            if (bitmapCalls > 0) return bitmapCalls
         }
 
         val vertices = hatchLines(projected, projector)
@@ -233,8 +237,8 @@ internal class AreaPatternRenderer(
 
     private fun hatchLines(projected: ProjectedPolygonClip, projector: GeometryProjector): FloatArrayBuilder {
         val bounds = projected.bounds ?: return FloatArrayBuilder(0)
-        val sy = projector.pixelToClipY(HATCH_SPACING_PX).toFloat().coerceAtLeast(0.0001f)
-        val inset = projector.pixelToClipX(0.75).toFloat()
+        val sy = projector.pixelToClipY(HATCH_SPACING_PX).coerceAtLeast(0.0001f)
+        val inset = projector.pixelToClipX(0.75)
         val floats = FloatArrayBuilder(64)
         val xs = ArrayList<Float>(16)
 

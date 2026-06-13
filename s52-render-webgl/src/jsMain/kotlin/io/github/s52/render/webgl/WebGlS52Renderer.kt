@@ -62,7 +62,12 @@ class WebGlS52Renderer(
         } else {
             gl.clearColor(0.9f, 0.95f, 1.0f, 1.0f)
         }
-        gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT)
+        gl.disable(WebGLRenderingContext.STENCIL_TEST)
+        gl.disable(WebGLRenderingContext.SCISSOR_TEST)
+        gl.colorMask(true, true, true, true)
+        gl.stencilMask(0xFF)
+        gl.clearStencil(0)
+        gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT or WebGLRenderingContext.STENCIL_BUFFER_BIT)
 
         val projector = GeometryProjector(viewport, canvas.width, canvas.height)
         textRenderer.beginFrame()

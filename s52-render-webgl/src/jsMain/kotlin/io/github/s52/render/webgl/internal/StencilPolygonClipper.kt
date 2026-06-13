@@ -1,15 +1,18 @@
 package io.github.s52.render.webgl.internal
 
+import io.github.s52.core.geometry.PolygonTriangulator
+import io.github.s52.core.geometry.TriangulationPoint
 import org.khronos.webgl.WebGLRenderingContext
 import kotlin.math.max
 
 /**
- * GPU even/odd polygon fill and clip helper.
+ * GPU polygon fill and clip helper.
  *
- * Phase 4 adds a per-polygon scissor rectangle.  Clearing the whole stencil
- * buffer for every ENC area is very expensive on dense harbour cells; limiting
- * stencil clear, ring writes, and pattern draws to the projected polygon bounds
- * avoids most of that cost and reduces fill bleed at the canvas edges.
+ * Each projected polygon is triangulated once into the stencil mask, then the
+ * final color or pattern draw is clipped by that mask and a tight scissor box.
+ * The triangulated mask is more robust than a triangle-fan ring toggle for
+ * concave OpenCPN/S-57 areas and prevents color from leaking outside rings or
+ * into holes while keeping fragment work bounded to the polygon extent.
  */
 internal class StencilPolygonClipper(
     private val gl: WebGLRenderingContext,
@@ -23,7 +26,10 @@ internal class StencilPolygonClipper(
         if (!stencilAvailable) return 0
         val bounds = projected.bounds ?: return 0
         val stencilCalls = writeStencil(projected, projector)
-        if (stencilCalls == 0) return 0
+        if (stencilCalls == 0) {
+            finishStencilPass()
+            return 0
+        }
 
         gl.colorMask(true, true, true, true)
         gl.stencilMask(0x00)
@@ -45,15 +51,21 @@ internal class StencilPolygonClipper(
             ClipPoint(bounds.maxX, bounds.maxY),
             ClipPoint(bounds.minX, bounds.maxY)
         )
-        val fillCalls = solidProgram.draw(WebGLRenderingContext.TRIANGLES, rect, color)
-        finishStencilPass()
+        val fillCalls = try {
+            solidProgram.draw(WebGLRenderingContext.TRIANGLES, rect, color)
+        } finally {
+            finishStencilPass()
+        }
         return stencilCalls + fillCalls
     }
 
     fun clip(projected: ProjectedPolygonClip, projector: GeometryProjector, drawInside: () -> Int): Int {
         if (!stencilAvailable) return drawInside()
         val stencilCalls = writeStencil(projected, projector)
-        if (stencilCalls == 0) return 0
+        if (stencilCalls == 0) {
+            finishStencilPass()
+            return 0
+        }
 
         gl.colorMask(true, true, true, true)
         gl.stencilMask(0x00)
@@ -63,8 +75,11 @@ internal class StencilPolygonClipper(
             WebGLRenderingContext.KEEP,
             WebGLRenderingContext.KEEP
         )
-        val drawCalls = drawInside()
-        finishStencilPass()
+        val drawCalls = try {
+            drawInside()
+        } finally {
+            finishStencilPass()
+        }
         return stencilCalls + drawCalls
     }
 
@@ -85,20 +100,29 @@ internal class StencilPolygonClipper(
         gl.stencilOp(
             WebGLRenderingContext.KEEP,
             WebGLRenderingContext.KEEP,
-            WebGLRenderingContext.INVERT
+            WebGLRenderingContext.REPLACE
         )
 
-        var calls = drawRingFan(projected.outer)
-        for (hole in projected.holes) calls += drawRingFan(hole)
-        return calls
+        return drawTriangulatedMask(projected)
     }
 
-    private fun drawRingFan(ring: List<ClipPoint>): Int {
-        if (ring.size < 3) return 0
-        val vertices = FloatArrayBuilder(max(6, ring.size * 2))
-        for (point in ring) vertices.add(point.x, point.y)
-        return solidProgram.draw(WebGLRenderingContext.TRIANGLE_FAN, vertices, STENCIL_MARK_COLOR)
+    private fun drawTriangulatedMask(projected: ProjectedPolygonClip): Int {
+        val outer = projected.outer.toTriangulationRing()
+        if (outer.size < 3) return 0
+        val holes = projected.holes.map { it.toTriangulationRing() }.filter { it.size >= 3 }
+        val triangles = PolygonTriangulator.triangulate(outer, holes)
+        if (triangles.isEmpty()) return 0
+        val vertices = FloatArrayBuilder(max(6, triangles.size * 6))
+        for (triangle in triangles) {
+            vertices.add(triangle.a.x.toFloat(), triangle.a.y.toFloat())
+            vertices.add(triangle.b.x.toFloat(), triangle.b.y.toFloat())
+            vertices.add(triangle.c.x.toFloat(), triangle.c.y.toFloat())
+        }
+        return solidProgram.draw(WebGLRenderingContext.TRIANGLES, vertices, STENCIL_MARK_COLOR)
     }
+
+    private fun List<ClipPoint>.toTriangulationRing(): List<TriangulationPoint> =
+        map { TriangulationPoint(it.x.toDouble(), it.y.toDouble()) }
 
     private fun finishStencilPass() {
         gl.stencilMask(0xFF)
