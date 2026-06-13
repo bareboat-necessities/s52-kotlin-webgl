@@ -88,14 +88,14 @@ class DrawCommandTest {
 
     @Test
     fun textCommandCarriesTextKindAndOptionalColorToken() {
-        val text = portrayPhase7Fixture().filterIsInstance<S52DrawCommand.Text>().single()
+        val text = portrayFixture().filterIsInstance<S52DrawCommand.Text>().single()
 
         assertEquals(InstructionKind.TE, text.textKind)
         assertEquals("CHBLK", text.colorToken)
         assertIs<S52DrawCommand.Text>(text)
     }
 
-    private fun portrayPhase7Fixture(): List<S52DrawCommand> {
+    private fun portrayFixture(): List<S52DrawCommand> {
         val features = listOf(
             areaFeature(),
             lineFeature(),

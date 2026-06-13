@@ -1,6 +1,6 @@
 package io.github.s52.csp
 
-import io.github.s52.preslib.generated.GeneratedPhase2PresLib
+import io.github.s52.preslib.generated.GeneratedPresLib
 import io.github.s52.preslib.validation.StaticCompletenessValidator
 import kotlin.test.Test
 import kotlin.test.assertFalse
@@ -8,10 +8,10 @@ import kotlin.test.assertTrue
 
 class StaticCompletenessTest {
     @Test
-    fun generatedPresentationLibraryHasZeroStaticCompletenessDiagnosticsWithPhase6Registry() {
+    fun generatedPresentationLibraryHasZeroStaticCompletenessDiagnosticsWithRegistry() {
         val report = StaticCompletenessValidator.validatePack(
-            pack = GeneratedPhase2PresLib.pack(),
-            implementedCsps = CspId.completePhase6Names()
+            pack = GeneratedPresLib.pack(),
+            implementedCsps = CspId.completeNames()
         )
 
         assertFalse(report.hasErrors, report.toMarkdown())

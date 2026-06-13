@@ -32,15 +32,15 @@ enum class CspId(
     DATCVR("DATCVR", DataCoverageCsp());
 
     companion object {
-        private val criticalPhase5 = setOf("DEPARE", "DEPCNT", "SOUNDG", "WRECKS", "OBSTRN", "LIGHTS", "TOPMAR")
+        private val critical = setOf("DEPARE", "DEPCNT", "SOUNDG", "WRECKS", "OBSTRN", "LIGHTS", "TOPMAR")
 
-        fun criticalPhase5Procedures(): List<ConditionalSymbologyProcedure> =
-            entries.filter { it.s52Name in criticalPhase5 }.map { it.procedure }
+        fun criticalProcedures(): List<ConditionalSymbologyProcedure> =
+            entries.filter { it.s52Name in critical }.map { it.procedure }
 
-        fun criticalPhase5Names(): Set<String> = criticalPhase5
+        fun criticalNames(): Set<String> = critical
 
-        fun completePhase6Procedures(): List<ConditionalSymbologyProcedure> = entries.map { it.procedure }
+        fun completeProcedures(): List<ConditionalSymbologyProcedure> = entries.map { it.procedure }
 
-        fun completePhase6Names(): Set<String> = entries.mapTo(mutableSetOf()) { it.s52Name }
+        fun completeNames(): Set<String> = entries.mapTo(mutableSetOf()) { it.s52Name }
     }
 }

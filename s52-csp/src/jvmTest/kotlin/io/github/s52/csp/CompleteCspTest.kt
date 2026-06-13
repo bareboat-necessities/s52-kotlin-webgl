@@ -24,14 +24,14 @@ class CompleteCspTest {
     private val context = PortrayalContext(compilationScale = 50_000.0, displayScale = 50_000.0)
 
     @Test
-    fun generatedPackHasNoMissingPhase6CspReferences() {
+    fun generatedPackHasNoMissingCspReferences() {
         val report = CspCoverageValidator.validate(
-            PresLibPack.phase2Synthetic().lookupTable,
-            DefaultCspRegistry.phase6Complete()
+            PresLibPack.synthetic().lookupTable,
+            DefaultCspRegistry.complete()
         )
 
         assertFalse(report.hasErrors, report.toMarkdown())
-        assertEquals(CspId.completePhase6Names(), report.implemented)
+        assertEquals(CspId.completeNames(), report.implemented)
         assertTrue(report.implemented.containsAll(report.referenced))
     }
 
@@ -67,9 +67,9 @@ class CompleteCspTest {
     }
 
     @Test
-    fun phase6EngineExpandsNewCspRowsIntoDrawCommands() {
-        val pack = PresLibPack.phase2Synthetic()
-        val engine = S52PortrayalEngine(pack.lookupTable, DefaultCspRegistry.phase6Complete())
+    fun engineExpandsNewCspRowsIntoDrawCommands() {
+        val pack = PresLibPack.synthetic()
+        val engine = S52PortrayalEngine(pack.lookupTable, DefaultCspRegistry.complete())
         val commands = engine.portray(
             listOf(
                 areaFeature(S57ObjectClass.RESARE, S57Attributes.of(S57Attribute.OBJNAM to S57Value.Text("No anchoring"))),

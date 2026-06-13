@@ -23,15 +23,15 @@ class CriticalCspTest {
     private val context = PortrayalContext(compilationScale = 50_000.0, displayScale = 50_000.0)
 
     @Test
-    fun registryContainsCriticalPhase5Procedures() {
-        val registry = DefaultCspRegistry.phase5Critical()
-        assertEquals(CspId.criticalPhase5Names(), registry.names())
-        CspId.criticalPhase5Names().forEach { assertTrue(registry.has(it)) }
+    fun registryContainsCriticalProcedures() {
+        val registry = DefaultCspRegistry.critical()
+        assertEquals(CspId.criticalNames(), registry.names())
+        CspId.criticalNames().forEach { assertTrue(registry.has(it)) }
     }
 
     @Test
-    fun generatedPackReferencesAllCriticalPhase5Procedures() {
-        val pack = PresLibPack.phase2Synthetic()
+    fun generatedPackReferencesAllCriticalProcedures() {
+        val pack = PresLibPack.synthetic()
         val report = CspCoverageValidator.validate(pack.lookupTable, DefaultCspRegistry.phase6Complete())
         assertFalse(report.hasErrors, report.toMarkdown())
         assertTrue(report.referenced.containsAll(CspId.criticalPhase5Names()))
