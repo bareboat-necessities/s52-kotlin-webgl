@@ -3,7 +3,7 @@ package io.github.s52.preslib
 import io.github.s52.core.instruction.InstructionFormatter
 import io.github.s52.core.instruction.InstructionParser
 import io.github.s52.core.instruction.InstructionReferenceCollector
-import io.github.s52.preslib.generated.GeneratedPhase2PresLib
+import io.github.s52.preslib.generated.GeneratedPresLib
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -11,7 +11,7 @@ import kotlin.test.assertTrue
 class InstructionCoverageTest {
     @Test
     fun everyGeneratedSourceLookupInstructionParsesWithDetailedMetadata() {
-        val source = GeneratedPhase2PresLib.sourcePack()
+        val source = GeneratedPresLib.sourcePack()
         val sequences = source.lookupRecords.map { record -> InstructionParser.parseSequenceDetailed(record.instruction) }
 
         assertEquals(source.lookupRecords.size, sequences.size)

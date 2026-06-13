@@ -67,59 +67,53 @@ tasks.register("phase1Check") {
 
 tasks.register("phase2Check") {
     group = "verification"
-    description = "Runs Phase 2 Presentation Library generation/validation checks and all previous phase checks."
+    description = "Runs Presentation Library generation/validation checks and all previous phase checks."
     dependsOn("phase1Check")
 }
 
 tasks.register("phase3Check") {
     group = "verification"
-    description = "Runs Phase 3 S-52 instruction parser checks and all previous phase checks."
+    description = "Runs S-52 instruction parser checks and all previous phase checks."
     dependsOn("phase2Check")
 }
 
-
 tasks.register("phase4Check") {
     group = "verification"
-    description = "Runs Phase 4 lookup matching, display filtering, and ordering checks plus all previous phase checks."
+    description = "Runs lookup matching, display filtering, and ordering checks plus all previous phase checks."
     dependsOn("phase3Check")
 }
 
 
 tasks.register("phase5Check") {
     group = "verification"
-    description = "Runs Phase 5 critical CSP framework checks and all previous phase checks."
+    description = "Runs critical CSP framework checks and all previous phase checks."
     dependsOn("phase4Check")
 }
 
 
 tasks.register("phase6Check") {
     group = "verification"
-    description = "Runs Phase 6 complete CSP coverage checks and all previous phase checks."
+    description = "Runs complete CSP coverage checks and all previous phase checks."
     dependsOn("phase5Check")
 }
 
 
 tasks.register("phase7Check") {
     group = "verification"
-    description = "Runs Phase 7 draw-command model checks and all previous phase checks."
+    description = "Runs draw-command model checks and all previous phase checks."
     dependsOn("phase6Check")
 }
 
-
 tasks.register("phase8Check") {
     group = "verification"
-    description = "Runs Phase 8 WebGL2 renderer checks and all previous phase checks."
-    dependsOn("phase7Check", ":s52-render-webgl:build", ":demo:build")
+    description = "Runs WebGL2 renderer checks and all previous phase checks."
 }
-
-
 
 tasks.register("phase9Check") {
     group = "verification"
     description = "Runs Phase 9 static Presentation Library completeness checks and all previous phase checks."
     dependsOn("phase8Check", ":s52-preslib:jvmTest", ":s52-csp:jvmTest")
 }
-
 
 tasks.register("Check") {
     group = "verification"
@@ -129,13 +123,13 @@ tasks.register("Check") {
 
 tasks.register("Check") {
     group = "verification"
-    description = "Runs Phase 11 S-64 / Chart-1 command validation harness checks and all previous phase checks."
+    description = "Runs S-64 / Chart-1 command validation harness checks and all previous phase checks."
     dependsOn("Check", ":s52-tests:jvmTest")
 }
 
 tasks.register("ReleaseAudit") {
     group = "verification"
-    description = "Checks Phase 15 release-readiness files and safety boundary."
+    description = "Checks release-readiness files and safety boundary."
 
     doLast {
         val requiredFiles = listOf(
@@ -218,7 +212,6 @@ tasks.register("Check") {
     dependsOn("Check", "ApiAudit", ":s52-api:build", ":s52-tests:jvmTest")
 }
 
-
 tasks.register("DiagnosticsAudit") {
     group = "verification"
     description = "Checks Phase 17 diagnostic bundle API and integration documentation."
@@ -234,8 +227,6 @@ tasks.register("DiagnosticsAudit") {
         check(missing.isEmpty()) { "Missing Phase 17 diagnostic files: $missing" }
 
         val readme = layout.projectDirectory.file("README.md").asFile.readText()
-        //check("S52DiagnosticBundle" in readme) { "README.md must document the Phase 17 diagnostic bundle." }
-        //check("Check" in readme) { "README.md must document the Phase 17 check task." }
     }
 }
 
@@ -262,7 +253,7 @@ tasks.register("Check") {
 
 tasks.register("ProfilesAudit") {
     group = "verification"
-    description = "Checks Phase 18 built-in portrayal profile API and integration documentation."
+    description = "Checks built-in portrayal profile API and integration documentation."
 
     doLast {
         val requiredFiles = listOf(
@@ -283,7 +274,7 @@ tasks.register("ProfilesAudit") {
 
 tasks.register<Zip>("SourceArchive") {
     group = "distribution"
-    description = "Builds a source archive for Phase 18 release handoff."
+    description = "Builds a source archive for release handoff."
     archiveBaseName.set("s52-kotlin-webgl")
     archiveClassifier.set("-source")
     archiveVersion.set(project.version.toString())
@@ -317,8 +308,6 @@ tasks.register("ArtifactsAudit") {
 
         val readme = layout.projectDirectory.file("README.md").asFile.readText()
         check("S52ArtifactBundle" in readme) { "README.md must document the Phase 19 artifact bundle API." }
-        //check("Check" in readme) { "README.md must document the Phase 19 check task." }
-        //check("Not for navigation" in readme) { "README.md must keep the not-for-navigation boundary." }
     }
 }
 
@@ -380,7 +369,7 @@ tasks.register<Zip>("SourceArchive") {
 
 tasks.register("Check") {
     group = "verification"
-    description = "Runs Phase 20 s52lib-compatible browser-gallery checks and all previous phase checks."
+    description = "Runs s52lib-compatible browser-gallery checks and all previous phase checks."
     dependsOn("Check", "GalleryAudit", ":s52-api:build", ":s52-api:jvmTest", ":demo:build", ":s52-tests:jvmTest")
 }
 
@@ -392,12 +381,12 @@ tasks.register("GenerateOpenCpnSymbologyImages") {
 
 tasks.register("GenerateSymbologyImages") {
     group = "documentation"
-    description = "Compatibility alias for Phase 22 real symbology export. Requires -Popencpn.chartsymbols or OPENCPN_CHARTSYMBOLS_XML_FILE."
+    description = "Compatibility alias for real symbology export. Requires -Popencpn.chartsymbols or OPENCPN_CHARTSYMBOLS_XML_FILE."
     dependsOn("GenerateOpenCpnSymbologyImages")
 }
 tasks.register("SymbologyImagesAudit") {
     group = "verification"
-    description = "Checks Phase 21 s52lib-compatible symbology image export files and generated artifact output."
+    description = "Checks s52lib-compatible symbology image export files and generated artifact output."
     dependsOn("GenerateSymbologyImages")
 
     doLast {
@@ -440,7 +429,7 @@ tasks.register("RealSymbologyImportAudit") {
             "docs/OPENCPN_.md"
         )
         val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
-        check(missing.isEmpty()) { "Missing Phase 22 real-import files: $missing" }
+        check(missing.isEmpty()) { "Missing real-import files: $missing" }
         val readme = layout.projectDirectory.file("README.md").asFile.readText()
         check("opencpn.chartsymbols" in readme) { "README.md must explain the required real PLib input path." }
         check("criticalCheck" in readme) { "README.md must document criticalCheck." }
@@ -464,7 +453,7 @@ tasks.register<Zip>("SourceArchive") {
 
 tasks.register("Check") {
     group = "verification"
-    description = "Runs Phase 21/22 OpenCPN symbology image export checks and all previous phase checks."
+    description = "Runs OpenCPN symbology image export checks and all previous phase checks."
     dependsOn("Check", "SymbologyImagesAudit", "RealSymbologyImportAudit", ":s52-api:jvmTest", ":s52-tests:jvmTest")
 }
 
@@ -562,6 +551,6 @@ tasks.register("WebGlBatchingAudit") {
 
 tasks.register("Check") {
     group = "verification"
-    description = "Runs Phase 33 HPGL fill, WebGL batching, and visual fixture checks."
+    description = "Runs PHPGL fill, WebGL batching, and visual fixture checks."
     dependsOn("WebGlBatchingAudit", ":s52-api:jvmTest", ":s52-render-webgl:compileKotlinJs", ":demo:compileKotlinJs")
 }
