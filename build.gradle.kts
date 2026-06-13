@@ -246,7 +246,7 @@ tasks.register<Zip>("SourceArchive") {
 
 tasks.register("Check") {
     group = "verification"
-    description = "Runs Phase 17 diagnostic bundle checks and all previous phase checks."
+    description = "Runs diagnostic bundle checks and all previous phase checks."
     dependsOn("Check", "DiagnosticsAudit", ":s52-api:build", ":s52-tests:jvmTest")
 }
 
@@ -325,7 +325,7 @@ tasks.register<Zip>("SourceArchive") {
 
 tasks.register("Check") {
     group = "verification"
-    description = "Runs Phase 19 artifact bundle checks and all previous phase checks."
+    description = "Runs artifact bundle checks and all previous phase checks."
     dependsOn("Check", "ArtifactsAudit", ":s52-api:build", ":s52-api:jvmTest", ":s52-tests:jvmTest")
 }
 
@@ -344,8 +344,6 @@ tasks.register("GalleryAudit") {
         val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
         check(missing.isEmpty()) { "Missing files: $missing" }
         val readme = layout.projectDirectory.file("README.md").asFile.readText()
-        //check("S52GalleryBuilder" in readme) { "README.md must document Phase 20 gallery API." }
-        //check("Check" in readme) { "README.md must document Check." }
         check("Not for navigation" in readme) { "README.md must keep the not-for-navigation boundary." }
     }
 }
@@ -415,7 +413,7 @@ tasks.register("SymbologyImagesAudit") {
 
 tasks.register("RealSymbologyImportAudit") {
     group = "verification"
-    description = "Checks the Phase 22 OpenCPN chartsymbols importer and refuses tiny placeholder symbology exports."
+    description = "Checks the OpenCPN chartsymbols importer and refuses tiny placeholder symbology exports."
     doLast {
         val requiredFiles = listOf(
             "s52-preslib/src/jvmMain/kotlin/io/github/s52/preslib/opencpn/OpenCpnChartSymbolsImporter.kt",
@@ -433,7 +431,7 @@ tasks.register("RealSymbologyImportAudit") {
 
 tasks.register<Zip>("SourceArchive") {
     group = "distribution"
-    description = "Builds a source archive for Phase 21 release handoff."
+    description = "Builds a source archive for release handoff."
     archiveBaseName.set("s52-kotlin-webgl")
     archiveClassifier.set("-source")
     archiveVersion.set(project.version.toString())
@@ -539,8 +537,8 @@ tasks.register("WebGlBatchingAudit") {
         check("opencpn-regression" in demo) { "Demo must expose the #opencpn-regression visual fixture route." }
 
         val renderer = layout.projectDirectory.file("s52-render-webgl/src/jsMain/kotlin/io/github/s52/render/webgl/WebGlS52Renderer.kt").asFile.readText()
-        check("symbolRenderer.renderBatch" in renderer) { "Point symbols must go through the Phase 33 batch renderer." }
-        check("areaPatternRenderer.renderBatch" in renderer) { "Area patterns must go through the Phase 33 batch renderer." }
+        check("symbolRenderer.renderBatch" in renderer) { "Point symbols must go through the batch renderer." }
+        check("areaPatternRenderer.renderBatch" in renderer) { "Area patterns must go through the batch renderer." }
     }
 }
 

@@ -3,7 +3,7 @@ package io.github.s52.preslib.esri.vector
 /**
  * Runtime-side ESRI vector asset model.
  *
- * Generated point-symbol meshes. Phases ESRI-8/9 extend the same
+ * Generated point-symbol meshes. Later ESRI extend the same
  * generated Kotlin mesh model to complex line styles and area-pattern tiles.
  * Runtime renderers consume triangles directly; they must not parse SVG files.
  */
