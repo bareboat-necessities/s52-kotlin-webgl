@@ -19,7 +19,7 @@ internal class SymbolRenderer(
     private val rasterAtlases: RasterAtlasCache,
     private val presLib: PresLibPack
 ) {
-    private val symbolHpglCache = mutableMapOf<String, List<HpglLineSegment>>()
+    private val symbolHpglCache = mutableMapOf<String, HpglDisplayList>()
     fun render(
         command: S52DrawCommand.PointSymbol,
         projector: GeometryProjector,
@@ -45,6 +45,10 @@ internal class SymbolRenderer(
                 )
                 return textureProgram.drawTriangles(atlas.texture, vertices)
             }
+        }
+
+        renderHpglDisplayList(definition, anchor, projector, colors, rotationDegrees).let { calls ->
+            if (calls > 0) return calls
         }
 
         val vertices = symbolLineSegments(
@@ -111,6 +115,54 @@ internal class SymbolRenderer(
         return transformLocal(x - px, y - py, anchor, projector, rotationDegrees)
     }
 
+    private fun renderHpglDisplayList(
+        definition: SymbolDefinition,
+        anchor: ClipPoint,
+        projector: GeometryProjector,
+        colors: ColorResolver,
+        rotationDegrees: Double
+    ): Int {
+        val hpgl = definition.vectorHpgl ?: return 0
+        val displayList = symbolHpglCache.getOrPut(definition.name) { HpglDisplayListCompiler.compile(hpgl) }
+        if (displayList.isEmpty) return 0
+
+        var calls = 0
+        for (geometry in displayList.geometries) {
+            if (geometry.fills.isNotEmpty()) {
+                val fillVertices = FloatArrayBuilder(geometry.fills.size * 6)
+                for (triangle in geometry.fills) {
+                    fillVertices.addTriangle(
+                        transformHpglPoint(triangle.a, definition, anchor, projector, rotationDegrees),
+                        transformHpglPoint(triangle.b, definition, anchor, projector, rotationDegrees),
+                        transformHpglPoint(triangle.c, definition, anchor, projector, rotationDegrees)
+                    )
+                }
+                calls += solidProgram.draw(
+                    WebGLRenderingContext.TRIANGLES,
+                    fillVertices,
+                    colors.resolve(displayList.colorTokenForPen(geometry.pen, definition.colorRefs), fallback = "CHBLK")
+                )
+            }
+
+            if (geometry.strokes.isNotEmpty()) {
+                val strokeVertices = FloatArrayBuilder(geometry.strokes.size * 4)
+                for (segment in geometry.strokes) {
+                    strokeVertices.addLine(
+                        transformHpglPoint(HpglPoint(segment.x1, segment.y1), definition, anchor, projector, rotationDegrees),
+                        transformHpglPoint(HpglPoint(segment.x2, segment.y2), definition, anchor, projector, rotationDegrees)
+                    )
+                }
+                gl.lineWidth(1.5f)
+                calls += solidProgram.draw(
+                    WebGLRenderingContext.LINES,
+                    strokeVertices,
+                    colors.resolve(displayList.colorTokenForPen(geometry.pen, definition.colorRefs), fallback = "CHBLK")
+                )
+            }
+        }
+        return calls
+    }
+
     private fun symbolLineSegments(
         definition: SymbolDefinition,
         anchor: ClipPoint,
@@ -119,7 +171,7 @@ internal class SymbolRenderer(
     ): FloatArray {
         val floats = FloatArrayBuilder()
         appendVectorCommands(floats, definition, anchor, projector, rotationDegrees)
-        if (floats.isEmpty()) {
+        if (floats.isEmpty() && definition.vectorHpgl.isNullOrBlank()) {
             appendHpglFallback(floats, definition, anchor, projector, rotationDegrees)
         }
         return floats.toFloatArray()
@@ -169,7 +221,7 @@ internal class SymbolRenderer(
         rotationDegrees: Double
     ) {
         val hpgl = definition.vectorHpgl ?: return
-        val segments = symbolHpglCache.getOrPut(definition.name) { HpglLineParser.parseSegments(hpgl) }
+        val segments = symbolHpglCache.getOrPut(definition.name) { HpglDisplayListCompiler.compile(hpgl) }.strokeSegments()
         for (segment in segments) {
             val a = transformLocal(
                 (segment.x1 - definition.pivotX) * HPGL_TO_PIXEL,
@@ -188,6 +240,20 @@ internal class SymbolRenderer(
             floats.addLine(a, b)
         }
     }
+
+    private fun transformHpglPoint(
+        point: HpglPoint,
+        definition: SymbolDefinition,
+        anchor: ClipPoint,
+        projector: GeometryProjector,
+        rotationDegrees: Double
+    ): ClipPoint = transformLocal(
+        (point.x - definition.pivotX) * HPGL_TO_PIXEL,
+        (point.y - definition.pivotY) * HPGL_TO_PIXEL,
+        anchor,
+        projector,
+        rotationDegrees
+    )
 
     private fun transformLocal(
         localX: Double,

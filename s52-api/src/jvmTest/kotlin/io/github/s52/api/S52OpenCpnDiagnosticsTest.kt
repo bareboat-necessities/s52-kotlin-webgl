@@ -27,6 +27,22 @@ class S52OpenCpnDiagnosticsTest {
         assertTrue(report.vectorSymbolCount >= 300)
         assertTrue(report.vectorLineStyleCount == report.lineStyleCount)
         assertTrue(report.knownRasterAtlases.contains("rastersymbols-day.png"))
+        assertEquals(report.symbolCount, report.coverageIndex.symbols.declared)
+        assertEquals(report.patternCount, report.coverageIndex.patterns.declared)
+        assertTrue(report.coverageIndex.hpgl.compiledDisplayListAssetCount > 0)
+        assertTrue(report.coverageIndex.hpgl.fillCapableAssetCount > 0)
+    }
+
+    @Test
+    fun openCpnCoverageIndexSummarizesAssetResolution() {
+        val index = S52OpenCpnDiagnostics.coverageIndex()
+
+        assertTrue(index.symbols.declared >= index.symbols.resolved)
+        assertTrue(index.lineStyles.declared >= index.lineStyles.resolved)
+        assertTrue(index.patterns.declared >= index.patterns.resolved)
+        assertTrue(index.hpgl.assetCount == index.hpgl.compiledDisplayListAssetCount)
+        assertTrue(index.primitiveLookupCounts.isNotEmpty())
+        assertTrue(index.presentationTableLookupCounts.isNotEmpty())
     }
 
     @Test

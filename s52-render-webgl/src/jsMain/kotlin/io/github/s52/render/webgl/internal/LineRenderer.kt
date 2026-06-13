@@ -13,7 +13,7 @@ internal class LineRenderer(
     private val program: SolidColorProgram,
     private val presLib: PresLibPack
 ) {
-    private val hpglCache = mutableMapOf<String, CachedHpgl>()
+    private val hpglCache = mutableMapOf<String, HpglDisplayList>()
     fun renderSimple(command: S52DrawCommand.LineSimple, projector: GeometryProjector, colors: ColorResolver): Int {
         return drawGeometry(command.geometry, projector, colors.resolve(command.colorToken), lineWidth = command.width)
     }
@@ -34,24 +34,22 @@ internal class LineRenderer(
             return drawGeometry(command.geometry, projector, colors.resolve(null, fallback = "CHBLK"), lineWidth = 1.0)
         }
 
-        val cachedHpgl = cachedHpgl(style.name, hpgl)
-        val bounds = cachedHpgl.bounds
-        if (cachedHpgl.segments.isEmpty() || bounds == null) {
+        val displayList = cachedHpgl(style.name, hpgl)
+        val bounds = displayList.bounds
+        val strokeSegments = displayList.strokeSegments()
+        if (strokeSegments.isEmpty() || bounds == null) {
             return drawGeometry(command.geometry, projector, colors.resolve(style.colorRefs.firstOrNull(), fallback = "CHBLK"), lineWidth = 1.0)
         }
 
-        val vertices = complexLineVertices(command.geometry, projector, style, cachedHpgl.segments, bounds)
+        val vertices = complexLineVertices(command.geometry, projector, style, strokeSegments, bounds)
         if (vertices.isEmpty()) return 0
         gl.lineWidth(1.5f)
         return program.draw(WebGLRenderingContext.LINES, vertices, colors.resolve(style.colorRefs.firstOrNull(), fallback = "CHBLK"))
     }
 
 
-    private fun cachedHpgl(name: String, hpgl: String): CachedHpgl =
-        hpglCache.getOrPut(name) {
-            val segments = HpglLineParser.parseSegments(hpgl)
-            CachedHpgl(segments, HpglLineParser.bounds(segments))
-        }
+    private fun cachedHpgl(name: String, hpgl: String): HpglDisplayList =
+        hpglCache.getOrPut(name) { HpglDisplayListCompiler.compile(hpgl) }
     private fun drawGeometry(geometry: EncGeometry, projector: GeometryProjector, color: GlColor, lineWidth: Double): Int {
         val vertices = FloatArrayBuilder()
         when (geometry) {
@@ -215,5 +213,3 @@ internal class LineRenderer(
         private const val MAX_TILES_PER_SEGMENT: Int = 512
     }
 }
-
-private data class CachedHpgl(val segments: List<HpglLineSegment>, val bounds: HpglBounds?)

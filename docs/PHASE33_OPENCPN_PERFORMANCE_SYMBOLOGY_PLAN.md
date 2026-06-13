@@ -21,25 +21,27 @@ This phase targets renderer-visible gaps in OpenCPN symbology support while keep
    * Resolve known project-level CSP symbol names to OpenCPN chart-symbol names where the two naming schemes differ.
    * Cache parsed symbol HPGL segment lists so repeated render frames do not repeatedly parse the same symbol source.
 
-## Next implementation steps
+## Completed implementation steps
 
 ### 1. Build a complete OpenCPN asset coverage index
 
-* Generate a normalized symbol, line, pattern, color, lookup, and CSP reference table from `chartsymbols.xml`, `s57objectclasses.csv`, and the generated Kotlin pack.
-* Add a strict CI check that fails on newly unresolved references, but allow an explicit compatibility-alias table for deliberate project/OpenCPN naming differences.
-* Store counts by asset class and primitive type so regressions are visible without opening a browser.
+* Added `S52OpenCpnDiagnostics.coverageIndex()` with normalized symbol, line, pattern, color, lookup, and CSP coverage from the generated runtime pack.
+* The index resolves deliberate project/OpenCPN symbol-name differences through an explicit compatibility-alias table.
+* The index stores asset-class counts, HPGL display-list/fill capability counts, primitive lookup counts, presentation-table counts, and unresolved reference sets for CI use.
 
 ### 2. Replace line-only HPGL rendering with a compiled vector-display-list model
 
-* Parse HPGL into a compact intermediate form: pen selection, stroke width, move/line/arc/circle, polygon-mode boundaries, and fill commands.
-* Compile each OpenCPN asset once per presentation library into immutable stroke and fill meshes.
-* Keep per-frame work to transform, append, and draw precompiled vertices; do not tokenize HPGL during rendering.
+* Added a WebGL `HpglDisplayListCompiler` that parses HPGL into reusable pen-keyed stroke and fill geometry.
+* Symbols, line styles, and area patterns cache compiled display lists by asset name.
+* Rendering transforms precompiled geometry each frame instead of reparsing HPGL strings in the hot path.
 
 ### 3. Add fill support for HPGL symbols and patterns
 
-* Convert `PM`/`FP` polygon-mode paths into triangulated local-space meshes.
-* Preserve `SP` color transitions as separate mesh batches keyed by color token.
-* Support circles/arcs as pre-flattened polylines/triangle fans with a bounded segment budget.
+* `PM`/`FP` polygon-mode paths are converted into triangulated local-space fill meshes.
+* `SP` pen transitions are preserved as separate geometry batches and mapped back to OpenCPN color references.
+* Circles/arcs are pre-flattened into bounded line geometry; rectangle fill/edge commands are compiled as fill/stroke geometry.
+
+## Remaining implementation steps
 
 ### 4. Batch OpenCPN symbols and patterns by GPU state
 
@@ -65,6 +67,6 @@ This phase targets renderer-visible gaps in OpenCPN symbology support while keep
 
 ## Open risks
 
-* Some OpenCPN HPGL constructs are still parsed only as line geometry. Filled symbol parity requires the compiled display-list work above.
+* Some OpenCPN HPGL constructs beyond the compiled subset may still need specialized support after visual comparison with OpenCPN.
 * Browser screenshots are required for final verification of visual parity; JVM tests can validate coverage and command generation but cannot prove atlas/pattern appearance.
 * Stencil triangulation improves correctness but adds CPU work. The compiled/cached polygon-mask plan should revisit reuse for static ENC tiles.
