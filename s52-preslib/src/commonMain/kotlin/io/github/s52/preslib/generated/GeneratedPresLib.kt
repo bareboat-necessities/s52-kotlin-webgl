@@ -22,7 +22,7 @@ import io.github.s52.preslib.source.SourceVectorCommand
  * This is deliberately small and synthetic. It proves the importer, builder,
  * registry, and validation architecture without bundling official IHO assets.
  */
-object GeneratedPhase2PresLib {
+object GeneratedPresLib {
     fun sourcePack(): PresLibSourcePack = PresLibSourcePack(
         metadata = PresLibMetadata(
             name = "Phase 2 synthetic S-52 Presentation Library pack",
