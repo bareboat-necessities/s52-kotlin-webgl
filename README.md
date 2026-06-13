@@ -67,6 +67,18 @@ s52-tests         golden portrayal tests and S-64/Chart-1-style validation harne
 demo              Kotlin/JS browser demo
 ```
 
+
+## Public API helpers
+
+The `s52-api` module exposes the stable consumer facade used by demos, tests, and downstream integrations:
+
+- `S52PortrayalSession` creates synthetic or generated-library portrayal sessions and returns renderer-independent draw commands.
+- `S52ProfileCatalog` provides deterministic built-in profiles such as `safetyDay`, `planningDay`, `nightMinimal`, and `diagnosticsAll` so examples and issue reports use repeatable mariner/display settings.
+- `S52DiagnosticBundle` packages manifests, command summaries, transcript previews, and error state for support/debug reports.
+- `S52ArtifactBundle` is the portable text-only export container produced by `S52ArtifactExporter` and `artifactBundle(...)`; downstream apps can write its artifacts to CI uploads, browser storage, local disk, or GitHub issue attachments.
+
+These helpers are for integration, regression testing, and diagnostics. They do not make the output type-approved and they do not add navigation functions.
+
 ## Legal boundary
 
 Official IHO Presentation Library assets should be treated as external input unless redistribution rights are clear. Provides the generator/builder/validation structure so a developer can provide local standards-derived assets and generate runtime tables without committing restricted source material.
@@ -112,3 +124,6 @@ The generated GitHub Actions artifact is `opencpn-symbology-images-directory`. T
 
 License note: the OpenCPN-compatible symbology import path requires **GPL-2.0-or-later** compatibility.
 
+## Kotlin 2.5 readiness
+
+Project-owned Kotlin sources should not use `data class ... private constructor(...)` patterns. Those keys are regular classes with explicit equality now, and the JVM test suite includes a guard for that migration-warning pattern. See `docs/KOTLIN_25_READINESS.md`.
