@@ -6,7 +6,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class GoldenPortrayalPhase10Test {
+class GoldenPortrayalTest {
     private val runner = GoldenPortrayalRunner()
 
     @Test

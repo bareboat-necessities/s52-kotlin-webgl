@@ -4,7 +4,7 @@ import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
-class Phase18ProfilesReadinessTest {
+class ProfilesReadinessTest {
     @Test
     fun phase18ProfileFilesArePresent() {
         val root = locateProjectRoot()

@@ -18,7 +18,7 @@ import io.github.s52.core.settings.SymbolStyle
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
-class OpenCpnGoldenPhase32Test {
+class OpenCpnGoldenTest {
     @Test
     fun representativeOpenCpnFeaturesProduceStableCommands() {
         val runtime = S52.openCpnRuntime()

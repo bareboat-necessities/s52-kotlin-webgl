@@ -4,7 +4,7 @@ import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
-class Phase17DiagnosticsReadinessTest {
+class DiagnosticsReadinessTest {
     private val root: File = findRepositoryRoot()
 
     @Test

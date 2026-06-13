@@ -5,7 +5,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class S64CommandValidationPhase11Test {
+class S64CommandValidationTest {
     private val fixtureResources = listOf(
         "/validation/chart1-depth-danger.s52v",
         "/validation/s64-display-settings.s52v",
