@@ -112,6 +112,3 @@ The generated GitHub Actions artifact is `opencpn-symbology-images-directory`. T
 
 License note: the OpenCPN-compatible symbology import path requires **GPL-2.0-or-later** compatibility.
 
-## Kotlin 2.5 readiness
-
-Project-owned Kotlin sources should not use `data class ... private constructor(...)` patterns. Those keys are regular classes with explicit equality now, and the JVM test suite includes a guard for that migration-warning pattern. See `docs/KOTLIN_25_READINESS.md`.
