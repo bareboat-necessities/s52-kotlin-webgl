@@ -14,8 +14,6 @@ class Phase15ReleaseReadinessTest {
             "CHANGELOG.md",
             "CONTRIBUTING.md",
             "SECURITY.md",
-            "docs/PHASES.md",
-            "docs/RELEASE_PHASE15.md",
             "samples/integration/minimal-core/README.md",
             ".github/workflows/ci.yml",
             ".github/workflows/release.yml"

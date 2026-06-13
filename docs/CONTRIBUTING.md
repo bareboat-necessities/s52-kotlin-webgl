@@ -34,15 +34,6 @@ Catalogue enums should remain generated-style. Keep acronym, numeric code, primi
 
 Lookup rows should enter through `s52-preslib` source/generator models rather than being scattered through CSP code. A lookup row should describe when instructions apply. A CSP should describe conditional behavior invoked by `CS(...)`.
 
-## Adding CSP behavior
-
-See [`ADDING_CSP.md`](ADDING_CSP.md). Every CSP addition should include:
-
-- typed attribute access
-- synthetic fixture coverage
-- command-level golden or validation coverage
-- static completeness validation
-
 ## Renderer changes
 
 Renderer changes should accept only `S52DrawCommand`, `PresLibPack`, palette/settings/context values, and viewport state. A renderer must not branch on `S57ObjectClass`.

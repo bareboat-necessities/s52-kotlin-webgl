@@ -13,7 +13,6 @@ class Phase16FacadeReadinessTest {
             "s52-api/build.gradle.kts",
             "s52-api/src/commonMain/kotlin/io/github/s52/api/S52PortrayalSession.kt",
             "s52-api/src/jvmTest/kotlin/io/github/s52/api/S52PortrayalSessionTest.kt",
-            "docs/API_FACADE_PHASE16.md",
             "samples/integration/facade/README.md"
         )
 

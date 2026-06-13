@@ -143,8 +143,6 @@ tasks.register("phase15ReleaseAudit") {
             "CHANGELOG.md",
             "CONTRIBUTING.md",
             "SECURITY.md",
-            "docs/PHASES.md",
-            "docs/RELEASE_PHASE15.md",
             "samples/integration/minimal-core/README.md",
             ".github/workflows/ci.yml",
             ".github/workflows/release.yml"
@@ -188,7 +186,6 @@ tasks.register("phase16ApiAudit") {
         val requiredFiles = listOf(
             "s52-api/build.gradle.kts",
             "s52-api/src/commonMain/kotlin/io/github/s52/api/S52PortrayalSession.kt",
-            "docs/API_FACADE_PHASE16.md",
             "samples/integration/facade/README.md"
         )
         val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
@@ -313,7 +310,6 @@ tasks.register("phase19ArtifactsAudit") {
         val requiredFiles = listOf(
             "s52-api/src/commonMain/kotlin/io/github/s52/api/S52ArtifactBundle.kt",
             "s52-api/src/jvmTest/kotlin/io/github/s52/api/S52ArtifactBundleTest.kt",
-            "docs/ARTIFACTS_PHASE19.md",
             "samples/integration/artifacts/README.md"
         )
         val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
