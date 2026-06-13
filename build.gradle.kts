@@ -103,24 +103,13 @@ tasks.register("phase7Check") {
 tasks.register("phase8Check") {
     group = "verification"
     description = "Runs WebGL2 renderer checks and all previous phase checks."
+    dependsOn("phase7Check")
 }
 
 tasks.register("phase9Check") {
     group = "verification"
     description = "Runs static Presentation Library completeness checks and all previous phase checks."
     dependsOn("phase8Check", ":s52-preslib:jvmTest", ":s52-csp:jvmTest")
-}
-
-tasks.register("Check") {
-    group = "verification"
-    description = "Runs command-level golden portrayal tests and all previous phase checks."
-    dependsOn("phase9Check", ":s52-tests:jvmTest")
-}
-
-tasks.register("Check") {
-    group = "verification"
-    description = "Runs S-64 / Chart-1 command validation harness checks and all previous phase checks."
-    dependsOn("Check", ":s52-tests:jvmTest")
 }
 
 tasks.register("ReleaseAudit") {
@@ -147,27 +136,6 @@ tasks.register("ReleaseAudit") {
     }
 }
 
-tasks.register<Zip>("SourceArchive") {
-    group = "distribution"
-    description = "Builds a source archive for release handoff."
-    archiveBaseName.set("s52-kotlin-webgl")
-    archiveClassifier.set("source")
-    archiveVersion.set(project.version.toString())
-
-    from(layout.projectDirectory) {
-        exclude(".git/**")
-        exclude(".gradle/**")
-        exclude("**/build/**")
-        exclude("build/**")
-    }
-}
-
-tasks.register("Check") {
-    group = "verification"
-    description = "Runs release-readiness checks and all previous phase checks."
-    dependsOn("Check", "ReleaseAudit", ":s52-tests:jvmTest")
-}
-
 tasks.register("ApiAudit") {
     group = "verification"
     description = "Checks consumer API facade and integration documentation."
@@ -187,27 +155,6 @@ tasks.register("ApiAudit") {
     }
 }
 
-tasks.register<Zip>("SourceArchive") {
-    group = "distribution"
-    description = "Builds a source archive for release handoff."
-    archiveBaseName.set("s52-kotlin-webgl")
-    archiveClassifier.set("-source")
-    archiveVersion.set(project.version.toString())
-
-    from(layout.projectDirectory) {
-        exclude(".git/**")
-        exclude(".gradle/**")
-        exclude("**/build/**")
-        exclude("build/**")
-    }
-}
-
-tasks.register("Check") {
-    group = "verification"
-    description = "Runs consumer API facade checks and all previous phase checks."
-    dependsOn("Check", "ApiAudit", ":s52-api:build", ":s52-tests:jvmTest")
-}
-
 tasks.register("DiagnosticsAudit") {
     group = "verification"
     description = "Checks diagnostic bundle API and integration documentation."
@@ -222,29 +169,7 @@ tasks.register("DiagnosticsAudit") {
         val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
         check(missing.isEmpty()) { "Missing diagnostic files: $missing" }
 
-        val readme = layout.projectDirectory.file("README.md").asFile.readText()
     }
-}
-
-tasks.register<Zip>("SourceArchive") {
-    group = "distribution"
-    description = "Builds a source archive for release handoff."
-    archiveBaseName.set("s52-kotlin-webgl")
-    archiveClassifier.set("-source")
-    archiveVersion.set(project.version.toString())
-
-    from(layout.projectDirectory) {
-        exclude(".git/**")
-        exclude(".gradle/**")
-        exclude("**/build/**")
-        exclude("build/**")
-    }
-}
-
-tasks.register("Check") {
-    group = "verification"
-    description = "Runs diagnostic bundle checks and all previous phase checks."
-    dependsOn("Check", "DiagnosticsAudit", ":s52-api:build", ":s52-tests:jvmTest")
 }
 
 tasks.register("ProfilesAudit") {
@@ -266,27 +191,6 @@ tasks.register("ProfilesAudit") {
     }
 }
 
-tasks.register<Zip>("SourceArchive") {
-    group = "distribution"
-    description = "Builds a source archive for release handoff."
-    archiveBaseName.set("s52-kotlin-webgl")
-    archiveClassifier.set("-source")
-    archiveVersion.set(project.version.toString())
-
-    from(layout.projectDirectory) {
-        exclude(".git/**")
-        exclude(".gradle/**")
-        exclude("**/build/**")
-        exclude("build/**")
-    }
-}
-
-tasks.register("Check") {
-    group = "verification"
-    description = "Runs portrayal profile checks and all previous phase checks."
-    dependsOn("Check", "ProfilesAudit", ":s52-api:build", ":s52-api:jvmTest", ":s52-tests:jvmTest")
-}
-
 tasks.register("ArtifactsAudit") {
     group = "verification"
     description = "Checks artifact bundle API and integration documentation."
@@ -303,27 +207,6 @@ tasks.register("ArtifactsAudit") {
         val readme = layout.projectDirectory.file("README.md").asFile.readText()
         check("S52ArtifactBundle" in readme) { "README.md must document the artifact bundle API." }
     }
-}
-
-tasks.register<Zip>("SourceArchive") {
-    group = "distribution"
-    description = "Builds a source archive for release handoff."
-    archiveBaseName.set("s52-kotlin-webgl")
-    archiveClassifier.set("-source")
-    archiveVersion.set(project.version.toString())
-
-    from(layout.projectDirectory) {
-        exclude(".git/**")
-        exclude(".gradle/**")
-        exclude("**/build/**")
-        exclude("build/**")
-    }
-}
-
-tasks.register("Check") {
-    group = "verification"
-    description = "Runs artifact bundle checks and all previous phase checks."
-    dependsOn("Check", "ArtifactsAudit", ":s52-api:build", ":s52-api:jvmTest", ":s52-tests:jvmTest")
 }
 
 tasks.register("GalleryAudit") {
@@ -344,26 +227,6 @@ tasks.register("GalleryAudit") {
     }
 }
 
-tasks.register<Zip>("SourceArchive") {
-    group = "distribution"
-    description = "Builds a source archive for release handoff."
-    archiveBaseName.set("s52-kotlin-webgl")
-    archiveClassifier.set("-source")
-    archiveVersion.set(project.version.toString())
-    from(layout.projectDirectory) {
-        exclude(".git/**")
-        exclude(".gradle/**")
-        exclude("**/build/**")
-        exclude("build/**")
-    }
-}
-
-tasks.register("Check") {
-    group = "verification"
-    description = "Runs s52lib-compatible browser-gallery checks and all previous phase checks."
-    dependsOn("Check", "GalleryAudit", ":s52-api:build", ":s52-api:jvmTest", ":demo:build", ":s52-tests:jvmTest")
-}
-
 tasks.register("GenerateOpenCpnSymbologyImages") {
     group = "documentation"
     description = "Generates per-asset SVG images from a real imported OpenCPN chartsymbols.xml payload."
@@ -381,12 +244,6 @@ tasks.register("SymbologyImagesAudit") {
     dependsOn("GenerateSymbologyImages")
 
     doLast {
-        val requiredFiles = listOf(
-            "s52-api/src/jvmMain/kotlin/io/github/s52/api/tools/S52SymbologyImageExportMain.kt",
-            "s52-api/src/jvmTest/kotlin/io/github/s52/api/S52SymbologyImageExporterTest.kt",
-            "docs/SYMBOLOGY_IMAGES_.md"
-        )
-
         val out = layout.buildDirectory.dir("s52-symbology-images").get().asFile
         check(out.resolve("index.html").isFile) { "Missing generated symbology index.html" }
         check(out.resolve("manifest.properties").isFile) { "Missing generated symbology manifest.properties" }
@@ -423,27 +280,6 @@ tasks.register("RealSymbologyImportAudit") {
         check("opencpn.chartsymbols" in readme) { "README.md must explain the required real PLib input path." }
         check("criticalCheck" in readme) { "README.md must document criticalCheck." }
     }
-}
-
-tasks.register<Zip>("SourceArchive") {
-    group = "distribution"
-    description = "Builds a source archive for release handoff."
-    archiveBaseName.set("s52-kotlin-webgl")
-    archiveClassifier.set("-source")
-    archiveVersion.set(project.version.toString())
-
-    from(layout.projectDirectory) {
-        exclude(".git/**")
-        exclude(".gradle/**")
-        exclude("**/build/**")
-        exclude("build/**")
-    }
-}
-
-tasks.register("Check") {
-    group = "verification"
-    description = "Runs OpenCPN symbology image export checks and all previous phase checks."
-    dependsOn("Check", "SymbologyImagesAudit", "RealSymbologyImportAudit", ":s52-api:jvmTest", ":s52-tests:jvmTest")
 }
 
 tasks.register<Zip>("sourceArchive") {
@@ -538,8 +374,39 @@ tasks.register("WebGlBatchingAudit") {
     }
 }
 
+tasks.register<Zip>("SourceArchive") {
+    group = "distribution"
+    description = "Builds a source archive for release handoff."
+    archiveBaseName.set("s52-kotlin-webgl")
+    archiveClassifier.set("source")
+    archiveVersion.set(project.version.toString())
+
+    from(layout.projectDirectory) {
+        exclude(".git/**")
+        exclude(".gradle/**")
+        exclude("**/build/**")
+        exclude("build/**")
+    }
+}
+
 tasks.register("Check") {
     group = "verification"
-    description = "Runs PHPGL fill, WebGL batching, and visual fixture checks."
-    dependsOn("WebGlBatchingAudit", ":s52-api:jvmTest", ":s52-render-webgl:compileKotlinJs", ":demo:compileKotlinJs")
+    description = "Runs all root S-52 verification phases, audits, symbology export checks, WebGL batching checks, and tests."
+    dependsOn(
+        "phase9Check",
+        "ReleaseAudit",
+        "ApiAudit",
+        "DiagnosticsAudit",
+        "ProfilesAudit",
+        "ArtifactsAudit",
+        "GalleryAudit",
+        "SymbologyImagesAudit",
+        "RealSymbologyImportAudit",
+        "WebGlBatchingAudit",
+        ":s52-api:build",
+        ":s52-api:jvmTest",
+        ":s52-tests:jvmTest",
+        ":s52-render-webgl:compileKotlinJs",
+        ":demo:compileKotlinJs"
+    )
 }
