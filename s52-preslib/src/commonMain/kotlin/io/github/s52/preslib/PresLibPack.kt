@@ -18,6 +18,12 @@ data class PresLibPack(
          */
         fun phase0Minimal(): PresLibPack = synthetic()
 
+        /**
+         * Historical smoke-test alias retained for downstream callers and JVM
+         * tests that still ask for the minimal synthetic pack directly.
+         */
+        fun minimal(): PresLibPack = synthetic()
+
         fun synthetic(): PresLibPack = io.github.s52.preslib.generated.GeneratedPresLib.pack()
 
         fun s52LibCompat(): PresLibPack = io.github.s52.preslib.s52lib.S52LibCompatPresLib.pack()
