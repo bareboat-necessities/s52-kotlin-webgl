@@ -77,7 +77,7 @@ object EsriSvgAssetKotlinGenerator {
             RegistryKind.PATTERN -> appendLine("import io.github.s52.preslib.esri.vector.EsriVectorAreaPattern")
         }
         appendLine()
-        appendLine("/** Generated from ESRI nautical-chart-symbols SVG assets by Phase ESRI-${if (kind == RegistryKind.LINE) "8" else "9"}. */")
+        appendLine("/** Generated from ESRI nautical-chart-symbols SVG assets by ESRI-${if (kind == RegistryKind.LINE) "8" else "9"}. */")
         when (kind) {
             RegistryKind.LINE -> {
                 appendLine("object EsriGeneratedLineRegistry {")

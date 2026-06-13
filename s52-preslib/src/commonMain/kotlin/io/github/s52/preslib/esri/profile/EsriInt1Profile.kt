@@ -22,7 +22,7 @@ import io.github.s52.preslib.esri.vector.EsriVectorSymbol
  * Stable entry point for the ESRI/INT1 symbology profile.
  *
  * The profile intentionally remains independent from a concrete chartplotter or
- * S-57 parser. It accepts the small phase ESRI rule/CSP feature models and
+ * S-57 parser. It accepts the small ESRI rule/CSP feature models and
  * exposes generated vector assets that WebGL renderers can consume directly.
  */
 object EsriInt1Profile {

@@ -6,7 +6,7 @@ import io.github.s52.preslib.esri.importer.EsriSourceLayout
 import java.io.File
 
 /**
- * Phase ESRI-2 SVG subset validator.
+ * SVG subset validator.
  *
  * Args:
  * 0: ESRI nautical-chart-symbols source root

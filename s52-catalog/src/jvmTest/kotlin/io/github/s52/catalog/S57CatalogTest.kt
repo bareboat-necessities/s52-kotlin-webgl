@@ -104,7 +104,7 @@ class S57CatalogTest {
     }
 
     @Test
-    fun phase1CatalogValidatesWithoutDuplicateTypedEntries() {
+    fun catalogValidatesWithoutDuplicateTypedEntries() {
         val report = S57CatalogValidator.validate()
 
         assertFalse(report.hasErrors, report.diagnostics.joinToString("\n") { it.message })

@@ -3,7 +3,7 @@ package io.github.s52.preslib.opencpn.inventory
 import java.io.File
 
 /**
- * Raw, lossless-enough OpenCPN portrayal payload model used by Phase 28A.
+ * Raw, lossless-enough OpenCPN portrayal payload.
  *
  * This package intentionally does not feed the runtime Presentation Library yet.
  * It gives later phases a verified view of the XML/CSV/PNG payload while keeping

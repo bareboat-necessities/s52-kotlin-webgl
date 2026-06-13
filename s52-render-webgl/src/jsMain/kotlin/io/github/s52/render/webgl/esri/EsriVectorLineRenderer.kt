@@ -8,7 +8,7 @@ import kotlin.math.hypot
 import kotlin.math.sin
 
 /**
- * Phase ESRI-8 renderer for generated ESRI complex-line SVG meshes.
+ * Renderer for generated ESRI complex-line SVG meshes.
  *
  * It places the generated line SVG as a repeated vector motif along a screen-space
  * polyline. Geometry is passed in screen pixels by the higher chart renderer.

@@ -39,7 +39,7 @@ object EsriRuleKotlinGenerator {
         appendLine("import io.github.s52.preslib.esri.rules.EsriRuleFilter")
         appendLine("import io.github.s52.preslib.esri.rules.EsriRuleOperator")
         appendLine()
-        appendLine("/** Generated from ESRI CustomSymbolMap.xml by Phase ESRI-5. */")
+        appendLine("/** Generated from ESRI CustomSymbolMap.xml */")
         appendLine("object EsriGeneratedRuleRegistry {")
         appendLine("    const val RULE_COUNT: Int = ${rules.size}")
         appendLine("    val rules: List<EsriPortrayalRule> = listOf(")

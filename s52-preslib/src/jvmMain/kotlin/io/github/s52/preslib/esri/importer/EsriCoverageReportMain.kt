@@ -3,7 +3,7 @@ package io.github.s52.preslib.esri.importer
 import java.io.File
 
 /**
- * Phase ESRI-1 initial coverage/gap report.
+ * Initial coverage/gap report.
  *
  * Args:
  * 0: ESRI nautical-chart-symbols source root

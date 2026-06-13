@@ -20,7 +20,7 @@ import io.github.s52.preslib.source.SourceLookupRecord
 import io.github.s52.preslib.source.SourcePattern
 import io.github.s52.preslib.source.SourceSymbol
 
-/** Converts Phase 28A/28B raw OpenCPN inventory records into the common source-pack model. */
+/** Converts raw OpenCPN inventory records into the common source-pack model. */
 object OpenCpnPresLibSourceConverter {
     fun toSourcePack(summary: OpenCpnChartSymbolsSummary): PresLibSourcePack = PresLibSourcePack(
         metadata = PresLibMetadata(

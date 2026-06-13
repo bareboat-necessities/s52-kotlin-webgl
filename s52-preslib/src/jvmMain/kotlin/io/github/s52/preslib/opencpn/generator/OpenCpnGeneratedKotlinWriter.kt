@@ -30,7 +30,7 @@ object OpenCpnGeneratedKotlinWriter {
         appendLine("import io.github.s52.preslib.source.SourcePattern")
         appendLine("import io.github.s52.preslib.source.SourceSymbol")
         appendLine()
-        appendLine("/** Generated from s52/opencpn/chartsymbols.xml by Phase 28C. */")
+        appendLine("/** Generated from s52/opencpn/chartsymbols.xml. */")
         appendLine("object OpenCpnGeneratedPresLib {")
         appendLine("    const val LOOKUP_COUNT: Int = ${source.lookupRecords.size}")
         appendLine("    const val SYMBOL_COUNT: Int = ${source.symbols.size}")

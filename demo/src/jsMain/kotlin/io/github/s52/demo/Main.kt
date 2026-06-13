@@ -65,10 +65,10 @@ fun main() {
             route == "opencpn-regression" -> {
                 val commands = S52VisualRegressionFixtures.Commands(includeLabels = true)
                 val stats = renderer.render(commands, settings)
-                status.textContent = "OpenCPN phase 33 visual regression fixture: ${commands.size} commands, $stats. Expected checks: concave area hole, HPGL pattern tiles without rounded preview boxes, TOPMAR/WRECK/OBSTRN/LIGHTS/QUESMRK symbols."
+                status.textContent = "OpenCPN visual regression fixture: ${commands.size} commands, $stats. Expected checks: concave area hole, HPGL pattern tiles without rounded preview boxes, TOPMAR/WRECK/OBSTRN/LIGHTS/QUESMRK symbols."
             }
             section == S52GallerySection.Chart -> {
-                val engine = S52PortrayalEngine(presLib.lookupTable, if (useOpenCpn) DefaultCspRegistry.openCpn() else DefaultCspRegistry.phase6Complete())
+                val engine = S52PortrayalEngine(presLib.lookupTable, if (useOpenCpn) DefaultCspRegistry.openCpn() else DefaultCspRegistry.complete())
                 val commands = engine.portray(SyntheticFeatures(), settings, context)
                 val stats = renderer.render(commands, settings)
                 status.textContent = "${if (useOpenCpn) "OpenCPN" else "Compat"} chart demo: ${commands.size} commands, $stats. Routes: #chart #symbols #opencpn-symbols #opencpn-colors #opencpn-lookups #opencpn-regression #opencpn-diagnostics"

@@ -8,7 +8,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 /**
- * Phase ESRI-4 WebGL renderer for generated ESRI vector symbol meshes.
+ * WebGL renderer for generated ESRI vector symbol meshes.
  *
  * This renderer deliberately consumes generated Kotlin mesh data, not runtime SVG
  * files.  It is intentionally small and dependency-light so it can be integrated

@@ -1,7 +1,7 @@
 package io.github.s52.catalog
 
 /**
- * Phase 1 typed S-57 object class catalogue used by the S-52 portrayal boundary.
+ * Typed S-57 object class catalogue used by the S-52 portrayal boundary.
  *
  * This file is intentionally shaped like generated code: each enum entry is data-only
  * and contains no portrayal behavior. Later phases can replace this curated starter

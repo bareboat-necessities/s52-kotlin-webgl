@@ -3,11 +3,11 @@ package io.github.s52.render.webgl.esri
 import io.github.s52.preslib.esri.vector.EsriVectorAreaPattern
 
 /**
- * Phase ESRI-9 renderer for generated ESRI vector area-pattern SVG meshes.
+ * Renderer for generated ESRI vector area-pattern SVG meshes.
  *
  * The first phase tiles a screen-space bounding box. The surrounding chart
  * renderer should enable polygon stencil/clipping before calling this method;
- * Phase ESRI-10 can wire that directly into the polygon fill pipeline.
+ * Can wire that directly into the polygon fill pipeline.
  */
 class EsriVectorPatternRenderer(
     gl: dynamic,

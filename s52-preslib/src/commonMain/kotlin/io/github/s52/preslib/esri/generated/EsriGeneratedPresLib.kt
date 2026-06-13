@@ -4,7 +4,7 @@ import io.github.s52.preslib.esri.alias.EsriAliasCoverage
 import io.github.s52.preslib.esri.profile.EsriProfileMetadata
 
 /**
- * Phase ESRI-10 generated profile metadata placeholder.
+ * ESRI-10 generated profile metadata placeholder.
  *
  * generateEsriPresLib overwrites this file with source-revision and coverage
  * counts derived from the current ESRI source and alias tables.

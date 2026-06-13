@@ -4,7 +4,7 @@ package io.github.s52.preslib.esri.generator
  * Failure policy for ESRI SVG/vector generation.
  *
  * The ESRI CustomPresentationLibrary contains SVG constructs that are broader than
- * the initial Phase ESRI-2/3 parser subset. The normal generation path must be
+ * the initial ESRI-2/3 parser subset. The normal generation path must be
  * tolerant: generate Kotlin/WebGL data for supported assets, write a complete
  * failure report for unsupported assets, and continue so CI can still build the
  * OpenCPN path plus partial ESRI artifacts.
@@ -39,7 +39,7 @@ internal object EsriGenerationFailurePolicy {
         } else {
             System.err.println("WARNING: $message")
             System.err.println(
-                "WARNING: continuing because Phase ESRI-2 validation is report-only by default. " +
+                "WARNING: continuing because ESRI-2 validation is report-only by default. " +
                     "Set ESRI_FAIL_ON_SVG_FAILURES=true to make this fatal."
             )
         }

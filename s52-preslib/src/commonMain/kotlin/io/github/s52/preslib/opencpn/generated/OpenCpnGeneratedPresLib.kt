@@ -17,7 +17,7 @@ import io.github.s52.preslib.source.SourcePattern
 import io.github.s52.preslib.source.SourceSymbol
 
 /**
- * Generated from s52/opencpn/chartsymbols.xml by Phase 28C.
+ * Generated from s52/opencpn/chartsymbols.xml.
  *
  * Compact TSV payload keeps Kotlin/JS source-pack generation practical while
  * preserving bitmap atlas refs, raw HPGL strings, and raw OpenCPN lookup metadata.

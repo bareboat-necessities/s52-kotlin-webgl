@@ -9,11 +9,11 @@ import io.github.s52.preslib.PresLibPack
 
 /** Runs golden cases through the public portrayal engine boundary. */
 class GoldenPortrayalRunner(
-    private val presLib: PresLibPack = PresLibPack.phase2Synthetic()
+    private val presLib: PresLibPack = PresLibPack.synthetic()
 ) {
     private val engine = S52PortrayalEngine(
         lookupTable = presLib.lookupTable,
-        cspRegistry = DefaultCspRegistry.phase6Complete()
+        cspRegistry = DefaultCspRegistry.complete()
     )
 
     fun portray(case: GoldenPortrayalCase): List<S52DrawCommand> =

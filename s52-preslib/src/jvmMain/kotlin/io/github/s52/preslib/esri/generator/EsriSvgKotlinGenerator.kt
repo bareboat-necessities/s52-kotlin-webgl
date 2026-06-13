@@ -63,7 +63,7 @@ object EsriSvgKotlinGenerator {
         appendLine("import io.github.s52.preslib.esri.vector.EsriVectorCategory")
         appendLine("import io.github.s52.preslib.esri.vector.EsriVectorSymbol")
         appendLine()
-        appendLine("/** Generated from ESRI nautical-chart-symbols SVG assets by Phase ESRI-3. */")
+        appendLine("/** Generated from ESRI nautical-chart-symbols SVG assets. */")
         appendLine("object EsriGeneratedSymbolRegistry {")
         appendLine("    const val SYMBOL_COUNT: Int = ${symbols.size}")
         appendLine("    val symbols: Map<String, EsriVectorSymbol> = linkedMapOf(")

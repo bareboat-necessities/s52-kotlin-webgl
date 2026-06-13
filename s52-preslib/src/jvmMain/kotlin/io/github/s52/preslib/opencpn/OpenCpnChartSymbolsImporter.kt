@@ -22,16 +22,16 @@ import kotlin.math.min
 import kotlin.math.sin
 
 /**
- * Phase 27 OpenCPN chartsymbols.xml importer fixes.
+ * OpenCPN chartsymbols.xml importer fixes.
  *
- * This file replaces the Phase 26 importer with the real fixes that were
+ * This file replaces the importer with the real fixes that were
  * missing from the previously reissued zip:
  *
  * - reads HPGL from nested <vector><HPGL> for symbols, line styles, and patterns;
  * - reads color-ref tags recursively instead of only direct children;
  * - keeps compact OpenCPN color-ref strings such as ACHBLKBCHREDCCHGRN usable;
  * - keeps HPGL helper functions at object scope, not accidentally inside a local
- *   function, which fixes the JVM compile errors seen in Phase 27 logs;
+ *   function, which fixes the JVM compile errors seen in logs;
  * - parses coordinates with a Kotlin-safe regex and explicit Pair<Double,Double>
  *   values so destructuring/iterator inference does not break;
  * - accepts common HPGL geometry commands used by OpenCPN symbols: PU, PD, CI,

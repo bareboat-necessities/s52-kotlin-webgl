@@ -4,7 +4,7 @@ import io.github.s52.preslib.esri.svg.EsriSvgParser
 import java.io.File
 
 /**
- * Phase ESRI-1 inventory entry point.
+ * Inventory entry point.
  *
  * Args:
  * 0: ESRI nautical-chart-symbols source root

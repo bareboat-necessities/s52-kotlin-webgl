@@ -60,14 +60,13 @@ tasks.register("phase0Check") {
 
 tasks.register("phase1Check") {
     group = "verification"
-    description = "Runs Phase 1 typed-catalogue validation and all Phase 0 checks."
+    description = "Runs typed-catalogue validation and all Phase 0 checks."
     dependsOn("phase0Check")
 }
 
-
 tasks.register("phase2Check") {
     group = "verification"
-    description = "Runs Presentation Library generation/validation checks and all previous phase checks."
+    description = "Runs Presentation Library generation/validation checks and all previous checks."
     dependsOn("phase1Check")
 }
 
@@ -526,7 +525,7 @@ tasks.register("releaseArtifacts") {
 
 tasks.register("WebGlBatchingAudit") {
     group = "verification"
-    description = "Checks Phase 33 HPGL fill batching and visual regression fixture files."
+    description = "Checks HPGL fill batching and visual regression fixture files."
     doLast {
         val requiredFiles = listOf(
             "s52-render-webgl/src/jsMain/kotlin/io/github/s52/render/webgl/internal/HpglDisplayList.kt",
@@ -538,7 +537,7 @@ tasks.register("WebGlBatchingAudit") {
             "docs/_WEBGL_BATCHING.md"
         )
         val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
-        check(missing.isEmpty()) { "Missing Phase 33 files: $missing" }
+        check(missing.isEmpty()) { "Missing files: $missing" }
 
         val demo = layout.projectDirectory.file("demo/src/jsMain/kotlin/io/github/s52/demo/Main.kt").asFile.readText()
         check("opencpn-regression" in demo) { "Demo must expose the #opencpn-regression visual fixture route." }

@@ -15,7 +15,7 @@ import io.github.s52.preslib.source.SourceAttributeFilter
 import io.github.s52.preslib.source.s52Token
 
 /**
- * Phase 9 static-completeness diagnostic.
+ * Static-completeness diagnostic.
  *
  * The validator is intentionally renderer-independent. It proves that a
  * Presentation Library pack is self-consistent before a chart engine ever tries
@@ -135,7 +135,7 @@ data class StaticCompletenessReport(
 }
 
 /**
- * Phase 9 static-completeness validator.
+ * Static-completeness validator.
  *
  * For runtime packs, it validates already parsed lookup records. For source
  * packs, it also validates instruction parsing and source-side duplicates.

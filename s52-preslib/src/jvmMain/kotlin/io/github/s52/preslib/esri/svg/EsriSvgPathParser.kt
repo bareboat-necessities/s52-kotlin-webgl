@@ -3,7 +3,7 @@ package io.github.s52.preslib.esri.svg
 /**
  * SVG path tokenizer used by the ESRI SVG importer.
  *
- * Phase ESRI-2 records all path commands and rejects unsupported commands before
+ * Records all path commands and rejects unsupported commands before
  * any renderer can silently substitute a placeholder.  Phase ESRI-3 consumes this
  * token stream to flatten paths into generated Kotlin mesh data.
  */

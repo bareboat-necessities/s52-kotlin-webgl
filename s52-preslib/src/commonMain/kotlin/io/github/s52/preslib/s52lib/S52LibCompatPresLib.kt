@@ -10,7 +10,7 @@ import io.github.s52.preslib.source.SourceColor
 import io.github.s52.preslib.source.SourceColorTable
 
 /**
- * Phase 20 compatibility pack for the public sduclos/S52 libS52 layout.
+ * Compatibility pack for the public sduclos/S52 libS52 layout.
  *
  * libS52 exposes a Presentation Library manager and OpenGL renderer. The public
  * GitHub tree includes the fallback `S52raz-3.2.rle` color payload and the C
@@ -21,7 +21,7 @@ import io.github.s52.preslib.source.SourceColorTable
  */
 object S52LibCompatPresLib {
     fun sourcePack(): PresLibSourcePack {
-        val base = GeneratedPhase2PresLib.sourcePack()
+        val base = GeneratedPresLib.sourcePack()
         return base.copy(
             metadata = PresLibMetadata(
                 name = "s52lib-compatible Presentation Library pack",

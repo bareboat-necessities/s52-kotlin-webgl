@@ -24,7 +24,7 @@ class InstructionCoverageTest {
 
     @Test
     fun generatedPackReferencesAreCollectedFromTypedInstructions() {
-        val pack = GeneratedPhase2PresLib.pack()
+        val pack = GeneratedPresLib.pack()
         val instructions = pack.lookupTable.records().flatMap { it.instructions }
         val refs = InstructionReferenceCollector.collect(instructions)
 

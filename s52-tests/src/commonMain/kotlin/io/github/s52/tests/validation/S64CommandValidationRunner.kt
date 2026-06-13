@@ -14,11 +14,11 @@ import io.github.s52.tests.golden.GoldenTranscriptComparison
  * normalized ENC features -> S52PortrayalEngine -> S52DrawCommand transcript.
  */
 class S64CommandValidationRunner(
-    private val presLib: PresLibPack = PresLibPack.phase2Synthetic()
+    private val presLib: PresLibPack = PresLibPack.synthetic()
 ) {
     private val engine = S52PortrayalEngine(
         lookupTable = presLib.lookupTable,
-        cspRegistry = DefaultCspRegistry.phase6Complete()
+        cspRegistry = DefaultCspRegistry.complete()
     )
 
     fun run(fixture: CommandValidationFixture): CommandValidationResult {

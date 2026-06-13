@@ -5,7 +5,7 @@ import io.github.s52.catalog.S57Attribute
 import io.github.s52.catalog.S57ObjectClass
 import io.github.s52.core.settings.DisplayCategory
 import io.github.s52.core.settings.S52Palette
-import io.github.s52.preslib.generated.GeneratedPhase2PresLib
+import io.github.s52.preslib.generated.GeneratedPresLib
 import io.github.s52.preslib.source.PresLibMetadata
 import io.github.s52.preslib.source.PresLibSourcePack
 import io.github.s52.preslib.source.SourceAttributeFilter
@@ -19,7 +19,7 @@ import kotlin.test.assertTrue
 class StaticCompletenessValidatorTest {
     @Test
     fun generatedSyntheticSourcePackIsStaticallyCompleteExceptCspResolutionWhenNoRegistryIsProvided() {
-        val report = StaticCompletenessValidator.validateSource(GeneratedPhase2PresLib.sourcePack())
+        val report = StaticCompletenessValidator.validateSource(GeneratedPresLib.sourcePack())
 
         assertFalse(report.hasErrors, report.toMarkdown())
         assertTrue(report.lookupRecordCount >= 20)

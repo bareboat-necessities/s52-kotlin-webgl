@@ -24,7 +24,7 @@ internal data class RasterAtlasTexture(
  *
  * The first render call starts image loading and returns null. Later frames use
  * the ready texture. This keeps [WebGlS52Renderer.render] synchronous and avoids
- * changing the public renderer API in Phase 30.
+ * changing the public renderer AP.
  */
 internal class RasterAtlasCache(
     private val gl: WebGLRenderingContext,

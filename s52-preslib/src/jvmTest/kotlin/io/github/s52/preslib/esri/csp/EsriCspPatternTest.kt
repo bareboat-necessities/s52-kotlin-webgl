@@ -5,7 +5,7 @@ import kotlin.test.assertTrue
 
 class EsriCspPatternTest {
     @Test
-    fun restrictedAreaAreaPrimitiveEmitsAreaPatternForPhase9() {
+    fun restrictedAreaAreaPrimitiveEmitsAreaPattern() {
         val emit = EsriInstructionEmitter()
         val feature = EsriCspFeature(
             acronym = "RESARE",

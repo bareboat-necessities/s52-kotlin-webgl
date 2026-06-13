@@ -9,7 +9,7 @@ import io.github.s52.core.settings.PortrayalContext
  *
  * The expected output is stored as a transcript resource in jvmTest/resources.
  * Keeping expected files outside the code makes review diffs readable and keeps
- * Phase 10 focused on stable renderer-independent command output, not pixels.
+ * Focused on stable renderer-independent command output, not pixels.
  */
 data class GoldenPortrayalCase(
     val id: String,

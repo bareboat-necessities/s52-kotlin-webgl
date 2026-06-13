@@ -22,7 +22,7 @@ import kotlin.math.min
 /**
  * Generates browsable SVG image artifacts for symbols, line styles, and patterns.
  *
- * The original Phase 2 generator was vector-only and always drew a red pivot dot.
+ * The original generator was vector-only and always drew a red pivot dot.
  * That is fine for tiny synthetic line art, but it is wrong for OpenCPN where most
  * symbols are bitmap cells in rastersymbols-*.png and have no vector commands.
  * When those bitmap symbols were rendered by this generator they appeared as
@@ -42,7 +42,7 @@ object SymbologyImageGenerator {
         generate(outputDir)
     }
 
-    fun generate(outputDir: Path, pack: PresLibPack = PresLibPack.phase2Synthetic()) {
+    fun generate(outputDir: Path, pack: PresLibPack = PresLibPack.synthetic()) {
         val rasterAtlases = RasterAtlasStore.locate()
         val symbolsDir = outputDir.resolve("symbols")
         val lineStylesDir = outputDir.resolve("line-styles")

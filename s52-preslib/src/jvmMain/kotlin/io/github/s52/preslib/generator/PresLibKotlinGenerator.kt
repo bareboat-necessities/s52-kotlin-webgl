@@ -6,7 +6,7 @@ import io.github.s52.preslib.source.SourceAttributeFilter
 import io.github.s52.preslib.source.SourceVectorCommand
 import java.util.Locale
 
-/** JVM-only deterministic Kotlin source generator for Phase 2 source packs. */
+/** JVM-only deterministic Kotlin source generator for source packs. */
 object PresLibKotlinGenerator {
     fun generate(
         source: PresLibSourcePack,

@@ -1,7 +1,7 @@
 package io.github.s52.catalog
 
 /**
- * Phase 1 typed S-57 attribute catalogue used by lookup matching and CSPs.
+ * Typed S-57 attribute catalogue used by lookup matching and CSPs.
  *
  * The enum is data-only. It intentionally contains no portrayal logic.
  */
