@@ -22,16 +22,6 @@ Experimental. Not type-approved ECDIS. Not for navigation.
 
 `criticalCheck` is the current full-check baseline:
 
-- Phase 16 `s52-api` remains the stable consumer-facing facade.
-- Phase 17 diagnostic bundles remain the support and CI handoff format.
-- Phase 18 built-in portrayal profiles remain the reproducible settings layer.
-- Phase 19 portable text artifact bundles remain available through `S52ArtifactBundle`, `S52ArtifactExporter`, and `S52PortrayalSession.artifactBundle(...)`.
-- Phase 20 s52lib-compatible pack and browser gallery routes remain available.
-- Phase 21 JVM image export remains as a compatibility alias.
-- The critical check imports a bundled OpenCPN-compatible `chartsymbols.xml` clean-check payload plus the three bundled raster-symbol PNG atlases and generates `opencpn-symbology-images`.
-- CI runs `scripts/critical-clean-check.sh` from a clean checkout; the script validates bundled inputs, runs `gradle --no-daemon criticalCheck`, and fails if `kotlin-js-store/yarn.lock` changes.
-- Kotlin 2.5 readiness notes are tracked in `docs/KOTLIN_25_READINESS.md`.
-
 The default browser demo uses the s52lib-compatible pack. The critical export/import tooling uses the bundled OpenCPN-compatible clean-check payload for repeatable CI checks. Use the external override path below to test against a full upstream OpenCPN `chartsymbols.xml` file.
 
 ## Build
@@ -83,10 +73,6 @@ Official IHO Presentation Library assets should be treated as external input unl
 
 OpenCPN-derived symbology import and bundled OpenCPN-compatible symbology inputs require the project’s GPL-2.0-or-later licensing boundary.
 
-## Next step
-
-Use the Phase 16 facade, Phase 17 diagnostic bundle, Phase 18 profile presets, and Phase 19 artifact bundles as the stable downstream integration/support boundary, then continue with broader performance work and official Presentation Library import tooling when ready.
-
 ## Browser gallery
 
 Run `gradle :demo:jsBrowserDevelopmentRun` and open `#symbols`, `#lines`, `#patterns`, `#colors`, or `#all` to render the loaded S-52 library assets in browser.
@@ -129,11 +115,3 @@ License note: the OpenCPN-compatible symbology import path requires **GPL-2.0-or
 ## Kotlin 2.5 readiness
 
 Project-owned Kotlin sources should not use `data class ... private constructor(...)` patterns. Those keys are regular classes with explicit equality now, and the JVM test suite includes a guard for that migration-warning pattern. See `docs/KOTLIN_25_READINESS.md`.
-
-## Historical phase compatibility
-
-The latest full check is `criticalCheck`, but the project intentionally keeps the older readiness markers visible for downstream CI and release-audit tests: `phase15Check`, `phase16Check`, `phase17Check`, `phase18Check`, and `phase19Check`.
-
-The Phase 18 profile API remains available through `S52ProfileCatalog`, and the Phase 19 artifact API remains available through `S52ArtifactBundle`.
-
-Safety boundary: Experimental. Not type-approved ECDIS. Not for navigation.
