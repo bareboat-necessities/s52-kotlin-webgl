@@ -16,7 +16,7 @@ internal class AreaPatternRenderer(
     private val presLib: PresLibPack,
     private val stencilClipper: StencilPolygonClipper
 ) {
-    private val vectorHpglCache = mutableMapOf<String, CachedPatternHpgl>()
+    private val vectorHpglCache = mutableMapOf<String, HpglDisplayList>()
     fun render(
         command: S52DrawCommand.AreaPattern,
         projector: GeometryProjector,
@@ -27,11 +27,15 @@ internal class AreaPatternRenderer(
         val projected = ProjectedPolygonClip.from(polygon, projector) ?: return 0
         val pattern = presLib.patterns.find(command.patternName)
         if (pattern != null) {
-            val bitmapCalls = renderBitmapPattern(command, pattern, projected, projector, palette)
-            if (bitmapCalls > 0) return bitmapCalls
-
+            // OpenCPN chart-symbol patterns often include both HPGL and a raster
+            // atlas cell. Prefer HPGL: the raster cell can be a preview/glyph box
+            // with rounded placeholder edges, which looks like stacked rounded
+            // rectangles when tiled across an ENC area.
             val vectorCalls = renderVectorPattern(pattern, projected, projector, colors)
             if (vectorCalls > 0) return vectorCalls
+
+            val bitmapCalls = renderBitmapPattern(command, pattern, projected, projector, palette)
+            if (bitmapCalls > 0) return bitmapCalls
         }
 
         val vertices = hatchLines(projected, projector)
@@ -69,24 +73,39 @@ internal class AreaPatternRenderer(
         colors: ColorResolver
     ): Int {
         val hpgl = pattern.vectorHpgl ?: return 0
-        val cachedHpgl = cachedPatternHpgl(pattern.name, hpgl)
-        val bounds = cachedHpgl.bounds ?: return 0
-        if (cachedHpgl.segments.isEmpty()) return 0
+        val displayList = cachedPatternHpgl(pattern.name, hpgl)
+        val bounds = displayList.bounds ?: return 0
+        if (displayList.isEmpty) return 0
 
-        val vertices = vectorTileVertices(projected, projector, pattern, cachedHpgl.segments, bounds)
-        if (vertices.isEmpty()) return 0
-        gl.lineWidth(1.0f)
         return clipped(projected, projector) {
-            solidProgram.draw(WebGLRenderingContext.LINES, vertices, colors.resolve(pattern.colorRefs.firstOrNull(), fallback = "CHMGD"))
+            var calls = 0
+            for (geometry in displayList.geometries) {
+                val fillVertices = vectorTileFillVertices(projected, projector, pattern, geometry.fills, bounds)
+                if (fillVertices.isNotEmpty()) {
+                    calls += solidProgram.draw(
+                        WebGLRenderingContext.TRIANGLES,
+                        fillVertices,
+                        colors.resolve(displayList.colorTokenForPen(geometry.pen, pattern.colorRefs), fallback = "CHMGD")
+                    )
+                }
+
+                val strokeVertices = vectorTileStrokeVertices(projected, projector, pattern, geometry.strokes, bounds)
+                if (strokeVertices.isNotEmpty()) {
+                    gl.lineWidth(1.0f)
+                    calls += solidProgram.draw(
+                        WebGLRenderingContext.LINES,
+                        strokeVertices,
+                        colors.resolve(displayList.colorTokenForPen(geometry.pen, pattern.colorRefs), fallback = "CHMGD")
+                    )
+                }
+            }
+            calls
         }
     }
 
 
-    private fun cachedPatternHpgl(name: String, hpgl: String): CachedPatternHpgl =
-        vectorHpglCache.getOrPut(name) {
-            val segments = HpglLineParser.parseSegments(hpgl)
-            CachedPatternHpgl(segments, HpglLineParser.bounds(segments))
-        }
+    private fun cachedPatternHpgl(name: String, hpgl: String): HpglDisplayList =
+        vectorHpglCache.getOrPut(name) { HpglDisplayListCompiler.compile(hpgl) }
     private fun clipped(projected: ProjectedPolygonClip, projector: GeometryProjector, drawInside: () -> Int): Int =
         if (stencilClipper.isAvailable()) stencilClipper.clip(projected, projector, drawInside) else drawInside()
 
@@ -135,7 +154,7 @@ internal class AreaPatternRenderer(
         return floats
     }
 
-    private fun vectorTileVertices(
+    private fun vectorTileStrokeVertices(
         projected: ProjectedPolygonClip,
         projector: GeometryProjector,
         pattern: PatternDefinition,
@@ -166,7 +185,7 @@ internal class AreaPatternRenderer(
                 val y0 = yCenter - tileHClip * 0.5f
                 val y1 = yCenter + tileHClip * 0.5f
                 if (projected.mayIntersectRect(x0, x1, y0, y1)) {
-                    appendPatternTile(
+                    appendPatternStrokeTile(
                         out = floats,
                         hpglSegments = hpglSegments,
                         originX = originX,
@@ -187,7 +206,61 @@ internal class AreaPatternRenderer(
         return floats
     }
 
-    private fun appendPatternTile(
+
+    private fun vectorTileFillVertices(
+        projected: ProjectedPolygonClip,
+        projector: GeometryProjector,
+        pattern: PatternDefinition,
+        hpglTriangles: List<HpglTriangle>,
+        bounds: HpglBounds
+    ): FloatArrayBuilder {
+        val clipBounds = projected.bounds ?: return FloatArrayBuilder(0)
+        if (hpglTriangles.isEmpty()) return FloatArrayBuilder(0)
+        val sx = projector.pixelToClipX(1.0).toDouble()
+        val sy = projector.pixelToClipY(1.0).toDouble()
+        if (sx <= 0.0 || sy <= 0.0) return FloatArrayBuilder(0)
+
+        val tileWidthPx = tileWidthPx(pattern, bounds)
+        val tileHeightPx = tileHeightPx(pattern, bounds)
+        val tileWClip = (tileWidthPx * sx).toFloat()
+        val tileHClip = (tileHeightPx * sy).toFloat()
+        val originX = if (pattern.width > 0.0) pattern.pivotX else bounds.minX
+        val originY = if (pattern.height > 0.0) pattern.pivotY else bounds.centerY
+        val floats = FloatArrayBuilder()
+
+        var yCenter = clipBounds.maxY + tileHClip * 0.5f
+        var row = 0
+        while (yCenter >= clipBounds.minY - tileHClip && row < MAX_TILE_ROWS) {
+            var xCenter = clipBounds.minX - tileWClip * 0.5f
+            var col = 0
+            while (xCenter <= clipBounds.maxX + tileWClip && col < MAX_TILE_COLS) {
+                val x0 = xCenter - tileWClip * 0.5f
+                val x1 = xCenter + tileWClip * 0.5f
+                val y0 = yCenter - tileHClip * 0.5f
+                val y1 = yCenter + tileHClip * 0.5f
+                if (projected.mayIntersectRect(x0, x1, y0, y1)) {
+                    appendPatternFillTile(
+                        out = floats,
+                        hpglTriangles = hpglTriangles,
+                        originX = originX,
+                        originY = originY,
+                        tileWidthPx = tileWidthPx,
+                        tileHeightPx = tileHeightPx,
+                        sx = sx,
+                        sy = sy,
+                        center = ClipPoint(xCenter, yCenter)
+                    )
+                }
+                xCenter += tileWClip
+                col++
+            }
+            yCenter -= tileHClip
+            row++
+        }
+        return floats
+    }
+
+    private fun appendPatternStrokeTile(
         out: FloatArrayBuilder,
         hpglSegments: List<HpglLineSegment>,
         originX: Double,
@@ -213,6 +286,31 @@ internal class AreaPatternRenderer(
         }
     }
 
+
+    private fun appendPatternFillTile(
+        out: FloatArrayBuilder,
+        hpglTriangles: List<HpglTriangle>,
+        originX: Double,
+        originY: Double,
+        tileWidthPx: Double,
+        tileHeightPx: Double,
+        sx: Double,
+        sy: Double,
+        center: ClipPoint
+    ) {
+        fun point(point: HpglPoint): ClipPoint {
+            val localX = (point.x - originX) * HPGL_TO_PIXEL - tileWidthPx * 0.5
+            val localY = (point.y - originY) * HPGL_TO_PIXEL - tileHeightPx * 0.5
+            return ClipPoint(
+                x = center.x + (localX * sx).toFloat(),
+                y = center.y - (localY * sy).toFloat()
+            )
+        }
+        for (triangle in hpglTriangles) {
+            out.addTriangle(point(triangle.a), point(triangle.b), point(triangle.c))
+        }
+    }
+
     private fun tileWidthPx(pattern: PatternDefinition, bounds: HpglBounds): Double {
         val sourceWidth = when {
             pattern.width > 0.0 -> pattern.width
@@ -233,8 +331,8 @@ internal class AreaPatternRenderer(
 
     private fun hatchLines(projected: ProjectedPolygonClip, projector: GeometryProjector): FloatArrayBuilder {
         val bounds = projected.bounds ?: return FloatArrayBuilder(0)
-        val sy = projector.pixelToClipY(HATCH_SPACING_PX).toFloat().coerceAtLeast(0.0001f)
-        val inset = projector.pixelToClipX(0.75).toFloat()
+        val sy = projector.pixelToClipY(HATCH_SPACING_PX).coerceAtLeast(0.0001f)
+        val inset = projector.pixelToClipX(0.75)
         val floats = FloatArrayBuilder(64)
         val xs = ArrayList<Float>(16)
 
@@ -285,5 +383,3 @@ internal class AreaPatternRenderer(
         private const val HATCH_SPACING_PX: Double = 18.0
     }
 }
-
-private data class CachedPatternHpgl(val segments: List<HpglLineSegment>, val bounds: HpglBounds?)

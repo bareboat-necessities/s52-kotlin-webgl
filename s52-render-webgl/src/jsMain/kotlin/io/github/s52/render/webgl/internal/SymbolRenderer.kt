@@ -19,6 +19,7 @@ internal class SymbolRenderer(
     private val rasterAtlases: RasterAtlasCache,
     private val presLib: PresLibPack
 ) {
+    private val symbolHpglCache = mutableMapOf<String, HpglDisplayList>()
     fun render(
         command: S52DrawCommand.PointSymbol,
         projector: GeometryProjector,
@@ -26,12 +27,12 @@ internal class SymbolRenderer(
         palette: S52Palette
     ): Int {
         val geometry = command.geometry as? EncGeometry.Point ?: return 0
-        val definition = presLib.symbols.find(command.symbolName) ?: return 0
+        val definition = resolveSymbol(command.symbolName) ?: return 0
         val anchor = projector.project(geometry.coordinate)
         val rotationDegrees = command.rotationDegrees ?: 0.0
 
         val bitmap = definition.bitmap
-        if (bitmap != null) {
+        if (bitmap != null && bitmap.width > 0.0 && bitmap.height > 0.0) {
             val atlas = rasterAtlases.textureFor(palette, bitmap.atlasFileName)
             if (atlas != null) {
                 val vertices = bitmapQuadVertices(
@@ -46,6 +47,10 @@ internal class SymbolRenderer(
             }
         }
 
+        renderHpglDisplayList(definition, anchor, projector, colors, rotationDegrees).let { calls ->
+            if (calls > 0) return calls
+        }
+
         val vertices = symbolLineSegments(
             definition = definition,
             anchor = anchor,
@@ -55,6 +60,14 @@ internal class SymbolRenderer(
         if (vertices.isEmpty()) return 0
         gl.lineWidth(1.5f)
         return solidProgram.draw(WebGLRenderingContext.LINES, vertices, colors.resolve(definition.colorRefs.firstOrNull(), fallback = "CHBLK"))
+    }
+
+    private fun resolveSymbol(name: String): SymbolDefinition? {
+        presLib.symbols.find(name)?.let { return it }
+        val key = name.trim().substringBefore('#').uppercase()
+        if (key.isEmpty()) return null
+        SYMBOL_ALIASES[key]?.let { alias -> presLib.symbols.find(alias)?.let { return it } }
+        return null
     }
 
     private fun bitmapQuadVertices(
@@ -72,10 +85,12 @@ internal class SymbolRenderer(
             transformBitmapPoint(0.0, bitmap.height, bitmap, anchor, projector, rotationDegrees)
         )
 
-        val u0 = (bitmap.x / atlasWidth.coerceAtLeast(1)).toFloat()
-        val u1 = ((bitmap.x + bitmap.width) / atlasWidth.coerceAtLeast(1)).toFloat()
-        val v0 = (bitmap.y / atlasHeight.coerceAtLeast(1)).toFloat()
-        val v1 = ((bitmap.y + bitmap.height) / atlasHeight.coerceAtLeast(1)).toFloat()
+        val atlasW = atlasWidth.coerceAtLeast(1).toDouble()
+        val atlasH = atlasHeight.coerceAtLeast(1).toDouble()
+        val u0 = ((bitmap.x + 0.5) / atlasW).toFloat()
+        val u1 = ((bitmap.x + bitmap.width - 0.5).coerceAtLeast(bitmap.x + 0.5) / atlasW).toFloat()
+        val v0 = ((bitmap.y + 0.5) / atlasH).toFloat()
+        val v1 = ((bitmap.y + bitmap.height - 0.5).coerceAtLeast(bitmap.y + 0.5) / atlasH).toFloat()
 
         return floatArrayOf(
             points[0].x, points[0].y, u0, v0,
@@ -100,6 +115,54 @@ internal class SymbolRenderer(
         return transformLocal(x - px, y - py, anchor, projector, rotationDegrees)
     }
 
+    private fun renderHpglDisplayList(
+        definition: SymbolDefinition,
+        anchor: ClipPoint,
+        projector: GeometryProjector,
+        colors: ColorResolver,
+        rotationDegrees: Double
+    ): Int {
+        val hpgl = definition.vectorHpgl ?: return 0
+        val displayList = symbolHpglCache.getOrPut(definition.name) { HpglDisplayListCompiler.compile(hpgl) }
+        if (displayList.isEmpty) return 0
+
+        var calls = 0
+        for (geometry in displayList.geometries) {
+            if (geometry.fills.isNotEmpty()) {
+                val fillVertices = FloatArrayBuilder(geometry.fills.size * 6)
+                for (triangle in geometry.fills) {
+                    fillVertices.addTriangle(
+                        transformHpglPoint(triangle.a, definition, anchor, projector, rotationDegrees),
+                        transformHpglPoint(triangle.b, definition, anchor, projector, rotationDegrees),
+                        transformHpglPoint(triangle.c, definition, anchor, projector, rotationDegrees)
+                    )
+                }
+                calls += solidProgram.draw(
+                    WebGLRenderingContext.TRIANGLES,
+                    fillVertices,
+                    colors.resolve(displayList.colorTokenForPen(geometry.pen, definition.colorRefs), fallback = "CHBLK")
+                )
+            }
+
+            if (geometry.strokes.isNotEmpty()) {
+                val strokeVertices = FloatArrayBuilder(geometry.strokes.size * 4)
+                for (segment in geometry.strokes) {
+                    strokeVertices.addLine(
+                        transformHpglPoint(HpglPoint(segment.x1, segment.y1), definition, anchor, projector, rotationDegrees),
+                        transformHpglPoint(HpglPoint(segment.x2, segment.y2), definition, anchor, projector, rotationDegrees)
+                    )
+                }
+                gl.lineWidth(1.5f)
+                calls += solidProgram.draw(
+                    WebGLRenderingContext.LINES,
+                    strokeVertices,
+                    colors.resolve(displayList.colorTokenForPen(geometry.pen, definition.colorRefs), fallback = "CHBLK")
+                )
+            }
+        }
+        return calls
+    }
+
     private fun symbolLineSegments(
         definition: SymbolDefinition,
         anchor: ClipPoint,
@@ -108,7 +171,7 @@ internal class SymbolRenderer(
     ): FloatArray {
         val floats = FloatArrayBuilder()
         appendVectorCommands(floats, definition, anchor, projector, rotationDegrees)
-        if (floats.isEmpty()) {
+        if (floats.isEmpty() && definition.vectorHpgl.isNullOrBlank()) {
             appendHpglFallback(floats, definition, anchor, projector, rotationDegrees)
         }
         return floats.toFloatArray()
@@ -158,7 +221,7 @@ internal class SymbolRenderer(
         rotationDegrees: Double
     ) {
         val hpgl = definition.vectorHpgl ?: return
-        val segments = HpglLineParser.parseSegments(hpgl)
+        val segments = symbolHpglCache.getOrPut(definition.name) { HpglDisplayListCompiler.compile(hpgl) }.strokeSegments()
         for (segment in segments) {
             val a = transformLocal(
                 (segment.x1 - definition.pivotX) * HPGL_TO_PIXEL,
@@ -177,6 +240,20 @@ internal class SymbolRenderer(
             floats.addLine(a, b)
         }
     }
+
+    private fun transformHpglPoint(
+        point: HpglPoint,
+        definition: SymbolDefinition,
+        anchor: ClipPoint,
+        projector: GeometryProjector,
+        rotationDegrees: Double
+    ): ClipPoint = transformLocal(
+        (point.x - definition.pivotX) * HPGL_TO_PIXEL,
+        (point.y - definition.pivotY) * HPGL_TO_PIXEL,
+        anchor,
+        projector,
+        rotationDegrees
+    )
 
     private fun transformLocal(
         localX: Double,
@@ -201,5 +278,24 @@ internal class SymbolRenderer(
     private companion object {
         /** OpenCPN vector HPGL units are much finer than atlas pixels. */
         private const val HPGL_TO_PIXEL: Double = 0.04
+
+        /**
+         * Compatibility aliases for renderer-independent CSP outputs whose
+         * stable project names differ from the OpenCPN chart-symbol names.
+         */
+        private val SYMBOL_ALIASES = mapOf(
+            "TOPMAR_CONE_UP01" to "TOPMAR88",
+            "TOPMAR_CONE_DOWN01" to "TOPMAR87",
+            "TOPMAR_SPHERE01" to "TOPMAR65",
+            "TOPMAR_TWO_SPHERES01" to "TOPMAR86",
+            "TOPMAR_CYLINDER01" to "TOPMAR85",
+            "TOPMAR_X01" to "QUESMRK1",
+            "TOPMAR_CROSS01" to "QUESMRK1",
+            "TOPMAR_UNKNOWN01" to "QUESMRK1",
+            "WRECKS_DANGER01" to "ISODGR01",
+            "WRECKS01" to "WRECKS05",
+            "OBSTRN_DANGER01" to "ISODGR01",
+            "OBSTRN01" to "OBSTRN11"
+        )
     }
 }
