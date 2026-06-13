@@ -4,7 +4,7 @@ import io.github.s52.catalog.S57Attribute
 import io.github.s52.catalog.S57AttributeValueKind
 import io.github.s52.catalog.S57ObjectClass
 
-/** Converts raw parser-facing features into the typed Phase 1 model with diagnostics. */
+/** Converts raw parser-facing features into the typed model with diagnostics. */
 object RawEncFeatureConverter {
     fun convert(raw: RawEncFeature): FeatureConversionResult {
         val diagnostics = mutableListOf<FeatureConversionDiagnostic>()

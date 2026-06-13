@@ -22,7 +22,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
-class LookupPhase4Test {
+class LookupTest {
     private val context = PortrayalContext(compilationScale = 50_000.0, displayScale = 50_000.0)
 
     @Test

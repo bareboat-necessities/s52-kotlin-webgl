@@ -2,13 +2,7 @@
 
 ## Development workflow
 
-Run the full current phase check before submitting changes:
-
-```bash
-gradle phase14Check
-```
-
-For focused work, run the module test first, then the phase check:
+For focused work, run the module test first, then the check:
 
 ```bash
 gradle :s52-core:jvmTest

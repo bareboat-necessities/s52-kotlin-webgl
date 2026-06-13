@@ -19,7 +19,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class PerformancePhase13Test {
+class PerformanceTest {
     @Test
     fun requestKeyUsesFeatureContentRatherThanListIdentity() {
         val settings = MarinerSettings()

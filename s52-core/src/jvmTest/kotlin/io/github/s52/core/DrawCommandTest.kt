@@ -24,7 +24,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
-class DrawCommandPhase7Test {
+class DrawCommandTest {
     private val context = PortrayalContext(compilationScale = 50_000.0, displayScale = 50_000.0)
 
     @Test

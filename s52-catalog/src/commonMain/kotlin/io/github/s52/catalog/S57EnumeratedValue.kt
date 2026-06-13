@@ -1,7 +1,7 @@
 package io.github.s52.catalog
 
 /**
- * Phase 1 generated-style starter for common S-57 enumerated attribute values.
+ * Generated-style starter for common S-57 enumerated attribute values.
  *
  * This is not portrayal behavior. CSPs and lookup filters should compare typed
  * attributes and integer values; this table supplies names for validation,

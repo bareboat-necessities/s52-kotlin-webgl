@@ -30,8 +30,6 @@ Add it to `CspId` and the default registry builder:
 MYOBJ("MYOBJ", MyObjectCsp())
 ```
 
-Then ensure `DefaultCspRegistry.phase6Complete()` includes it through the enum-derived list.
-
 ## 3. Reference it from the Presentation Library pack
 
 Lookup rows should call `CS(MYOBJ)` rather than duplicating conditional logic directly.

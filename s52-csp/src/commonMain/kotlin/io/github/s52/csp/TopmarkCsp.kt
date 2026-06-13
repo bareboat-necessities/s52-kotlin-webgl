@@ -8,7 +8,7 @@ import io.github.s52.core.model.EncFeature
 import io.github.s52.core.settings.MarinerSettings
 import io.github.s52.core.settings.PortrayalContext
 
-/** Phase 5 TOPMAR: selects a synthetic topmark symbol from TOPSHP. */
+/** TOPMAR: selects a synthetic topmark symbol from TOPSHP. */
 class TopmarkCsp : ConditionalSymbologyProcedure {
     override val name: String = "TOPMAR"
 
