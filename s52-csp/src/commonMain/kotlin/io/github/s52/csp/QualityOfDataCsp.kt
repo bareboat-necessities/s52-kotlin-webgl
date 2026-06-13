@@ -7,7 +7,7 @@ import io.github.s52.core.model.EncFeature
 import io.github.s52.core.settings.MarinerSettings
 import io.github.s52.core.settings.PortrayalContext
 
-/** Phase 6 starter for M_QUAL / quality-of-data portrayal. */
+/** Starter for M_QUAL / quality-of-data portrayal. */
 class QualityOfDataCsp : ConditionalSymbologyProcedure {
     override val name: String = "M_QUAL"
 

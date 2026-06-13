@@ -33,5 +33,3 @@ Lookup rows should enter through `s52-preslib` source/generator models rather th
 Renderer changes should accept only `S52DrawCommand`, `PresLibPack`, palette/settings/context values, and viewport state. A renderer must not branch on `S57ObjectClass`.
 
 ## Documentation changes
-
-When adding a public concept, update the relevant phase document and link it from [`PHASES.md`](PHASES.md) or this contributor guide.

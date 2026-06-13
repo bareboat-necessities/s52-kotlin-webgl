@@ -7,7 +7,7 @@ import io.github.s52.core.model.EncFeature
 import io.github.s52.core.settings.MarinerSettings
 import io.github.s52.core.settings.PortrayalContext
 
-/** Phase 6 starter for dredged-area depth portrayal. */
+/** Starter for dredged-area depth portrayal. */
 class DredgedAreaCsp : ConditionalSymbologyProcedure {
     override val name: String = "DRGARE"
 

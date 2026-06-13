@@ -11,8 +11,8 @@ import kotlin.test.assertTrue
 
 class GeneratedPresLibTest {
     @Test
-    fun generatedPhase2PackIsInternallyValid() {
-        val pack = GeneratedPhase2PresLib.pack()
+    fun generatedPackIsInternallyValid() {
+        val pack = GeneratedPresLib.pack()
         val report = PresLibValidator.validate(pack)
 
         assertFalse(report.hasErrors, report.toMarkdown())
@@ -24,8 +24,8 @@ class GeneratedPresLibTest {
     }
 
     @Test
-    fun generatedPhase2PackContainsAllPalettes() {
-        val pack = GeneratedPhase2PresLib.pack()
+    fun generatedPackContainsAllPalettes() {
+        val pack = GeneratedPresLib.pack()
 
         S52Palette.entries.forEach { palette ->
             assertNotNull(pack.colors.color(palette, "LANDA"))
@@ -35,7 +35,7 @@ class GeneratedPresLibTest {
 
     @Test
     fun generatedLookupRowsParseIntoTypedInstructions() {
-        val pack = GeneratedPhase2PresLib.pack()
+        val pack = GeneratedPresLib.pack()
         val records = pack.lookupTable.records()
 
         assertTrue(records.any { it.objectClass == S57ObjectClass.DEPARE && it.instructions.single() is S52Instruction.Conditional })

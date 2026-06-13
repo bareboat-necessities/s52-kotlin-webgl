@@ -8,7 +8,7 @@ import io.github.s52.core.model.EncFeature
 import io.github.s52.core.settings.MarinerSettings
 import io.github.s52.core.settings.PortrayalContext
 
-/** Phase 5 DEPCNT: promotes the selected safety contour to a stronger style. */
+/** DEPCNT: promotes the selected safety contour to a stronger style. */
 class DepthContourCsp : ConditionalSymbologyProcedure {
     override val name: String = "DEPCNT"
 

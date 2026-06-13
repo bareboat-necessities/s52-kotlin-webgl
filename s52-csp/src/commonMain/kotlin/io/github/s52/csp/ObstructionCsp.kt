@@ -9,7 +9,7 @@ import io.github.s52.core.model.EncFeature
 import io.github.s52.core.settings.MarinerSettings
 import io.github.s52.core.settings.PortrayalContext
 
-/** Phase 5 OBSTRN: separates dangerous and non-dangerous obstruction portrayal. */
+/** OBSTRN: separates dangerous and non-dangerous obstruction portrayal. */
 class ObstructionCsp : ConditionalSymbologyProcedure {
     override val name: String = "OBSTRN"
 

@@ -9,7 +9,7 @@ import io.github.s52.core.model.EncFeature
 import io.github.s52.core.settings.MarinerSettings
 import io.github.s52.core.settings.PortrayalContext
 
-/** Phase 5 WRECKS: separates dangerous and non-dangerous wreck portrayal. */
+/** WRECKS: separates dangerous and non-dangerous wreck portrayal. */
 class WrecksCsp : ConditionalSymbologyProcedure {
     override val name: String = "WRECKS"
 

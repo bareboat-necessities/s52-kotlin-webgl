@@ -8,7 +8,7 @@ import io.github.s52.core.settings.MarinerSettings
 import io.github.s52.core.settings.PortrayalContext
 
 /**
- * Starter Phase 6 restricted/caution-area CSP.
+ * Starter restricted/caution-area CSP.
  *
  * This keeps the behavior renderer-independent and deliberately conservative:
  * restricted/caution areas get a synthetic caution pattern, dashed boundary, and

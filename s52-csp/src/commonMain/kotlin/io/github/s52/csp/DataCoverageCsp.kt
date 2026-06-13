@@ -7,7 +7,7 @@ import io.github.s52.core.model.EncFeature
 import io.github.s52.core.settings.MarinerSettings
 import io.github.s52.core.settings.PortrayalContext
 
-/** Phase 6 starter for data-coverage boundary/no-data behavior. */
+/** Starter for data-coverage boundary/no-data behavior. */
 class DataCoverageCsp : ConditionalSymbologyProcedure {
     override val name: String = "DATCVR"
 

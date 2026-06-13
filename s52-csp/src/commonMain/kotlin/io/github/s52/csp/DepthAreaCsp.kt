@@ -11,7 +11,7 @@ import io.github.s52.core.settings.PortrayalContext
 /**
  * Starter implementation of the critical DEPARE conditional symbology.
  *
- * This Phase 5 version models the mariner shallow/safety/deep contour settings
+ * This models the mariner shallow/safety/deep contour settings
  * and emits renderer-independent S-52 instructions. Official Presentation
  * Library symbol names remain external to the generated PresLib pack.
  */

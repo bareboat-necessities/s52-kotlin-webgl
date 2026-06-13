@@ -10,7 +10,7 @@ import io.github.s52.core.model.EncFeature
 import io.github.s52.core.settings.MarinerSettings
 import io.github.s52.core.settings.PortrayalContext
 
-/** Phase 5 LIGHTS: emits the light symbol, optional sector line, and optional description text. */
+/** LIGHTS: emits the light symbol, optional sector line, and optional description text. */
 class LightsCsp : ConditionalSymbologyProcedure {
     override val name: String = "LIGHTS"
 

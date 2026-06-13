@@ -9,7 +9,7 @@ import io.github.s52.core.model.EncFeature
 import io.github.s52.core.settings.MarinerSettings
 import io.github.s52.core.settings.PortrayalContext
 
-/** Phase 5 SOUNDG: hides soundings when requested and colors unsafe soundings. */
+/** SOUNDG: hides soundings when requested and colors unsafe soundings. */
 class SoundingCsp : ConditionalSymbologyProcedure {
     override val name: String = "SOUNDG"
 
