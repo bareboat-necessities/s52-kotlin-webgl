@@ -360,7 +360,7 @@ tasks.register("WebGlBatchingAudit") {
             "s52-api/src/commonMain/kotlin/io/github/s52/api/S52VisualRegressionFixtures.kt",
             "s52-api/src/jvmTest/kotlin/io/github/s52/api/S52VisualRegressionFixturesTest.kt",
             "scripts/export--regression-gallery.mjs",
-            "docs/_WEBGL_BATCHING.md"
+            "docs/WEBGL_BATCHING.md"
         )
         val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
         check(missing.isEmpty()) { "Missing files: $missing" }
