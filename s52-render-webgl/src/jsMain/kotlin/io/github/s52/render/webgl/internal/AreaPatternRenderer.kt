@@ -49,6 +49,11 @@ internal class AreaPatternRenderer(
         palette: S52Palette
     ): Int {
         val bitmap = pattern.bitmap ?: return 0
+        // OpenCPN pattern placeholders can carry an atlas coordinate with a
+        // zero-sized bitmap. Treat those as non-raster patterns; sampling a
+        // single atlas texel and stretching it across each tile creates solid
+        // color blocks that appear to bleed between patterned areas.
+        if (bitmap.width <= 0.0 || bitmap.height <= 0.0) return 0
         val atlas = rasterAtlases.textureFor(palette, bitmap.atlasFileName) ?: return 0
         val vertices = bitmapTileVertices(projected, projector, bitmap, atlas.width, atlas.height)
         if (vertices.isEmpty()) return 0
