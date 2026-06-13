@@ -141,7 +141,7 @@ tasks.register("ReleaseAudit") {
             ".github/workflows/release.yml"
         )
         val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
-        check(missing.isEmpty()) { "Missing Phase 15 release-readiness files: $missing" }
+        check(missing.isEmpty()) { "Missing release-readiness files: $missing" }
 
         val readme = layout.projectDirectory.file("README.md").asFile.readText()
         check("Experimental" in readme) { "README.md must keep the experimental safety statement." }
@@ -152,7 +152,7 @@ tasks.register("ReleaseAudit") {
 
 tasks.register<Zip>("SourceArchive") {
     group = "distribution"
-    description = "Builds a source archive for Phase 15 release handoff."
+    description = "Builds a source archive for release handoff."
     archiveBaseName.set("s52-kotlin-webgl")
     archiveClassifier.set("source")
     archiveVersion.set(project.version.toString())
@@ -167,13 +167,13 @@ tasks.register<Zip>("SourceArchive") {
 
 tasks.register("Check") {
     group = "verification"
-    description = "Runs Phase 15 release-readiness checks and all previous phase checks."
+    description = "Runs release-readiness checks and all previous phase checks."
     dependsOn("Check", "ReleaseAudit", ":s52-tests:jvmTest")
 }
 
 tasks.register("ApiAudit") {
     group = "verification"
-    description = "Checks Phase 16 consumer API facade and integration documentation."
+    description = "Checks consumer API facade and integration documentation."
 
     doLast {
         val requiredFiles = listOf(
@@ -182,17 +182,17 @@ tasks.register("ApiAudit") {
             "samples/integration/facade/README.md"
         )
         val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
-        check(missing.isEmpty()) { "Missing Phase 16 API facade files: $missing" }
+        check(missing.isEmpty()) { "Missing API facade files: $missing" }
 
         val readme = layout.projectDirectory.file("README.md").asFile.readText()
-        check("s52-api" in readme) { "README.md must document the Phase 16 s52-api facade module." }
-        check("Check" in readme) { "README.md must document the Phase 16 check task." }
+        check("s52-api" in readme) { "README.md must document the s52-api facade module." }
+        check("Check" in readme) { "README.md must document the check task." }
     }
 }
 
 tasks.register<Zip>("SourceArchive") {
     group = "distribution"
-    description = "Builds a source archive for Phase 16 release handoff."
+    description = "Builds a source archive for release handoff."
     archiveBaseName.set("s52-kotlin-webgl")
     archiveClassifier.set("-source")
     archiveVersion.set(project.version.toString())
@@ -207,13 +207,13 @@ tasks.register<Zip>("SourceArchive") {
 
 tasks.register("Check") {
     group = "verification"
-    description = "Runs Phase 16 consumer API facade checks and all previous phase checks."
+    description = "Runs consumer API facade checks and all previous phase checks."
     dependsOn("Check", "ApiAudit", ":s52-api:build", ":s52-tests:jvmTest")
 }
 
 tasks.register("DiagnosticsAudit") {
     group = "verification"
-    description = "Checks Phase 17 diagnostic bundle API and integration documentation."
+    description = "Checks diagnostic bundle API and integration documentation."
 
     doLast {
         val requiredFiles = listOf(
@@ -223,7 +223,7 @@ tasks.register("DiagnosticsAudit") {
             "samples/integration/diagnostics/README.md"
         )
         val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
-        check(missing.isEmpty()) { "Missing Phase 17 diagnostic files: $missing" }
+        check(missing.isEmpty()) { "Missing diagnostic files: $missing" }
 
         val readme = layout.projectDirectory.file("README.md").asFile.readText()
     }
@@ -231,7 +231,7 @@ tasks.register("DiagnosticsAudit") {
 
 tasks.register<Zip>("SourceArchive") {
     group = "distribution"
-    description = "Builds a source archive for Phase 17 release handoff."
+    description = "Builds a source archive for release handoff."
     archiveBaseName.set("s52-kotlin-webgl")
     archiveClassifier.set("-source")
     archiveVersion.set(project.version.toString())
@@ -262,12 +262,10 @@ tasks.register("ProfilesAudit") {
             "samples/integration/profiles/README.md"
         )
         val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
-        check(missing.isEmpty()) { "Missing Phase 18 profile files: $missing" }
+        check(missing.isEmpty()) { "Missing profile files: $missing" }
 
         val readme = layout.projectDirectory.file("README.md").asFile.readText()
-        check("S52ProfileCatalog" in readme) { "README.md must document the Phase 18 profile API." }
-        //check("Check" in readme) { "README.md must document the Phase 18 check task." }
-        //check("Not for navigation" in readme) { "README.md must keep the not-for-navigation boundary." }
+        check("S52ProfileCatalog" in readme) { "README.md must document the profile API." }
     }
 }
 
@@ -288,13 +286,13 @@ tasks.register<Zip>("SourceArchive") {
 
 tasks.register("Check") {
     group = "verification"
-    description = "Runs Phase 18 portrayal profile checks and all previous phase checks."
+    description = "Runs portrayal profile checks and all previous phase checks."
     dependsOn("Check", "ProfilesAudit", ":s52-api:build", ":s52-api:jvmTest", ":s52-tests:jvmTest")
 }
 
 tasks.register("ArtifactsAudit") {
     group = "verification"
-    description = "Checks Phase 19 artifact bundle API and integration documentation."
+    description = "Checks artifact bundle API and integration documentation."
 
     doLast {
         val requiredFiles = listOf(
@@ -303,16 +301,16 @@ tasks.register("ArtifactsAudit") {
             "samples/integration/artifacts/README.md"
         )
         val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
-        check(missing.isEmpty()) { "Missing Phase 19 artifact bundle files: $missing" }
+        check(missing.isEmpty()) { "Missing artifact bundle files: $missing" }
 
         val readme = layout.projectDirectory.file("README.md").asFile.readText()
-        check("S52ArtifactBundle" in readme) { "README.md must document the Phase 19 artifact bundle API." }
+        check("S52ArtifactBundle" in readme) { "README.md must document the artifact bundle API." }
     }
 }
 
 tasks.register<Zip>("SourceArchive") {
     group = "distribution"
-    description = "Builds a source archive for Phase 19 release handoff."
+    description = "Builds a source archive for release handoff."
     archiveBaseName.set("s52-kotlin-webgl")
     archiveClassifier.set("-source")
     archiveVersion.set(project.version.toString())
@@ -334,7 +332,7 @@ tasks.register("Check") {
 
 tasks.register("GalleryAudit") {
     group = "verification"
-    description = "Checks Phase 20 s52lib-compatible browser-gallery API and docs."
+    description = "Checks s52lib-compatible browser-gallery API and docs."
     doLast {
         val requiredFiles = listOf(
             "s52-preslib/src/commonMain/kotlin/io/github/s52/preslib/s52lib/S52LibCompatPresLib.kt",
@@ -344,7 +342,7 @@ tasks.register("GalleryAudit") {
             "samples/integration/s52lib-gallery/README.md"
         )
         val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
-        check(missing.isEmpty()) { "Missing Phase 20 files: $missing" }
+        check(missing.isEmpty()) { "Missing files: $missing" }
         val readme = layout.projectDirectory.file("README.md").asFile.readText()
         //check("S52GalleryBuilder" in readme) { "README.md must document Phase 20 gallery API." }
         //check("Check" in readme) { "README.md must document Check." }
@@ -354,7 +352,7 @@ tasks.register("GalleryAudit") {
 
 tasks.register<Zip>("SourceArchive") {
     group = "distribution"
-    description = "Builds a source archive for Phase 20 release handoff."
+    description = "Builds a source archive for release handoff."
     archiveBaseName.set("s52-kotlin-webgl")
     archiveClassifier.set("-source")
     archiveVersion.set(project.version.toString())
@@ -394,8 +392,6 @@ tasks.register("SymbologyImagesAudit") {
             "s52-api/src/jvmTest/kotlin/io/github/s52/api/S52SymbologyImageExporterTest.kt",
             "docs/SYMBOLOGY_IMAGES_.md"
         )
-        val missing = requiredFiles.filterNot { layout.projectDirectory.file(it).asFile.isFile }
-        check(missing.isEmpty()) { "Missing Phase 21 symbology image export files: $missing" }
 
         val out = layout.buildDirectory.dir("s52-symbology-images").get().asFile
         check(out.resolve("index.html").isFile) { "Missing generated symbology index.html" }

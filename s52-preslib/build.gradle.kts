@@ -277,7 +277,7 @@ tasks.register<JavaExec>("esriCoverageReport") {
 
 tasks.register<JavaExec>("generateEsriVectorSymbols") {
     group = "generation"
-    description = "Phase ESRI-3: parses ESRI SVG assets, generates Kotlin vector mesh symbol registry, and writes a generation report."
+    description = "parses ESRI SVG assets, generates Kotlin vector mesh symbol registry, and writes a generation report."
 
     val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
     dependsOn("jvmMainClasses")
@@ -299,7 +299,7 @@ tasks.register<JavaExec>("generateEsriVectorSymbols") {
 
 tasks.register<JavaExec>("generateEsriDirectRules") {
     group = "generation"
-    description = "Phase ESRI-5: generates Kotlin direct/function rule registry from ESRI CustomSymbolMap.xml."
+    description = "generates Kotlin direct/function rule registry from ESRI CustomSymbolMap.xml."
 
     val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
     dependsOn("jvmMainClasses")
@@ -373,7 +373,7 @@ tasks.register<JavaExec>("generateEsriVectorLines") {
 
 tasks.register<JavaExec>("generateEsriVectorPatterns") {
     group = "generation"
-    description = "Phase ESRI-9: parses ESRI pattern SVG assets and generates Kotlin vector area-pattern registry."
+    description = "parses ESRI pattern SVG assets and generates Kotlin vector area-pattern registry."
 
     val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
     dependsOn("jvmMainClasses")
@@ -399,7 +399,7 @@ val esriStrictCoverageProvider = providers.gradleProperty("esri.strictCoverage")
 
 tasks.register<JavaExec>("generateEsriPresLib") {
     group = "generation"
-    description = "Phase ESRI-10: generates the ESRI/INT1 profile metadata facade."
+    description = "generates the ESRI/INT1 profile metadata facade."
 
     val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
     dependsOn(
@@ -460,7 +460,7 @@ tasks.matching { task ->
 
 tasks.register<JavaExec>("checkEsriStrictCoverage") {
     group = "verification"
-    description = "Phase ESRI-11: writes strict ESRI coverage closure reports and optionally fails unresolved release coverage."
+    description = "writes strict ESRI coverage closure reports and optionally fails unresolved release coverage."
 
     val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
     dependsOn(
@@ -502,7 +502,7 @@ tasks.register<JavaExec>("checkEsriStrictCoverage") {
 
 tasks.register<JavaExec>("esriNoaaSmokeTest") {
     group = "verification"
-    description = "Phase ESRI-12: runs NOAA-style smoke fixtures through the ESRI profile facade and CSP ports."
+    description = "runs NOAA-style smoke fixtures through the ESRI profile facade and CSP ports."
 
     val jvmCompilation = kotlin.targets.getByName("jvm").compilations.getByName("main")
     dependsOn("jvmMainClasses", "generateEsriPresLib")
