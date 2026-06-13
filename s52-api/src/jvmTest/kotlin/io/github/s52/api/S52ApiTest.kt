@@ -13,7 +13,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class S52ApiPhase12Test {
+class S52ApiTest {
     @Test
     fun defaultRuntimePortraysSyntheticFeature() {
         val runtime = S52.defaultRuntime()

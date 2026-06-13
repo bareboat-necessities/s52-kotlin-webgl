@@ -12,7 +12,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class S52PerformancePhase13Test {
+class S52PerformanceTest {
     @Test
     fun cachedRuntimeHitsOnRepeatedEquivalentRequests() {
         val cached = S52.cachedRuntime(maxEntries = 2)

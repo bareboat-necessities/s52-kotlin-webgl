@@ -12,7 +12,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class S52DocumentationPhase14Test {
+class S52DocumentationTest {
     @Test
     fun publicVersionReflectsPhase14() {
         assertEquals("0.14.0-SNAPSHOT", S52.version.toString())

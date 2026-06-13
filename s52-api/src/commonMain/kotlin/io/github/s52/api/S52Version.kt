@@ -4,7 +4,7 @@ package io.github.s52.api
  * Public semantic-version metadata for the portrayal library.
  *
  * The project is still pre-1.0 while the Presentation Library importer and
- * validation harness mature, but the Phase 14 public facade is intended to be
+ * validation harness mature, but the public facade is intended to be
  * the stable integration surface for downstream Kotlin/JVM and Kotlin/JS apps.
  */
 data class S52Version(
