@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform) apply false
 }
 
-val defaultProjectVersion = "0.5.4-SNAPSHOT"
+val defaultProjectVersion = "0.5.6-SNAPSHOT"
 val releaseLabelVersion: String? = providers.gradleProperty("releaseLabel")
     .orElse(providers.environmentVariable("S52_RELEASE_LABEL"))
     .orElse(providers.environmentVariable("GITHUB_REF_NAME"))
