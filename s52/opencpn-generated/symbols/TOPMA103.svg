@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="36" viewBox="0 0 32 36" role="img" aria-label="TOPMA103">
+  <title>TOPMA103 Symbol</title>
+  <desc>OpenCPN bitmap cell x=529, y=660, width=15, height=12</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="8" y="12" width="15" height="12" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAMCAYAAAC9QufkAAAASklEQVR4XmNgoBVgZ2f/jy5GFABpzHgS9p8sA8jWDNMIw0QbgKzxyqt3pBlAtmZ0jTBM0ABcGokyAD2QcGEMzSABUjGKAdgAIUUAcrGU+fXdCM0AAAAASUVORK5CYII="/>
+  <text x="4" y="32" font-family="monospace" font-size="8" fill="#333333">TOPMA103 Symbol</text>
+</svg>

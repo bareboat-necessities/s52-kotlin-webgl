@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="33" viewBox="0 0 32 33" role="img" aria-label="HECMTR02">
+  <title>HECMTR02 Symbol</title>
+  <desc>OpenCPN bitmap cell x=552, y=495, width=9, height=9</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="11" y="12" width="9" height="9" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAN0lEQVR4XmNgQANHXQ//RxdDASAFMIwuBwbICrAqRJfEUIguiA0TVIhsI1aFKApggKACGMCmAACCe3Kt8BVyWQAAAABJRU5ErkJggg=="/>
+  <text x="4" y="29" font-family="monospace" font-size="8" fill="#333333">HECMTR02 Symbol</text>
+</svg>

@@ -1,0 +1,10 @@
+<!-- OpenCPN enhanced slot: CRANES01; ESRI source: F53_Crane.svg; match: CUSTOM_SYMBOL_MAP; reason: CustomSymbolMap object rule for CRANES -->
+<svg data-opencpn-name="CRANES01" data-esri-source="F53_Crane.svg" data-match-kind="CUSTOM_SYMBOL_MAP" data-enhancement-palette="opencpn-inspired-day" data-enhanced-svg="true" data-opencpn-colors="WLANDF" data-opencpn-bitmap="rastersymbols-day.png:898,78,18x16@8,14" width="1.35mm" height="1.951mm" version="1.1" viewBox="-.67 -1.3 1.35 1.951" xmlns="http://www.w3.org/2000/svg">
+	<path d="m-0.61-0.024c0-0.3397 0.275-0.6149 0.61-0.6149 0.345 0 0.62 0.2752 0.62 0.6149s-0.275 0.6149-0.62 0.6149c-0.335 0-0.61-0.2752-0.61-0.6149z" fill="none" stroke="#111111" stroke-miterlimit="3.864" stroke-width=".12"/>
+	<path d="m0 0v-1.3" fill="none" stroke="#111111" stroke-miterlimit="3.864" stroke-width=".17004"/>
+<g id="opencpn-enhancement" fill="none" pointer-events="none">
+  <path d="M-0.53 -1.16 L0.54 0.511" stroke="#476ce6" stroke-width="0.72" stroke-linecap="round" stroke-opacity="0.82"/>
+  <rect x="-0.27" y="-0.9" width="0.55" height="1.151" rx="0.075" ry="0.075" stroke="#324a8f" stroke-width="0.4" stroke-opacity="0.55"/>
+  <circle cx="0.473" cy="-1.076" r="0.115" fill="#111111" stroke="#111111" stroke-width="0.4"/>
+</g>
+</svg>

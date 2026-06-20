@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="34" height="37" viewBox="0 0 34 37" role="img" aria-label="VECGND21">
+  <title>VECGND21 Symbol</title>
+  <desc>OpenCPN bitmap cell x=1024, y=307, width=18, height=13</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="8" y="12" width="18" height="13" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAANCAYAAACkTj4ZAAABmUlEQVR4Xo1SQStFQRS+EVKyUjbKBqknG0rKvXeeR7G0eFsb9ZLnztx5/sBbWihlIyLlzgxu1pKyUxY2LK2QLJUNFhLnzH0z7n3y8tXpnvnO+c6Ze844TgMU42KzJ9kxGvr18X+DSLbqS/aF5im2Xh//F4igi7Ui3BNhWReDb31eQ+QFLegiiu4azlXBNnJE0Zl07p8gannQF/QZ5nKRi6utNlCtNkGhc7BXV7HhlOQ3Cop1Q+IDGhFBD3K+pHk09Ila6QL/1hPsBRtm1TXMngRtnghOPUE/yAEfRY7s0yEUaSH4yE0cVgbwxn7EbsZE0Jmt4mA3tqYHKtk8nsdj3g7+JdijL9gT+shhzI+4q2cowqNMERhqUBtuYDnJ9uA3PvOK59DQR87GBZ1DjSvCjQwBHTdNklk3iEtWCH7SLKxYDnx7AThcw+HMbIhEIdGdYN1GYIDdEyGbNhw82h1XhvfOpCz3knipQ5PJ6t9wHiNbpZafEgmQw2cB9o6/ixxewGzYgkg+BUlXnqT9mUAKJOJ9sNk7yFtI89/E4tVGLr84AAAAAABJRU5ErkJggg=="/>
+  <text x="4" y="33" font-family="monospace" font-size="8" fill="#333333">VECGND21 Symbol</text>
+</svg>

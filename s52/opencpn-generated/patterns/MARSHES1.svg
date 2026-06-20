@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="426.0" height="431.0" viewBox="0 0 426.0 431.0" overflow="visible" shape-rendering="geometricPrecision" role="img" aria-label="MARSHES1">
+  <title>MARSHES1 Pattern</title>
+  <desc>colorRefs=CHBRN; unresolvedColors=</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <g transform="translate(-537.0 -486.0)">
+    <path d="M 751.0 765.0 L 751.0 499.0" fill="none" stroke="#B19139" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 626.0 892.0 L 876.0 892.0" fill="none" stroke="#B19139" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 550.0 810.0 L 950.0 810.0" fill="none" stroke="#B19139" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 664.0 799.0 L 592.0 634.0" fill="none" stroke="#B19139" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 830.0 799.0 L 901.0 637.0" fill="none" stroke="#B19139" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="4" y="427.0" font-family="monospace" font-size="8" fill="#333333">MARSHES1 Pattern</text>
+</svg>

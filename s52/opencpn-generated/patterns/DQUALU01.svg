@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1629.0" height="467.0" viewBox="0 0 1629.0 467.0" overflow="visible" shape-rendering="geometricPrecision" role="img" aria-label="DQUALU01">
+  <title>DQUALU01 Pattern</title>
+  <desc>colorRefs=CHGRD; unresolvedColors=</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <g transform="translate(-2111.5 -828.5)">
+    <path d="M 2316.0 841.0 L 2271.0 855.0 L 2236.0 869.0 L 2201.0 894.0 L 2173.0 929.0 L 2148.0 971.0 L 2134.0 1009.0 L 2124.0 1058.0 L 2131.0 1110.0 L 2141.0 1152.0 L 2159.0 1198.0 L 2204.0 1236.0 L 2260.0 1261.0 L 2309.0 1271.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 2302.0 845.0 L 3557.0 845.0 L 3599.0 859.0 L 3651.0 887.0 L 3683.0 918.0 L 3711.0 957.0 L 3718.0 985.0 L 3725.0 1023.0 L 3728.0 1058.0 L 3725.0 1103.0 L 3718.0 1145.0 L 3700.0 1187.0 L 3683.0 1212.0 L 3644.0 1247.0 L 3616.0 1264.0 L 3592.0 1271.0 L 3557.0 1268.0 L 2306.0 1268.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 2841.0 946.0 L 2842.0 1137.0 L 2852.0 1166.0 L 2873.0 1186.0 L 2904.0 1201.0 L 2938.0 1203.0 L 2961.0 1193.0 L 2990.0 1175.0 L 3008.0 1158.0 L 3018.0 1134.0 L 3018.0 946.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="4" y="463.0" font-family="monospace" font-size="8" fill="#333333">DQUALU01 Pattern</text>
+</svg>

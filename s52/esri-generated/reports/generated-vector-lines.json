@@ -1,0 +1,25 @@
+{
+  "generatedFile": "/home/runner/work/s52-kotlin-webgl/s52-kotlin-webgl/s52-preslib/src/commonMain/kotlin/io/github/s52/preslib/esri/generated/EsriGeneratedLineRegistry.kt",
+  "generatedLineCount": 9,
+  "failedAssetCount": 17,
+  "strictFailureEnabled": false,
+  "failures": [
+    {"name": "C8_Dunes.svg", "relativePath": "CustomPresentationLibrary/symbols/line/C8_Dunes.svg", "reason": "unsupported subset: elements=[cc:Work, dc:format, dc:type, defs, inkscape:grid, rdf:RDF, sodipodi:guide, sodipodi:namedview], features=[defs-element], commands=[A]"},
+    {"name": "CBLS.svg", "relativePath": "CustomPresentationLibrary/symbols/line/CBLS.svg", "reason": "unsupported subset: elements=[circle], features=[], commands=[]"},
+    {"name": "D11_Roadway.svg", "relativePath": "CustomPresentationLibrary/symbols/line/D11_Roadway.svg", "reason": "unsupported subset: elements=[cc:Work, dc:format, dc:title, dc:type, defs, rdf:RDF, rect, sodipodi:namedview], features=[defs-element], commands=[]"},
+    {"name": "D14_Cutting.svg", "relativePath": "CustomPresentationLibrary/symbols/line/D14_Cutting.svg", "reason": "unsupported subset: elements=[cc:Work, dc:format, dc:type, defs, inkscape:grid, rdf:RDF, rect, sodipodi:guide, sodipodi:namedview], features=[defs-element], commands=[]"},
+    {"name": "D15_Embankment.svg", "relativePath": "CustomPresentationLibrary/symbols/line/D15_Embankment.svg", "reason": "unsupported subset: elements=[rect], features=[], commands=[]"},
+    {"name": "L40_pipeline_supply.svg", "relativePath": "CustomPresentationLibrary/symbols/line/L40_pipeline_supply.svg", "reason": "unsupported subset: elements=[circle, defs, rect, sodipodi:namedview], features=[defs-element], commands=[]"},
+    {"name": "L41_pipeline_outfall_intake.svg", "relativePath": "CustomPresentationLibrary/symbols/line/L41_pipeline_outfall_intake.svg", "reason": "unsupported subset: elements=[circle, defs, rect, sodipodi:namedview], features=[defs-element], commands=[]"},
+    {"name": "M1_NavigationLine.svg", "relativePath": "CustomPresentationLibrary/symbols/line/M1_NavigationLine.svg", "reason": "unsupported subset: elements=[clipPath, defs], features=[defs-element, path@clip-path], commands=[]"},
+    {"name": "M4_RecommendedTrack1.svg", "relativePath": "CustomPresentationLibrary/symbols/line/M4_RecommendedTrack1.svg", "reason": "unsupported subset: elements=[cc:Work, clipPath, dc:format, dc:title, dc:type, defs, rdf:RDF, sodipodi:guide, sodipodi:namedview], features=[defs-element], commands=[]"},
+    {"name": "M4_RecommendedTrack2.svg", "relativePath": "CustomPresentationLibrary/symbols/line/M4_RecommendedTrack2.svg", "reason": "unsupported subset: elements=[cc:Work, clipPath, dc:format, dc:title, dc:type, defs, rdf:RDF, sodipodi:guide, sodipodi:namedview], features=[defs-element], commands=[]"},
+    {"name": "N1_1_RecommendedTrack.svg", "relativePath": "CustomPresentationLibrary/symbols/line/N1_1_RecommendedTrack.svg", "reason": "unsupported subset: elements=[cc:Work, clipPath, dc:format, dc:title, dc:type, defs, rdf:RDF, sodipodi:namedview], features=[defs-element], commands=[]"},
+    {"name": "N1_Limit_general.svg", "relativePath": "CustomPresentationLibrary/symbols/line/N1_Limit_general.svg", "reason": "unsupported subset: elements=[defs, sodipodi:namedview], features=[defs-element], commands=[]"},
+    {"name": "N20_AnchoringProhibited.svg", "relativePath": "CustomPresentationLibrary/symbols/line/N20_AnchoringProhibited.svg", "reason": "unsupported subset: elements=[defs, sodipodi:guide, sodipodi:namedview], features=[defs-element], commands=[]"},
+    {"name": "N20_AnchoringProhibitedPoint.svg", "relativePath": "CustomPresentationLibrary/symbols/line/N20_AnchoringProhibitedPoint.svg", "reason": "unsupported subset: elements=[defs, sodipodi:guide, sodipodi:namedview], features=[defs-element], commands=[]"},
+    {"name": "N21_1_Fishing_ProhibitedPoint.svg", "relativePath": "CustomPresentationLibrary/symbols/line/N21_1_Fishing_ProhibitedPoint.svg", "reason": "unsupported subset: elements=[style], features=[style-element], commands=[]"},
+    {"name": "N2_2_EntryProhibited.svg", "relativePath": "CustomPresentationLibrary/symbols/line/N2_2_EntryProhibited.svg", "reason": "unsupported subset: elements=[defs, sodipodi:guide, sodipodi:namedview], features=[defs-element], commands=[]"},
+    {"name": "rock_ledge.svg", "relativePath": "CustomPresentationLibrary/symbols/line/rock_ledge.svg", "reason": "unsupported subset: elements=[cc:Work, dc:format, dc:title, dc:type, defs, rdf:RDF, sodipodi:guide, sodipodi:namedview], features=[defs-element], commands=[]"}
+  ]
+}

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2275.0" height="4350.0" viewBox="0 0 2275.0 4350.0" overflow="visible" shape-rendering="geometricPrecision" role="img" aria-label="DIAMOND1">
+  <title>DIAMOND1 Pattern</title>
+  <desc>colorRefs=DEPCN; unresolvedColors=\</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <g transform="translate(-1112.5 -80.5)">
+    <path d="M 1125.0 93.0 L 3375.0 4406.0 M 1125.0 4406.0 L 3375.0 93.0" fill="none" stroke="#000000" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="4" y="4346.0" font-family="monospace" font-size="8" fill="#333333">DIAMOND1 Pattern</text>
+</svg>

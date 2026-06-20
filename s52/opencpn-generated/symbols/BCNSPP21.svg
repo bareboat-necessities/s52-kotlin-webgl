@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="39" viewBox="0 0 32 39" role="img" aria-label="BCNSPP21">
+  <title>BCNSPP21 Symbol</title>
+  <desc>OpenCPN bitmap cell x=800, y=10, width=5, height=15</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="13" y="12" width="5" height="15" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAPCAYAAAAs9AWDAAAAx0lEQVR4XmPg4OCIZ2Rkvs3AwHIJSN9hY2OrYWBhYb0+vV3v//7Vlv8nNun+B0puZGBkZLl+aY/9///v/P+f3GILFWRiuX5qq+3//0+9/x9aa4VPEKj9NEjwjd//Q+uggkxMrNePrLf+f26H3f99qywhguzs7Nfn9xn+52Dn+L9qhgnCzGMbrf/fPuyIUAk387UvwkzstmMVBGq/vBfoo/f+/0GSYEGQ3ycA/bx9ifn/rhptiCAwVKqBqjcBOWsYGdk2A51YDADf0oS35A7y9AAAAABJRU5ErkJggg=="/>
+  <text x="4" y="35" font-family="monospace" font-size="8" fill="#333333">BCNSPP21 Symbol</text>
+</svg>

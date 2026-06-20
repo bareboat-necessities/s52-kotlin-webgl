@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" role="img" aria-label="PASTRK02">
+  <title>PASTRK02 Symbol</title>
+  <desc>OpenCPN bitmap cell x=1071, y=175, width=13, height=2</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="9" y="15" width="13" height="2" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAACCAYAAACDvVapAAAAIklEQVR4XmOo6ex5XNvR84kYXNPZXc4AAqRoqu3qaQfpAQC89DtG43qchwAAAABJRU5ErkJggg=="/>
+  <text x="4" y="28" font-family="monospace" font-size="8" fill="#333333">PASTRK02 Symbol</text>
+</svg>

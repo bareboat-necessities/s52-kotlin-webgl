@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" role="img" aria-label="ARPSIX01">
+  <title>ARPSIX01 Symbol</title>
+  <desc>OpenCPN bitmap cell x=455, y=10, width=13, height=2</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="9" y="15" width="13" height="2" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAACCAYAAACDvVapAAAAGUlEQVR4XmOwX5r/0H5p3ificf5DBnI0AQAN0Dqp2GZG1gAAAABJRU5ErkJggg=="/>
+  <text x="4" y="28" font-family="monospace" font-size="8" fill="#333333">ARPSIX01 Symbol</text>
+</svg>

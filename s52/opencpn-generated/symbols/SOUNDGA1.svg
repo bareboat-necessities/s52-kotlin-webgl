@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" role="img" aria-label="SOUNDGA1">
+  <title>SOUNDGA1 Symbol</title>
+  <desc>OpenCPN bitmap cell x=168, y=454, width=8, height=2</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="12" y="15" width="8" height="2" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAAEUlEQVR4XmNgIATY2dn/48MAgvIIocF2/dkAAAAASUVORK5CYII="/>
+  <text x="4" y="28" font-family="monospace" font-size="8" fill="#333333">SOUNDGA1 Symbol</text>
+</svg>

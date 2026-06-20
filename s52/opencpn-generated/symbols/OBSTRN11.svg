@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="33" viewBox="0 0 32 33" role="img" aria-label="OBSTRN11">
+  <title>OBSTRN11 Symbol</title>
+  <desc>OpenCPN bitmap cell x=387, y=358, width=9, height=9</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="11" y="12" width="9" height="9" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAIUlEQVR4XmMIior5TwgzoAtgw3BFJ3dWYeAhoQgfJkoRABfJvAyMxVB3AAAAAElFTkSuQmCC"/>
+  <text x="4" y="29" font-family="monospace" font-size="8" fill="#333333">OBSTRN11 Symbol</text>
+</svg>

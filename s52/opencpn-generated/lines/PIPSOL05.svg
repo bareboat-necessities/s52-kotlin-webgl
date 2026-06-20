@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420.0" height="110.0" viewBox="0 0 420.0 110.0" overflow="visible" shape-rendering="geometricPrecision" role="img" aria-label="PIPSOL05">
+  <rect width="100%" height="100%" fill="white"/>
+  <line x1="12" y1="48" x2="408" y2="48" stroke="#D0D0D0" stroke-width="1" stroke-dasharray="4 4"/>
+  <g class="line-style-tile" transform="translate(16.0 24.0) scale(0.09446254071661238) translate(-2074.5 -2091.5)">
+    <path d="M 2581.0 2199.0" fill="none" stroke="#C545C3" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="2581.0" cy="2199.0" r="95.0" fill="none" stroke="#C545C3" stroke-width="1.0"/>
+    <path d="M 2087.0 2199.0 L 2484.0 2199.0" fill="none" stroke="#C545C3" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g class="line-style-tile" transform="translate(86.0 24.0) scale(0.09446254071661238) translate(-2074.5 -2091.5)">
+    <path d="M 2581.0 2199.0" fill="none" stroke="#C545C3" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="2581.0" cy="2199.0" r="95.0" fill="none" stroke="#C545C3" stroke-width="1.0"/>
+    <path d="M 2087.0 2199.0 L 2484.0 2199.0" fill="none" stroke="#C545C3" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g class="line-style-tile" transform="translate(156.0 24.0) scale(0.09446254071661238) translate(-2074.5 -2091.5)">
+    <path d="M 2581.0 2199.0" fill="none" stroke="#C545C3" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="2581.0" cy="2199.0" r="95.0" fill="none" stroke="#C545C3" stroke-width="1.0"/>
+    <path d="M 2087.0 2199.0 L 2484.0 2199.0" fill="none" stroke="#C545C3" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g class="line-style-tile" transform="translate(226.0 24.0) scale(0.09446254071661238) translate(-2074.5 -2091.5)">
+    <path d="M 2581.0 2199.0" fill="none" stroke="#C545C3" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="2581.0" cy="2199.0" r="95.0" fill="none" stroke="#C545C3" stroke-width="1.0"/>
+    <path d="M 2087.0 2199.0 L 2484.0 2199.0" fill="none" stroke="#C545C3" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g class="line-style-tile" transform="translate(296.0 24.0) scale(0.09446254071661238) translate(-2074.5 -2091.5)">
+    <path d="M 2581.0 2199.0" fill="none" stroke="#C545C3" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="2581.0" cy="2199.0" r="95.0" fill="none" stroke="#C545C3" stroke-width="1.0"/>
+    <path d="M 2087.0 2199.0 L 2484.0 2199.0" fill="none" stroke="#C545C3" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="12" y="94" font-family="monospace" font-size="12" fill="#333333">PIPSOL05 repeated line-style sample</text>
+</svg>

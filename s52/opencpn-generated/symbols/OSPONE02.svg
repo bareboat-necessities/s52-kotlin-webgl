@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" role="img" aria-label="OSPONE02">
+  <title>OSPONE02 Symbol</title>
+  <desc>OpenCPN bitmap cell x=940, y=175, width=13, height=2</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="9" y="15" width="13" height="2" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAACCAYAAACDvVapAAAAHUlEQVR4XmNgZ2ffDMSfSMCHGdjY2I5jkcCHLwIAOJ0Z+on512kAAAAASUVORK5CYII="/>
+  <text x="4" y="28" font-family="monospace" font-size="8" fill="#333333">OSPONE02 Symbol</text>
+</svg>

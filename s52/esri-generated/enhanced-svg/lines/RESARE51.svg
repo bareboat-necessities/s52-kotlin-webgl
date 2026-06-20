@@ -1,0 +1,14 @@
+<!-- OpenCPN enhanced slot: RESARE51; ESRI source: N2_1_RestrictedArea.svg; match: SEMANTIC_TOKEN; reason: semantic token match for RESARE -->
+<svg data-opencpn-name="RESARE51" data-esri-source="N2_1_RestrictedArea.svg" data-match-kind="SEMANTIC_TOKEN" data-enhancement-palette="opencpn-inspired-day" data-enhanced-svg="true" data-opencpn-colors="ACHMGD" data-opencpn-bitmap="" width="7.6824mm" height=".70273mm" version="1.1" viewBox="0 -.13 8.6824 .70273" xmlns="http://www.w3.org/2000/svg">
+ <path d="M 1,0.07003 H 3.0002 V -0.13 H 1 Z" style="fill:#47c6e6"/>
+ <path d="m1.8996 0.57063h0.20038v-0.69991h-0.20038z" style="fill:#47c6e6"/>
+ <path d="m3.9825 0.07143h1.9995v-0.20003h-1.9995z" style="fill:#47c6e6"/>
+ <path d="m4.8821 0.57163h0.20002v-0.69956h-0.20002z" style="fill:#47c6e6"/>
+ <path d="m6.6822 0.07283h2.0002v-0.19967h-2.0002z" style="fill:#47c6e6"/>
+ <path d="m7.5822 0.57273h0.20108v-0.69991h-0.20108z" style="fill:#47c6e6"/>
+<g id="opencpn-enhancement" fill="none" pointer-events="none">
+  <path d="M0.073 0.5 L8.61 -0.057" stroke="#c347e6" stroke-width="0.72" stroke-linecap="round" stroke-opacity="0.82"/>
+  <rect x="0.4" y="0.27" width="7.882" height="-0.097" rx="0.039" ry="0.039" stroke="#8a5a00" stroke-width="0.4" stroke-opacity="0.55"/>
+  <path d="M8.515 0.007 H8.635" stroke="#111111" stroke-width="0.88" stroke-linecap="round"/>
+</g>
+</svg>

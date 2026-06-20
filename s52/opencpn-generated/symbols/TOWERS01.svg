@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="50" viewBox="0 0 32 50" role="img" aria-label="TOWERS01">
+  <title>TOWERS01 Symbol</title>
+  <desc>OpenCPN bitmap cell x=343, y=742, width=14, height=26</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="9" y="12" width="14" height="26" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAaCAYAAACHD21cAAABMklEQVR4XmNgQAOK8vL7leTl/2PDIDl09XAAkjQzMX0+ffb8BcgYJEZQo5213f2nr782IGOQ2CDUiB4otA0ckMn+foHn0Z0KEgPJoauHA5BkSkrGAXSNIDGcGhUUFAQIaQSpQdfHoKKg4ACS7OzpX4GuESQGkgOpQdcH1wgKDHSNIDGcGpUVFBIIaQSpQdfHoKSg0ACSRNcEw+D4BKpB10eBRjm5+Rpqat/RNcAwSA6oeT26PpzpFIZxpleyNQKd8R5bcoNhaLJ7j64PJbnl5xfvANkAwiA2SAxnsoNpjIiIPg4OQXl5kA3gxA0Sw9AIjgZgiIIE3Vzdr0M1wUMPxEaRA6qF24SBkeILFr/IGCaHAoAS94H4PTgJKigUgNggMXR1GACYdQzQipDzIDF0dWQBAD17yQVhSTO7AAAAAElFTkSuQmCC"/>
+  <text x="4" y="46" font-family="monospace" font-size="8" fill="#333333">TOWERS01 Symbol</text>
+</svg>

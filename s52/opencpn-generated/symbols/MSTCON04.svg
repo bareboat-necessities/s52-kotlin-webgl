@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="44" viewBox="0 0 32 44" role="img" aria-label="MSTCON04">
+  <title>MSTCON04 Symbol</title>
+  <desc>OpenCPN bitmap cell x=749, y=175, width=10, height=20</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="11" y="12" width="10" height="20" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAUCAYAAAC07qxWAAABY0lEQVR4XnWSzytFQRTHx88sSdnozRlZWirZKf6Gt7B76s3cJ0sbG3WzoDdzsfZjJVFKWVi9shVFLCyeIhsrhVCE8pwzOJ5TvjV1b5/vfM+ZmaOUkHe5rOxgN01Vo2R/FJw+CQ5u0nxfq2QsTGlGYzVYeFosmHbJWZSCaRfewnMo9XZJzpob1x3ewS2uD2/NkOQsMmLZO0ythSIMS84ql3oG0PhOxiwxo5Kz5hM9EtNoJWZMchal/Bi9M1OSs/AABU50MC05K3Mw6Z1+o5OjcU1yFsIZvPAXNF6Got6XnIVvvEkv4xPYw/Szrbxqkp4oNBxhn5WyhVV8nesl198iPaqmVEOwudPgcttYeiEORsG0SV8ciMzqq2D1TkhgGVt4/Xcw4uTwPer72Ynuzl+IuzHpEOFxHIYE1mmRGQ93Tgz73VDUT/xxcICJj7QhbrL6ga7om63UFca3LprBr/K6St/17BO4+qR9RsV6VQAAAABJRU5ErkJggg=="/>
+  <text x="4" y="40" font-family="monospace" font-size="8" fill="#333333">MSTCON04 Symbol</text>
+</svg>

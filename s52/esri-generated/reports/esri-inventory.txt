@@ -1,0 +1,9 @@
+ESRI source inventory
+Source root: /home/runner/work/s52-kotlin-webgl/s52-kotlin-webgl/s52-preslib/s52/esri/source
+Feature rules: 61
+Direct symbol conditions: 129
+Function conditions: 29
+Point SVGs: 140
+Line SVGs: 26
+Pattern SVGs: 0
+Lua files: 34

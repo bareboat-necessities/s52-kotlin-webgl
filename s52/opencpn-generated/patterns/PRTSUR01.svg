@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="228.0" height="38.0" viewBox="0 0 228.0 38.0" overflow="visible" shape-rendering="geometricPrecision" role="img" aria-label="PRTSUR01">
+  <title>PRTSUR01 Pattern</title>
+  <desc>colorRefs=CHGRD; unresolvedColors=</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <g transform="translate(-2435.0 -728.0)">
+    <path d="M 2448.0 741.0 L 2650.0 741.0" fill="none" stroke="#7D898C" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="4" y="34.0" font-family="monospace" font-size="8" fill="#333333">PRTSUR01 Pattern</text>
+</svg>

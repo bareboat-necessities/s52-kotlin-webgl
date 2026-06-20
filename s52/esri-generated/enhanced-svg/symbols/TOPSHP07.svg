@@ -1,0 +1,9 @@
+<!-- OpenCPN enhanced slot: TOPSHP07; ESRI source: Q130_3_topmark_E.svg; match: SEMANTIC_TOKEN; reason: semantic token match for TOPSHP -->
+<svg data-opencpn-name="TOPSHP07" data-esri-source="Q130_3_topmark_E.svg" data-match-kind="SEMANTIC_TOKEN" data-enhancement-palette="opencpn-inspired-day" data-enhanced-svg="true" data-opencpn-colors="ADEPMDBCHBLKCCHCORDCHWHTECHYLW" data-opencpn-bitmap="rastersymbols-day.png:663,902,15x15@7,26" width=".99955mm" height="2.786mm" version="1.1" viewBox="-.5 -2.79 .99955 2.786" xmlns="http://www.w3.org/2000/svg">
+	<path stroke="#111111" stroke-width="0.7" fill="#111111" d="m-0.0074398-2.79-0.48913 0.99269h0.44456v0.30255h-0.44798l0.44798 0.88432 0.002056 0.60645 0.098103-6.838e-4 6.8378e-4 -0.60579 0.45073-0.88432h-0.45072v-0.30255h0.44661z"/>
+<g id="opencpn-enhancement" fill="none" pointer-events="none">
+  <path d="M-0.369 -2.659 L0.369 -0.135" stroke="#52e647" stroke-width="0.72" stroke-linecap="round" stroke-opacity="0.82"/>
+  <rect x="-0.1" y="-2.39" width="0.2" height="1.986" rx="0.055" ry="0.055" stroke="#324a8f" stroke-width="0.4" stroke-opacity="0.55"/>
+  <circle cx="0.317" cy="-2.624" r="0.085" fill="#f2c400" stroke="#111111" stroke-width="0.4"/>
+</g>
+</svg>

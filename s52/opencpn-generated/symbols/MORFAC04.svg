@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40" role="img" aria-label="MORFAC04">
+  <title>MORFAC04 Symbol</title>
+  <desc>OpenCPN bitmap cell x=728, y=175, width=11, height=16</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="10" y="12" width="11" height="16" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAQCAYAAADAvYV+AAABNElEQVR4Xm2Rv0oDQRCHD+H+czYWSkDSiI0iCEajRUoL38AUqRSsxN5C9AXyBD6AoBaCNqKkFOwEESQqVkbU0srG73fsLctyA8P8Zubbudm9IKixOI53kyRp+vVaC8NwBNzx67UWRdFrmqarfr3WgF+Y3vLr1vI8nwS4Bnxn5z+tQnzG1302YMcejUfiNvGLQwfoE+Kxz+rT+0B9o4foGXwDv/JZPVefSYfSuiBrLFGbxR98VvAlUFfawK0syxroD0rjLjsG/ERjzoGXBaG/ufyUJYuimGCFH02qYN65rSEc+iSft7B2UxGZOHD5U9Bv6BULqyGgyg28Js2QG72KhXUxXdDJh0CL0tTP8J2ywYRpGrfsfA+0Kaf5S35k8jvyAXFBf27LnD7VdLn+HPHC5Oqd43v/ipo6u2zWyOAAAAAASUVORK5CYII="/>
+  <text x="4" y="36" font-family="monospace" font-size="8" fill="#333333">MORFAC04 Symbol</text>
+</svg>

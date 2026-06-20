@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="44" viewBox="0 0 32 44" role="img" aria-label="WIMCON11">
+  <title>WIMCON11 Symbol</title>
+  <desc>OpenCPN bitmap cell x=1311, y=307, width=12, height=20</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="10" y="12" width="12" height="20" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAUCAYAAAC58NwRAAABF0lEQVR4XmPg4OBIYmdn38LAwMDFQAwAanAGavgPpFegy+EEQMUxIE1APBNdDidgY2OrAWkC0lXocjgB0KZ2qKZ6IDseiFNgGCieAcQ+6BoUgPgt1HkYGGjQXWT1fEDBrVCJO0CsB8QaQKwFxTqcnJzSMMWMQJNXAhV/A0o8AtK3gGKsSIahAqCCLpDJoNACapgLxI8ZcGkAKkqAOqMSyl+GVwNQsQdQQS2QyQTiAzUsx6sBHQwTDSuJ1gBUGAKKPGhSKEaXBwOgxCwgvgBUfBxI/wbasAqIl0Ij8gwQn2ZlZd3HxcUlBdPQB9VwDCj5Dsg+B6RPAekvIDEgfRZI7+Dh4RFDswvsJC2ggutA+gFQkwO6PAgAACFFR7lgzWy4AAAAAElFTkSuQmCC"/>
+  <text x="4" y="40" font-family="monospace" font-size="8" fill="#333333">WIMCON11 Symbol</text>
+</svg>

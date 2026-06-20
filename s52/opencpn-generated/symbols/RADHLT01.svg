@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="33" height="41" viewBox="0 0 33 41" role="img" aria-label="RADHLT01">
+  <title>RADHLT01 Symbol</title>
+  <desc>OpenCPN bitmap cell x=1266, y=605, width=17, height=17</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="8" y="12" width="17" height="17" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAAZklEQVR4XtWMQQqAQAwD95X7Bh/uPxQEhU6TrB4dyKWZdAzDts+DoWPhUIWbAuUUbi8oUWTHvgmlBNaVx0Dz7edA23x9cPODJ28fyU07LJC+/GyILksK7Ng/UErhtkBZhRsLh2l8AueXWxTEqB4XAAAAAElFTkSuQmCC"/>
+  <text x="4" y="37" font-family="monospace" font-size="8" fill="#333333">RADHLT01 Symbol</text>
+</svg>

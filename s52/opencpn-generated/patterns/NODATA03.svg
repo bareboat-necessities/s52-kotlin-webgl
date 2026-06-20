@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="226.0" height="39.0" viewBox="0 0 226.0 39.0" overflow="visible" shape-rendering="geometricPrecision" role="img" aria-label="NODATA03">
+  <title>NODATA03 Pattern</title>
+  <desc>colorRefs=CHGRD; unresolvedColors=</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <g transform="translate(-2329.0 -1027.0)">
+    <path d="M 2342.0 1041.0 L 2542.0 1040.0" fill="none" stroke="#7D898C" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="4" y="35.0" font-family="monospace" font-size="8" fill="#333333">NODATA03 Pattern</text>
+</svg>

@@ -1,0 +1,10 @@
+<!-- OpenCPN enhanced slot: RDOCAL; ESRI source: M40_1b_Radio_calling_in.svg; match: CUSTOM_SYMBOL_MAP; reason: CustomSymbolMap object rule for RDOCAL -->
+<svg data-opencpn-name="RDOCAL" data-esri-source="M40_1b_Radio_calling_in.svg" data-match-kind="CUSTOM_SYMBOL_MAP" data-enhancement-palette="opencpn-inspired-day" data-enhanced-svg="true" data-opencpn-colors="" data-opencpn-bitmap="" width="2.8835mm" height="4.9309mm" version="1.1" viewBox="-1.44 -3.51 2.8835 4.9309" xmlns="http://www.w3.org/2000/svg">
+ <path d="m7.0043e-4 -1.3918c0.75707-3.685e-4 1.3718 0.61312 1.3723 1.3702 5.306e-4 0.75756-0.61312 1.3718-1.3702 1.3721-0.75728 6.846e-4 -1.3716-0.61265-1.3723-1.3702-3.685e-4 -0.75707 0.61328-1.3713 1.3702-1.3721z" style="fill:none;stroke-miterlimit:3.864;stroke-width:.14096;stroke:#111111"/>
+ <path d="m-0.7331-1.1775 0.73719-2.1174 0.73064 2.1164" style="fill:none;stroke-miterlimit:3.864;stroke-width:.14096;stroke:#111111"/>
+<g id="opencpn-enhancement" fill="none" pointer-events="none">
+  <path d="M-1.063 -3.133 L1.066 1.043" stroke="#47e6b1" stroke-width="0.72" stroke-linecap="round" stroke-opacity="0.82"/>
+  <rect x="-1.04" y="-3.11" width="2.084" height="4.131" rx="0.159" ry="0.159" stroke="#324a8f" stroke-width="0.4" stroke-opacity="0.55"/>
+  <circle cx="1.002" cy="-3.032" r="0.245" fill="#111111" stroke="#111111" stroke-width="0.4"/>
+</g>
+</svg>

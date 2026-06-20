@@ -1,0 +1,12 @@
+<!-- OpenCPN enhanced slot: BCNISD; ESRI source: Q80_Beacon.svg; match: CUSTOM_SYMBOL_MAP; reason: CustomSymbolMap object rule for BCNISD -->
+<svg data-opencpn-name="BCNISD" data-esri-source="Q80_Beacon.svg" data-match-kind="CUSTOM_SYMBOL_MAP" data-enhancement-palette="opencpn-inspired-day" data-enhanced-svg="true" data-opencpn-colors="AOUTLWCCHRED" data-opencpn-bitmap="rastersymbols-day.png:644,10,8x17@3,8" width="2.0073mm" height="2.0757mm" version="1.1" viewBox="-1 -1.75 2.0073 2.0757" xmlns="http://www.w3.org/2000/svg">
+	<path d="m0.21532-0.0041019h0.79199" style="fill:none;stroke-miterlimit:3.864;stroke-width:.099836;stroke:#111111"/>
+	<path d="m-1-0.0041019h0.74859" style="fill:none;stroke-miterlimit:3.864;stroke-width:.099836;stroke:#111111"/>
+	<path d="m-0.25634 0.005775c0-0.14358 0.11642-0.26 0.26-0.26 0.14358 0 0.26 0.11642 0.26 0.26s-0.11642 0.26-0.26 0.26c-0.14358 0-0.26-0.11642-0.26-0.26z" style="fill:none;stroke-miterlimit:3.864;stroke-width:.11994;stroke:#111111"/>
+	<path d="m-0.29656-1.75h0.60008v1.7999s-0.12912-0.2794-0.28681-0.28646c-0.16545-0.00741-0.31327 0.28646-0.31327 0.28646" style="fill:#f2c400"/>
+<g id="opencpn-enhancement" fill="none" pointer-events="none">
+  <path d="M-0.846 -1.596 L0.854 0.172" stroke="#477ce6" stroke-width="0.72" stroke-linecap="round" stroke-opacity="0.82"/>
+  <rect x="-0.6" y="-1.35" width="1.207" height="1.276" rx="0.111" ry="0.111" stroke="#324a8f" stroke-width="0.4" stroke-opacity="0.55"/>
+  <circle cx="0.7" cy="-1.477" r="0.171" fill="#111111" stroke="#111111" stroke-width="0.4"/>
+</g>
+</svg>

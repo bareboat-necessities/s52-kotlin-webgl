@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="225.0" height="237.0" viewBox="0 0 225.0 237.0" overflow="visible" shape-rendering="geometricPrecision" role="img" aria-label="DRGARE01">
+  <title>DRGARE01 Pattern</title>
+  <desc>colorRefs=CHGRD; unresolvedColors=</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <g transform="translate(-1487.5 -1287.5)">
+    <path d="M 1500.0 1300.0 M 1700.0 1500.0" fill="none" stroke="#F4DA48" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="4" y="233.0" font-family="monospace" font-size="8" fill="#333333">DRGARE01 Pattern</text>
+</svg>

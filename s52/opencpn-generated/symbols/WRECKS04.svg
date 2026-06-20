@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="34" viewBox="0 0 32 34" role="img" aria-label="WRECKS04">
+  <title>WRECKS04 Symbol</title>
+  <desc>OpenCPN bitmap cell x=10, y=358, width=15, height=10</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="8" y="12" width="15" height="10" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAKCAYAAABrGwT5AAAAPElEQVR4XrWLQQoAIAzDfHp/ruAtOawgGNghbbfWR7aDicj9HDnwuDlw2fwGrwccNAcum4PIPY58xM/gABRgIOKBxdIgAAAAAElFTkSuQmCC"/>
+  <text x="4" y="30" font-family="monospace" font-size="8" fill="#333333">WRECKS04 Symbol</text>
+</svg>

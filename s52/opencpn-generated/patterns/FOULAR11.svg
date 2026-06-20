@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="595.0" height="721.0" viewBox="0 0 595.0 721.0" overflow="visible" shape-rendering="geometricPrecision" role="img" aria-label="FOULAR11">
+  <title>FOULAR11 Pattern</title>
+  <desc>colorRefs=CHGRD; unresolvedColors=</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <g transform="translate(-1007.5 -837.5)">
+    <path d="M 1590.0 1294.0 L 1409.0 1534.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 1410.0 1294.0 L 1590.0 1533.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 1022.0 850.0 L 1200.0 1090.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 1196.0 853.0 L 1020.0 1093.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="4" y="717.0" font-family="monospace" font-size="8" fill="#333333">FOULAR11 Pattern</text>
+</svg>

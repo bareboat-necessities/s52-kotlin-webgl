@@ -1,0 +1,8 @@
+{
+  "sourceRoot": "/home/runner/work/s52-kotlin-webgl/s52-kotlin-webgl/s52-preslib/s52/esri/source",
+  "sourceRevision": "unknown",
+  "symbolAliasCount": 8,
+  "lineAliasCount": 7,
+  "patternAliasCount": 8,
+  "output": "/home/runner/work/s52-kotlin-webgl/s52-kotlin-webgl/s52-preslib/src/commonMain/kotlin/io/github/s52/preslib/esri/generated/EsriGeneratedPresLib.kt"
+}

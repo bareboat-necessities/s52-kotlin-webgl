@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="43" viewBox="0 0 32 43" role="img" aria-label="BCNCAR04">
+  <title>BCNCAR04 Symbol</title>
+  <desc>OpenCPN bitmap cell x=547, y=10, width=13, height=19</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="9" y="12" width="13" height="19" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAATCAYAAABLN4eXAAAB9klEQVR4XmPg4OBIYmdnv87IyHSegQE/ZmVlu83GxlbFwMrKkcrNxfG/vVLr/9weg/8zOvQx8Kwug/9T2/T+S4rz/GdhYS9lgADmGSlRiv//fw74//+ZDyb+Fvi/q1bnPwMDy1aoBjBgA2o8Ng1o2v8XPv+/3PT4/+UWBP9/6v1/zwrL/6ysrI8YGLgkkTUxAN2qC3Tmj/M77f7/feQN1vDrvtf/p2dd/svL8AJtYfdD0YAArFl6WkL/PwNt+nnP8/+/x97/g71lQM7qQ1eJBpjnF6Sq/P//0f//pGZdoAbmI0BBVnRV6ICHmZn1bluF1n8+Xs5PwOhQRleAFQAVurKwsAI9z56FLocXADWqAikmdHGcAKhBjZGR5Towtbigy+ECTIyMrKeig+T+c3Gy3QXy+dEVYAFMdX7u0v//v/b9X5imAgq9Zegq0ABboLQkz/9Hp53BcfTxpvt/KxNRUDyVoKsEA05OTllgUL/cstAMnN5AEQzSeHG3/X9eHo4fwGRkgq4HCBg31eSr////0hee7sBpD2jAwgmGINsuAhXxIGlgKfdxkfr//40vJFUDEykK/hLwvzBdFeS/OWDloIgEZq7/XdXa/zfMNf2/YroxBl4z2+T/HGBeExLkAqX2RJCmbCDezMTEuhxoEk4Mkgeq2wjEBQBZKgCw2XDTzQAAAABJRU5ErkJggg=="/>
+  <text x="4" y="39" font-family="monospace" font-size="8" fill="#333333">BCNCAR04 Symbol</text>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" role="img" aria-label="TOPMAR85">
+  <title>TOPMAR85 Symbol</title>
+  <desc>OpenCPN bitmap cell x=380, y=307, width=8, height=8</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="12" y="12" width="8" height="8" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAhElEQVR4XmNgZWXdxcbGVsuABjg4OBLZ2dkPMAAVTAEy/gMFWtEk/wPxGhCfEciYAxIAmlQBxFFQyYNAOQFkI9uhEiC8GijEBpeEKkiBKQBaOxlFEihYCpWcAbSiBsqeA5RiBEnmgQSAJiwHCrBCTWuFmwRkHALqWgQUZ0I2FeR1oNw5ALu2Hx73LIpQAAAAAElFTkSuQmCC"/>
+  <text x="4" y="28" font-family="monospace" font-size="8" fill="#333333">TOPMAR85 Symbol</text>
+</svg>

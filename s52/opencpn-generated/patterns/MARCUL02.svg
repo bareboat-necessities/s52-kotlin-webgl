@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="730.0" height="440.0" viewBox="0 0 730.0 440.0" overflow="visible" shape-rendering="geometricPrecision" role="img" aria-label="MARCUL02">
+  <title>MARCUL02 Pattern</title>
+  <desc>colorRefs=CHGRD; unresolvedColors=</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <g transform="translate(-403.5 -555.5)">
+    <path d="M 505.0 847.0 L 641.0 725.0 L 714.0 684.0 L 771.0 668.0 L 822.0 662.0 L 882.0 673.0 L 944.0 693.0 L 984.0 717.0 L 1018.0 744.0 L 1039.0 774.0 L 1004.0 803.0 L 968.0 831.0 L 914.0 855.0 L 871.0 869.0 L 819.0 871.0 L 763.0 869.0 L 709.0 857.0 L 670.0 835.0 L 505.0 698.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 416.0 669.0 L 416.0 570.0 L 1117.0 570.0 L 1117.0 666.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 416.0 871.0 L 416.0 971.0 L 1120.0 971.0 L 1121.0 871.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 564.0 871.0 L 564.0 971.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 965.0 871.0 L 965.0 971.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 765.0 870.0 L 765.0 968.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 564.0 571.0 L 564.0 672.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 965.0 569.0 L 965.0 670.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 764.0 568.0 L 764.0 668.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="4" y="436.0" font-family="monospace" font-size="8" fill="#333333">MARCUL02 Pattern</text>
+</svg>

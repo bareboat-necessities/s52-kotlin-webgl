@@ -1,0 +1,9 @@
+<!-- OpenCPN enhanced slot: LIGHTS13; ESRI source: S1_Ra_transponder_wLight.svg; match: SEMANTIC_TOKEN; reason: semantic token match for LIGHTS -->
+<svg data-opencpn-name="LIGHTS13" data-esri-source="S1_Ra_transponder_wLight.svg" data-match-kind="SEMANTIC_TOKEN" data-enhancement-palette="opencpn-inspired-day" data-enhanced-svg="true" data-opencpn-colors="PLITYW^CHBLK" data-opencpn-bitmap="rastersymbols-day.png:278,175,22x22@0,0" width="6.826mm" height="6.826mm" version="1.1" viewBox="-3.42 -3.41 6.826 6.826" xmlns="http://www.w3.org/2000/svg">
+ <circle class="st0" cx="-.0069813" cy=".0030187" r="3.2631" style="fill:none;stroke-miterlimit:3.864;stroke-width:.29986;stroke:#111111"/>
+<g id="opencpn-enhancement" fill="none" pointer-events="none">
+  <path d="M-2.712 -2.702 L2.698 2.708" stroke="#47e657" stroke-width="0.72" stroke-linecap="round" stroke-opacity="0.82"/>
+  <rect x="-3.02" y="-3.01" width="6.026" height="6.026" rx="0.377" ry="0.377" stroke="#324a8f" stroke-width="0.4" stroke-opacity="0.55"/>
+  <circle cx="2.362" cy="-2.482" r="0.58" fill="#b05a00" stroke="#111111" stroke-width="0.4"/>
+</g>
+</svg>

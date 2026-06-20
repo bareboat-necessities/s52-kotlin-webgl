@@ -1,0 +1,10 @@
+{
+  "fixture": "/home/runner/work/s52-kotlin-webgl/s52-kotlin-webgl/s52/esri/noaa-smoke-features.tsv",
+  "rowCount": 19,
+  "passed": 19,
+  "failed": 0,
+  "profileSymbolCount": 0,
+  "profileLineCount": 0,
+  "profilePatternCount": 0,
+  "profileDirectRuleCount": 36
+}

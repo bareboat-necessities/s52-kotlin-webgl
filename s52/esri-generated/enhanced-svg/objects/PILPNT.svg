@@ -1,0 +1,9 @@
+<!-- OpenCPN enhanced slot: PILPNT; ESRI source: F22_Post.svg; match: CUSTOM_SYMBOL_MAP; reason: CustomSymbolMap object rule for PILPNT -->
+<svg data-opencpn-name="PILPNT" data-esri-source="F22_Post.svg" data-match-kind="CUSTOM_SYMBOL_MAP" data-enhancement-palette="opencpn-inspired-day" data-enhanced-svg="true" data-opencpn-colors="CCHBLK" data-opencpn-bitmap="rastersymbols-day.png:1120,175,7x7@3,3" width=".60008mm" height=".59972mm" version="1.1" viewBox="-.3 -.3 .60008 .59972" xmlns="http://www.w3.org/2000/svg">
+	<path d="m-0.3-1.389e-4c0-0.16545 0.13441-0.29986 0.30021-0.29986 0.16545 0 0.29986 0.13441 0.29986 0.29986 0 0.16616-0.13441 0.29986-0.29986 0.29986-0.16581 0-0.30021-0.1337-0.30021-0.29986" style="fill:#47e6b9"/>
+<g id="opencpn-enhancement" fill="none" pointer-events="none">
+  <path d="M-0.23 -0.23 L0.23 0.229" stroke="#e64d47" stroke-width="0.72" stroke-linecap="round" stroke-opacity="0.82"/>
+  <rect x="0.1" y="0.1" width="-0.2" height="-0.2" rx="0.033" ry="0.033" stroke="#324a8f" stroke-width="0.4" stroke-opacity="0.55"/>
+  <circle cx="0.19" cy="-0.201" r="0.051" fill="#111111" stroke="#111111" stroke-width="0.4"/>
+</g>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="44" viewBox="0 0 32 44" role="img" aria-label="BOYCAR02">
+  <title>BOYCAR02 Symbol</title>
+  <desc>OpenCPN bitmap cell x=1007, y=10, width=12, height=20</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="10" y="12" width="12" height="20" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAUCAYAAAC58NwRAAAB20lEQVR4XmNgIBJwcHA4sLOz56CLYwUsLCzObGxsf4EaVqPLYQHMMdKSvD9LMlT/MzGzrUCXRQOshdrqAv8fnHD6v2OpxX+gZnwamCfpawv9f3bO5f//d37/184ywamBGYgWBXvJ/H97xe3/74de//8/9v6/drYpNg28wkBnHIwPkf//96n3/39PvP//vOf5//8Ln/8b56Fp4OTklGFgZLmQnagEdsb9407/bx9xBOOnZ13+z+kxAGpgRWhgZWXdzcHB/l9KgvuLoADXFwF+VMzHy/kfGKyz4RqAgBeIBYFYAAsGivOIAWlukEKgJxlEgVgIi0KoYgYekEIwYGPjaBcX5f6rKMf7RUEWgeVleL9oqPB/Acr9Ajr3JRcXlyRUC9PFWV36/3898Pz/7qobHP8BBuexjdb/VRX5/zMxsefDbQBpmN9v+P//c9//3+54gvH/177/dy+3+C/Ax/4e6IYAJMUQDfN6Df7/B4Y7WPFL3/+zugz+c3GyvwcmOkc0xSAA1QBUCIrVhiINUASdAcaMNLpKKGC6uHiS0f//b/3+p0YrghQfAUYiLsUgwHSxv0HnfxAw7QAVL0eXxQDA2LskLMgFDAm2ViCXFV0eAwBzUi0rK3shujguAAArn8IvA65+cgAAAABJRU5ErkJggg=="/>
+  <text x="4" y="40" font-family="monospace" font-size="8" fill="#333333">BOYCAR02 Symbol</text>
+</svg>

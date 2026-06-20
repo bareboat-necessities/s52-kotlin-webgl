@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" role="img" aria-label="PILPNT02">
+  <title>PILPNT02 Symbol</title>
+  <desc>OpenCPN bitmap cell x=1120, y=175, width=7, height=7</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="12" y="12" width="7" height="7" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAQUlEQVR4XmNgIAYoKygEKCkoNKgoKDigSCjJyfUrycv/h2OgIrikorz8fmRJEB+3TiAfLgkCQDsTQMaBaBQJXAAA9FoW3pILwRkAAAAASUVORK5CYII="/>
+  <text x="4" y="28" font-family="monospace" font-size="8" fill="#333333">PILPNT02 Symbol</text>
+</svg>

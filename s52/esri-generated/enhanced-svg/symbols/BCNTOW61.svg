@@ -1,0 +1,11 @@
+<!-- OpenCPN enhanced slot: BCNTOW61; ESRI source: Q83_Beacon_submerged_rock.svg; match: SEMANTIC_TOKEN; reason: semantic token match for BCNTOW -->
+<svg data-opencpn-name="BCNTOW61" data-esri-source="Q83_Beacon_submerged_rock.svg" data-match-kind="SEMANTIC_TOKEN" data-enhancement-palette="opencpn-inspired-day" data-enhanced-svg="true" data-opencpn-colors="ADEPMDBCHBLKCCHGRN" data-opencpn-bitmap="rastersymbols-day.png:268,742,15x18@7,14" width="1.7408mm" height="2.4923mm" version="1.1" viewBox="-.5 -1.99 1.7408 2.4923" xmlns="http://www.w3.org/2000/svg">
+ <path d="m2.398e-4 -0.4982v1.0005" style="fill:none;stroke-miterlimit:3.864;stroke-width:.14993;stroke:#111111"/>
+ <path d="m-0.5 0.0016901h1.0001" style="fill:none;stroke-miterlimit:3.864;stroke-width:.14993;stroke:#111111"/>
+ <path d="m1.1542-1.94-1.1 1.9054" style="fill:none;stroke-miterlimit:3.864;stroke-width:.20002;stroke:#111111"/>
+<g id="opencpn-enhancement" fill="none" pointer-events="none">
+  <path d="M-0.319 0.322 L1.06 -1.809" stroke="#9e47e6" stroke-width="0.72" stroke-linecap="round" stroke-opacity="0.82"/>
+  <rect x="-0.1" y="-1.59" width="0.941" height="1.692" rx="0.096" ry="0.096" stroke="#324a8f" stroke-width="0.4" stroke-opacity="0.55"/>
+  <circle cx="0.923" cy="-1.753" r="0.148" fill="#111111" stroke="#111111" stroke-width="0.4"/>
+</g>
+</svg>

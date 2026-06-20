@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="536.0" height="475.0" viewBox="0 0 536.0 475.0" overflow="visible" shape-rendering="geometricPrecision" role="img" aria-label="FSHFAC04">
+  <title>FSHFAC04 Pattern</title>
+  <desc>colorRefs=CHGRD; unresolvedColors=</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <g transform="translate(-479.5 -403.5)">
+    <path d="M 492.0 854.0 L 1003.0 854.0 L 1003.0 632.0 L 494.0 632.0 L 494.0 853.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 558.0 416.0 L 776.0 634.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="4" y="471.0" font-family="monospace" font-size="8" fill="#333333">FSHFAC04 Pattern</text>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="42" height="45" viewBox="0 0 42 45" role="img" aria-label="QUAPOS03">
+  <title>QUAPOS03 Symbol</title>
+  <desc>OpenCPN bitmap cell x=585, y=415, width=26, height=21</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="8" y="12" width="26" height="21" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAVCAYAAABYHP4bAAAAVklEQVR4Xu2PMQoAIAwD3fr/F+skSEjBoBGHHgiaIWdaRPR5mpNVYJVlIlx5vBzLlEyC/ZTdWSaRFe3IJVjBbiaRFbBFmFmwCyYowreVkl3hqawo/mIAtKI4EZtd9UgAAAAASUVORK5CYII="/>
+  <text x="4" y="41" font-family="monospace" font-size="8" fill="#333333">QUAPOS03 Symbol</text>
+</svg>

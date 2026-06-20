@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="36" height="43" viewBox="0 0 36 43" role="img" aria-label="RTPBCN02">
+  <title>RTPBCN02 Symbol</title>
+  <desc>OpenCPN bitmap cell x=816, y=239, width=20, height=19</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="8" y="12" width="20" height="19" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAATCAYAAACQjC21AAAB90lEQVR4XqVUMWsVQRC+aApFLQxGUUFRFIsYFcQinby73WcIBISIRZQE8jPSBCwkYiX4EyxMZ6Ok0Lg7M+tTEMWgoJWNESsLIRERLt9cHsE3eHIPPzjubr9vvp3dndksq0FqpaOp4Dvk6IN4OahjeJ9Njt6z5+tWXwsu+JgUdF8cbejDnm6vXF7ZVXGOj+D/CcZLLojFyQUb34OOC6ch/sQu/hLP96Qlx61GgQynMekatN8llzHLV9AlYvavMFsnTxctbxHb8XB38nVq03nLZ6kIo+LCi9oZ/4KtFcUvMF7sIZauLe3sGegDqZ2GeJL3bXskF3Ns9ju+wmeMtjFgeko91AulQAt6alTQSStsiuDDCfXAQd3KOOcgeXxbZuWAFfYDGD6XIrzRjx8o1odW0C/gcxcZ/kSxxlfohpf/myFK7oGeuDovwvk3uuGAFTWFJqNJaXJa9TO6oZ08nrPCptCy0aS0u7Jlv7xHO6NcKHdYYVNorPg4peWzPdjJO4f0tJHtzT+0/wRN0H5k9gzPvOUy7OFeEK+resrlkuUt0ljajZJ7Wt08nsctX6Hb8B+5iN8gmqtrSfGhhROlrtm05XtQNbwuY+vOW0XgLLIfVI7bPIL/RxXn4mfU71UbXwu9dZILjzUwjsdhHUO/TlY3kos3dMk2RrEJuIktKA6BHzQAAAAASUVORK5CYII="/>
+  <text x="4" y="39" font-family="monospace" font-size="8" fill="#333333">RTPBCN02 Symbol</text>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="52" viewBox="0 0 32 52" role="img" aria-label="LOCMAG01">
+  <title>LOCMAG01 Symbol</title>
+  <desc>OpenCPN bitmap cell x=510, y=175, width=7, height=28</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="12" y="12" width="7" height="28" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAcCAYAAACtQ6WLAAABMUlEQVR4Xs3SPUvEQBAG4OAHgrWlgo2VjSD2QjJ7prBSEQSvUws7xc7CThsre8VKiZWCacPuzqynpvEnCIog2ttIfPfgxE3uBzhNwj5MduYlUdSnuMXTjux2/bxbQvZIyNzWz6NythzmxHxasld1i1xiWuisgBd1i3B4Kon9ksRcBlDMF2NM5gOdx7jzOkBWvAp8AK470nmAQvoRsOsSuxagVnrCT1kdVAO4byNAUXYfw9z7d0e8FSKZV3QsNbBDespPmaf5SAMdmRMX65veV34xW8kGsfS7xDLXQOyW+vt6EKCPi0m/iDLLDeykxTgrs8fKvknMZ11UdjNYBbkOIZmSlT7Hs92Ir1wsR/GFJ8zwjBizAH3dLRSTiPG7L/pC92Hf38RXI9u/9e9QSGaw584PnFvfHetjsJkAAAAASUVORK5CYII="/>
+  <text x="4" y="48" font-family="monospace" font-size="8" fill="#333333">LOCMAG01 Symbol</text>
+</svg>

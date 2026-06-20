@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="815.0" height="357.0" viewBox="0 0 815.0 357.0" overflow="visible" shape-rendering="geometricPrecision" role="img" aria-label="FSHHAV02">
+  <title>FSHHAV02 Pattern</title>
+  <desc>colorRefs=CHGRD; unresolvedColors=</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <g transform="translate(-697.5 -1322.5)">
+    <path d="M 835.0 1490.0 L 725.0 1355.0 M 835.0 1500.0 L 710.0 1625.0 M 835.0 1500.0 L 890.0 1440.0 L 960.0 1390.0 L 1050.0 1350.0 L 1150.0 1335.0 L 1240.0 1340.0 L 1340.0 1360.0 L 1425.0 1400.0 L 1485.0 1445.0 L 1500.0 1475.0 M 840.0 1495.0 L 925.0 1565.0 L 1030.0 1625.0 L 1140.0 1650.0 L 1220.0 1655.0 L 1305.0 1640.0 L 1385.0 1610.0 L 1450.0 1550.0 L 1500.0 1480.0 M 1365.0 1380.0 L 1340.0 1445.0 L 1340.0 1535.0 L 1385.0 1600.0" fill="none" stroke="#C545C3" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="4" y="353.0" font-family="monospace" font-size="8" fill="#333333">FSHHAV02 Pattern</text>
+</svg>

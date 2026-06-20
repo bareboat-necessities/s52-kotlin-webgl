@@ -1,0 +1,12 @@
+<!-- OpenCPN enhanced slot: BOYLAT; ESRI source: Q23a_Pillar_buoy.svg; match: CUSTOM_SYMBOL_MAP; reason: CustomSymbolMap object rule for BOYLAT -->
+<svg data-opencpn-name="BOYLAT" data-esri-source="Q23a_Pillar_buoy.svg" data-match-kind="CUSTOM_SYMBOL_MAP" data-enhancement-palette="opencpn-inspired-day" data-enhanced-svg="true" data-opencpn-colors="ACHREDbOUTLW" data-opencpn-bitmap="rastersymbols-day.png:1256,10,14x14@9,9" width="2.4042mm" height="3.4133mm" version="1.1" viewBox="-1.2 -3.08 2.4042 3.4133" xmlns="http://www.w3.org/2000/svg">
+	<path d="m-0.85251-0.011746 0.71649-0.94827 0.70026-2.0338 0.41346 0.12277-0.29774 2.0108 0.11712 0.85937" style="fill:none;stroke-miterlimit:3.864;stroke-width:.14005;stroke:#111111"/>
+	<path d="m0.22205 0.003071h0.98213" style="fill:none;stroke-miterlimit:3.864;stroke-width:.11994;stroke:#111111"/>
+	<path d="m-1.2 0.003071h0.94403" style="fill:none;stroke-miterlimit:3.864;stroke-width:.11994;stroke:#111111"/>
+	<path d="m-0.26796 0.003071c0-0.14887 0.121-0.27023 0.26988-0.27023 0.14922 0 0.27023 0.12136 0.27023 0.27023 0 0.14922-0.121 0.27023-0.27023 0.27023-0.14887 0-0.26988-0.121-0.26988-0.27023z" style="fill:none;stroke-miterlimit:3.864;stroke-width:.11994;stroke:#111111"/>
+<g id="opencpn-enhancement" fill="none" pointer-events="none">
+  <path d="M-0.885 -2.765 L0.889 0.019" stroke="#81e647" stroke-width="0.72" stroke-linecap="round" stroke-opacity="0.82"/>
+  <rect x="-0.8" y="-2.68" width="1.604" height="2.613" rx="0.133" ry="0.133" stroke="#324a8f" stroke-width="0.4" stroke-opacity="0.55"/>
+  <circle cx="0.836" cy="-2.61" r="0.204" fill="#e21b2d" stroke="#111111" stroke-width="0.4"/>
+</g>
+</svg>

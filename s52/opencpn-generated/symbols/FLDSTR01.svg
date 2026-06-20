@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="51" viewBox="0 0 32 51" role="img" aria-label="FLDSTR01">
+  <title>FLDSTR01 Symbol</title>
+  <desc>OpenCPN bitmap cell x=754, y=121, width=7, height=27</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="12" y="12" width="7" height="27" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAbCAYAAACwRpUzAAABT0lEQVR4Xs2Sv0oEMRDGtzhPFBsbC8E3EEEQxVexVBAsLLRR2eRuFSSZzGSLE5Fr7O0E0cbGQhsLC8FCbAT/FSKIpRY6kzvj7t4LGAgs3y/z5dvMJElhNQCzLNsdKmphacRZDfStnZ+vsiQF2hOowJ+XQBNxRFv6kK0svmnjJyNU1i9x1YkyeCYOCmg/Qg3umsMsKEeXKeTTytITJ6tLkBlt6H4lzwc04G1w4kPixlV0kILfETEFvAtOFuc49WHSBBiVqsV2u0+g2Mm36PFeEX9hFP8tlPj8Mi+p92NVJpU1ftMvbd12lXWgdATwed2Y4SqsM7jifawAN3qhpRvuyhTbPyy3Wv0RhkAs8qFBbt+Ftn61WFnjbnxqRw2ejAntEEuQA71yC99lbCLowk4gQ0dcrXohBwojavFRMpTg3yTQKYfairArboaDiOP8r2s/jPLZ9hhtb9kAAAAASUVORK5CYII="/>
+  <text x="4" y="47" font-family="monospace" font-size="8" fill="#333333">FLDSTR01 Symbol</text>
+</svg>

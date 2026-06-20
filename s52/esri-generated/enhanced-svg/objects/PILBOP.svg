@@ -1,0 +1,10 @@
+<!-- OpenCPN enhanced slot: PILBOP; ESRI source: T1_pilot_boarding_place.svg; match: CUSTOM_SYMBOL_MAP; reason: CustomSymbolMap object rule for PILBOP -->
+<svg data-opencpn-name="PILBOP" data-esri-source="T1_pilot_boarding_place.svg" data-match-kind="CUSTOM_SYMBOL_MAP" data-enhancement-palette="opencpn-inspired-day" data-enhanced-svg="true" data-opencpn-colors="ADEPDWBCHBLKCDEPMDDCHMGD" data-opencpn-bitmap="rastersymbols-day.png:736,778,17x17@8,8" width="3.2mm" height="3.2mm" version="1.1" viewBox="-1.6 -1.6 3.2 3.2" xmlns="http://www.w3.org/2000/svg">
+ <path d="m-1.5 2.3604e-5c0-0.82868 0.67169-1.5 1.5-1.5 0.82832 0 1.5 0.67134 1.5 1.5 0 0.82832-0.67169 1.5-1.5 1.5-0.82832 0-1.5-0.67169-1.5-1.5z" style="fill:none;stroke-miterlimit:3.864;stroke-width:.20002;stroke:#111111"/>
+ <path d="m-0.5997 2.3604e-5 0.60008-1.4256 0.59972 1.4256-0.59972 1.4256" style="fill:#e6db47"/>
+<g id="opencpn-enhancement" fill="none" pointer-events="none">
+  <path d="M-1.312 1.312 L1.312 -1.312" stroke="#47e6d8" stroke-width="0.72" stroke-linecap="round" stroke-opacity="0.82"/>
+  <rect x="-1.2" y="-1.2" width="2.4" height="2.4" rx="0.177" ry="0.177" stroke="#324a8f" stroke-width="0.4" stroke-opacity="0.55"/>
+  <circle cx="0.92" cy="-0.974" r="0.272" fill="#111111" stroke="#111111" stroke-width="0.4"/>
+</g>
+</svg>

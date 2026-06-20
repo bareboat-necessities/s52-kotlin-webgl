@@ -1,0 +1,9 @@
+<!-- OpenCPN enhanced slot: TOPMAR93; ESRI source: Q9_Arrow.svg; match: CUSTOM_SYMBOL_MAP; reason: CustomSymbolMap object rule for TOPMAR -->
+<svg data-opencpn-name="TOPMAR93" data-esri-source="Q9_Arrow.svg" data-match-kind="CUSTOM_SYMBOL_MAP" data-enhancement-palette="opencpn-inspired-day" data-enhanced-svg="true" data-opencpn-colors="" data-opencpn-bitmap="rastersymbols-day.png:55,239,10x10@4,27" width="1.0873mm" height="1.5889mm" version="1.1" viewBox="-.54 -1.59 1.0873 1.5889" xmlns="http://www.w3.org/2000/svg">
+	<path stroke="#111111" stroke-width="0.7" fill="#111111" d="m-0.0070317-1.59-0.53297 0.90277 0.49391-0.00165-0.001077 0.6878 0.09784-6.463e-4 0.001738-0.68799 0.49494 0.00232-0.50267-0.81847zm0.003901 0.23192 0.33625 0.54983-0.66218-8.43e-4z"/>
+<g id="opencpn-enhancement" fill="none" pointer-events="none">
+  <path d="M-0.412 -1.462 L0.42 -0.129" stroke="#47ace6" stroke-width="0.72" stroke-linecap="round" stroke-opacity="0.82"/>
+  <rect x="-0.14" y="-1.19" width="0.287" height="0.789" rx="0.06" ry="0.06" stroke="#324a8f" stroke-width="0.4" stroke-opacity="0.55"/>
+  <circle cx="0.349" cy="-1.41" r="0.092" fill="#f2c400" stroke="#111111" stroke-width="0.4"/>
+</g>
+</svg>

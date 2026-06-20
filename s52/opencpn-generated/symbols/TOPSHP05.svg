@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="39" viewBox="0 0 32 39" role="img" aria-label="TOPSHP05">
+  <title>TOPSHP05 Symbol</title>
+  <desc>OpenCPN bitmap cell x=750, y=858, width=15, height=15</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="8" y="12" width="15" height="15" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAAW0lEQVR4XqWNQQ7AIAjAvPGj/W4v9hFbOGBcBZXZhBO0lHKKiDzZGQL1vj5DwRUjOQrQdWVKoazsBOg0KFOcysoswNuBXk59NbwAb0JMTn81+gB3S35/VY7kHV7AbJUa+qJxHAAAAABJRU5ErkJggg=="/>
+  <text x="4" y="35" font-family="monospace" font-size="8" fill="#333333">TOPSHP05 Symbol</text>
+</svg>

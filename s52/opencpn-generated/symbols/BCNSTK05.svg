@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40" role="img" aria-label="BCNSTK05">
+  <title>BCNSTK05 Symbol</title>
+  <desc>OpenCPN bitmap cell x=222, y=778, width=8, height=16</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="12" y="12" width="8" height="16" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAQCAYAAAArij59AAAAZ0lEQVR4XmNgIBYoysvvV5KX/w/GcnLzUSSVFRQSQBJbdx74v3LNJrAiFQUFB7gCJQWFBpDgszdfwXhUAQEFLW1dYIyiAMQAhT1IEIjvQ/F/oKYCsCKoBASDTEIoBmOENcgSQIUwcQCg+pn1ETaRcgAAAABJRU5ErkJggg=="/>
+  <text x="4" y="36" font-family="monospace" font-size="8" fill="#333333">BCNSTK05 Symbol</text>
+</svg>

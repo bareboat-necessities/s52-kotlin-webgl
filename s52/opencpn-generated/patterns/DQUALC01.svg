@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1629.0" height="467.0" viewBox="0 0 1629.0 467.0" overflow="visible" shape-rendering="geometricPrecision" role="img" aria-label="DQUALC01">
+  <title>DQUALC01 Pattern</title>
+  <desc>colorRefs=CHGRD; unresolvedColors=</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <g transform="translate(-1578.5 -824.5)">
+    <path d="M 3021.0 947.0 L 2840.0 1187.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 2841.0 947.0 L 3021.0 1186.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 2499.0 947.0 L 2318.0 1187.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 2319.0 947.0 L 2499.0 1186.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 1970.0 952.0 L 1789.0 1192.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 1790.0 952.0 L 1970.0 1191.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 1783.0 837.0 L 1738.0 851.0 L 1703.0 865.0 L 1668.0 890.0 L 1640.0 925.0 L 1615.0 967.0 L 1601.0 1005.0 L 1591.0 1054.0 L 1598.0 1106.0 L 1608.0 1148.0 L 1626.0 1194.0 L 1671.0 1232.0 L 1727.0 1257.0 L 1776.0 1267.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 1769.0 841.0 L 3024.0 841.0 L 3066.0 855.0 L 3118.0 883.0 L 3150.0 914.0 L 3178.0 953.0 L 3185.0 981.0 L 3192.0 1019.0 L 3195.0 1054.0 L 3192.0 1099.0 L 3185.0 1141.0 L 3167.0 1183.0 L 3150.0 1208.0 L 3111.0 1243.0 L 3083.0 1260.0 L 3059.0 1267.0 L 3024.0 1264.0 L 1773.0 1264.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 1731.0 1069.0 L 2031.0 1069.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 2780.0 1066.0 L 3080.0 1066.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 2249.0 1064.0 L 2549.0 1064.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="4" y="463.0" font-family="monospace" font-size="8" fill="#333333">DQUALC01 Pattern</text>
+</svg>

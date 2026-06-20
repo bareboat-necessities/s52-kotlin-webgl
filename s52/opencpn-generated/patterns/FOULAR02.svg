@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="42.0" height="54.0" viewBox="0 0 42.0 54.0" overflow="visible" shape-rendering="geometricPrecision" role="img" aria-label="FOULAR02">
+  <title>FOULAR02 Pattern</title>
+  <desc>colorRefs=CHGRD; unresolvedColors=</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <g transform="translate(20.75 20.75)">
+    <path d="M 0 -8 L 8 8 L -8 8 Z" fill="none" stroke="#7D898C" stroke-width="1.5"/>
+  </g>
+  <text x="4" y="50.0" font-family="monospace" font-size="8" fill="#333333">FOULAR02 Pattern</text>
+</svg>

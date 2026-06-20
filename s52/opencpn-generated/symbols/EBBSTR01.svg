@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="50" viewBox="0 0 32 50" role="img" aria-label="EBBSTR01">
+  <title>EBBSTR01 Symbol</title>
+  <desc>OpenCPN bitmap cell x=424, y=121, width=7, height=26</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="12" y="12" width="7" height="26" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAaCAYAAAB7GkaWAAAAzUlEQVR4XmNgQAJ1nd0NDQ1TeZDFwKC6o9eqtrPnP1BBMrocQ3Vnz3SQZE1n7xEUifrubrHajp5PIFzT0f22tr3XEC5Z09GbDdS1raa9+0BdV/c0oKL5cEkg50ZtV29cbVfPmdqOXv3azu5nuZMmsQPt6rUA2ncf6EwOoOBNsEldPaeAJmUx1LR3LQHqbAYJVnd23wbRdR3d/rUd3WsYKtvahEFGpM2cyQqSBJrAFrpqFXNl2yRRuL0gQZgkXHBUcshKggAwRTSCIh3GBwAEZLHhCwjabQAAAABJRU5ErkJggg=="/>
+  <text x="4" y="46" font-family="monospace" font-size="8" fill="#333333">EBBSTR01 Symbol</text>
+</svg>

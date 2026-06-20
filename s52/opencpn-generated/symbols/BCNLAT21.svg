@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="39" viewBox="0 0 32 39" role="img" aria-label="BCNLAT21">
+  <title>BCNLAT21 Symbol</title>
+  <desc>OpenCPN bitmap cell x=696, y=10, width=5, height=15</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="13" y="12" width="5" height="15" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAPCAYAAAAs9AWDAAAAyklEQVR4XmPg4OCIZ2Rmvs3AxHQJSN9hY2OrYWBhZbk+1cz5/17nkP/9Jg7/GVhYNjIwsrBcv+AZ/f9/dNH/427h/xkYGSGCx90i/v+NyPu/3yWEgOBJ9wig9sL/B2CCTEDBgy6h/0+7R/7f4xQMtAgoyM7Ofn2uhdt/Dnb2/ytsvBC2H3YN+3/DJ/7/HudghJknQGZGIZmJ03asghe9Yv7/jyn+DzIGLAjye7+xw/+tDgH/O41sIbYDQ6WakYVxE1DFGiC9GejEYgD/nXf7gSKb1wAAAABJRU5ErkJggg=="/>
+  <text x="4" y="35" font-family="monospace" font-size="8" fill="#333333">BCNLAT21 Symbol</text>
+</svg>

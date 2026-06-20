@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="46" viewBox="0 0 32 46" role="img" aria-label="DAYSQR01">
+  <title>DAYSQR01 Symbol</title>
+  <desc>OpenCPN bitmap cell x=433, y=358, width=15, height=22</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="8" y="12" width="15" height="22" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAWCAYAAAAfD8YZAAAAOUlEQVR4XmNgoBQcdT38n1SMohnJLIJgVPOoZoKAoGaQGAxjk0PhkIqRzMIERCvEBcjWCAKjmqkMANP5p9HvwG8PAAAAAElFTkSuQmCC"/>
+  <text x="4" y="42" font-family="monospace" font-size="8" fill="#333333">DAYSQR01 Symbol</text>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42" role="img" aria-label="NOTBRD12">
+  <title>NOTBRD12 Symbol</title>
+  <desc>OpenCPN bitmap cell x=1095, y=778, width=12, height=18</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="10" y="12" width="12" height="18" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAASCAYAAABvqT8MAAAAiklEQVR4XmNgIBUoAIGSgkIDIayioOAA1gBi2FlK/5/YIYATRwaL/wdpgmsACfz/wIATgzQNOw0khRIwGgwU5eX3w7CSvPx5IP4PxPeRxZUVFBLAGtAByEawBpiJhMAg0wDyGFDxe6in38MTHDqAhRRUISqWk+sHygugaABKrMdQiIRBBqJoIAUAAA2N5J3ESF3KAAAAAElFTkSuQmCC"/>
+  <text x="4" y="38" font-family="monospace" font-size="8" fill="#333333">NOTBRD12 Symbol</text>
+</svg>

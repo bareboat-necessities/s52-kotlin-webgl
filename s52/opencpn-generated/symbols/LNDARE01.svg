@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" role="img" aria-label="LNDARE01">
+  <title>LNDARE01 Symbol</title>
+  <desc>OpenCPN bitmap cell x=493, y=175, width=7, height=7</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="12" y="12" width="7" height="7" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAYElEQVR4XmNgIAT8IxJlgyPiJgdHxewMiYgpCQ0N5QRL+PqmcQVHxS4Kjoz9D8dRsWlgyaCoKHmgwE0UyYjY+UApRpjOpWiSGXA7QbqDImOmgu2MiimH24kMPD1z2ZH5AC3TLmDI9StqAAAAAElFTkSuQmCC"/>
+  <text x="4" y="28" font-family="monospace" font-size="8" fill="#333333">LNDARE01 Symbol</text>
+</svg>

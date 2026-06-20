@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" role="img" aria-label="TOPMAR23">
+  <title>TOPMAR23 Symbol</title>
+  <desc>OpenCPN bitmap cell x=913, y=742, width=9, height=6</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="11" y="13" width="9" height="6" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAGCAYAAAARx7TFAAAAJUlEQVR4XmNgIAd8ueXxH10MBYAUwDC6HBggK8CqEF0Sp0J8AADyrDFRrJtDxAAAAABJRU5ErkJggg=="/>
+  <text x="4" y="28" font-family="monospace" font-size="8" fill="#333333">TOPMAR23 Symbol</text>
+</svg>

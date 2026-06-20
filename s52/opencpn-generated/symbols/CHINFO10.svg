@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="39" viewBox="0 0 32 39" role="img" aria-label="CHINFO10">
+  <title>CHINFO10 Symbol</title>
+  <desc>OpenCPN bitmap cell x=800, y=78, width=15, height=15</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="8" y="12" width="15" height="15" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAAeElEQVR4XmPYOTvwP7mYAcyYE3h/5+ygBqIxWD1U867ZgfsZSAAg9Xg1Q2wJ/L9jTtB8dDkiNCP5DQ0QoZlMm7dPD1DYPjvAAYaR5UAAv2agBgqdPeQ1gwIQWQ6v5l2zAhJAYnAM5KPII2sG4vcoiglgkHpkzWRhAJ0aWKp7gCTbAAAAAElFTkSuQmCC"/>
+  <text x="4" y="35" font-family="monospace" font-size="8" fill="#333333">CHINFO10 Symbol</text>
+</svg>

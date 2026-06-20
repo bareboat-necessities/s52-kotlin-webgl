@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="45" viewBox="0 0 32 45" role="img" aria-label="LITDEF11">
+  <title>LITDEF11 Symbol</title>
+  <desc>OpenCPN bitmap cell x=369, y=358, width=8, height=21</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="12" y="12" width="8" height="21" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAVCAYAAAB7R6/OAAABGklEQVR4XnWRsUrEQBCG18ZKEYsr7AQ7OzsLCzGzq8eBnfgClqJiY3NYCVqLz2Ah2tqIhMzMxkIr4QrBpxDERo2zcyZnds8ffgL7fRkyG2Mkg63BpLd0WFq6keeL9OwJ7mYCM/lqPsUZ38th1W7xGJiRt/ZT+FtHfeMtUgJGvZIJxe0YMBIYeHcM0HJGF0FYiUHdEvjAYBc7DPgeQ50AvKyr/vOhH7iOc0PB8XkiOHytTDWhAlvcSQRLlwpDMMPFRHC01wjUo1kP+NYSAHuNEMJAXEPZ6uthI59vCxaPG8Hycwuq4Hi7FsJvj7nxa35BpnzrBEenMdeE0UOBuzHTyIVdByGsHTONwCMP9MmbPB0zTQnFklzQyd+zH4BTObyTncbqAAAAAElFTkSuQmCC"/>
+  <text x="4" y="41" font-family="monospace" font-size="8" fill="#333333">LITDEF11 Symbol</text>
+</svg>

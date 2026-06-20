@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="39" viewBox="0 0 32 39" role="img" aria-label="BCNLAT22">
+  <title>BCNLAT22 Symbol</title>
+  <desc>OpenCPN bitmap cell x=711, y=10, width=5, height=15</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="13" y="12" width="5" height="15" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAPCAYAAAAs9AWDAAAAx0lEQVR4XmPg4OCIZ2Zkvs3EwHQJSN9hY2OrYWBhYb3u1GfxP3iL63+HDtP/LAwsGxlYGFmuRx3x+l/4M/Z/2B6P/4wMjBDB8L0e/3PfR/0P3upKSHCfx/+CH7H/Q7bBBJlYrodsd/sfccDrf9AmF4ggOzv7ddepVv/ZOdj/e823hdoOVBm60/1/3FlfhEq4mV9j/ocQth2bYPRR7/9Fv+L+gyQhgkC/O7Sb/g9Y7fTftskYYjswVKoZGVk2AVWsAdKbgU4sBgAZRXacMShb1gAAAABJRU5ErkJggg=="/>
+  <text x="4" y="35" font-family="monospace" font-size="8" fill="#333333">BCNLAT22 Symbol</text>
+</svg>

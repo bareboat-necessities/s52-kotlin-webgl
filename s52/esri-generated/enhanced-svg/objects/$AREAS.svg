@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72" data-opencpn-name="$AREAS" data-match-kind="UNRESOLVED" data-enhanced-svg="true">
+  <title>$AREAS enhanced unresolved ESRI mapping</title>
+  <desc>no exact/direct/semantic ESRI match; generic category fallback disabled</desc>
+  <circle cx="36" cy="36" r="24" fill="none" stroke="#111111" stroke-width="3" stroke-dasharray="7 4"/>
+  <path d="M21 48 L36 18 L51 48 Z" fill="#6247e6" fill-opacity="0.72" stroke="#111111" stroke-width="2"/>
+  <path d="M23 50 L49 24" stroke="#47e6de" stroke-width="3" stroke-linecap="round" opacity="0.86"/>
+  <circle cx="59" cy="18" r="5" fill="#111111" stroke="#111111" stroke-width="1"/>
+</svg>

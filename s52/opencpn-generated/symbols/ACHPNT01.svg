@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="37" viewBox="0 0 32 37" role="img" aria-label="ACHPNT01">
+  <title>ACHPNT01 Symbol</title>
+  <desc>OpenCPN bitmap cell x=63, y=358, width=11, height=13</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="10" y="12" width="11" height="13" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAABBklEQVR4Xq2Qvy6FQRDFF4mWRKNU6CQ8AYWG0hsg0ao1IjyCJ7gRdlY2Wi8gVCQ3d/+EQmgk38xISFQqa3Y/3y3WLRROstnsnt+enRylKvVNM+cNPUXA1dr7pQx5oOSAt2tvKGvTRLRx0gFtZNgD7+a7dJjGa1YFwJ2SqPGrhdsVNK3VrAqnPC+pB2LqFsRLp3kvWp6t2aH+NHOn/4ODwX2ZbaU7j4LDOS0FoCNpga6kgcd+7316FJxSGisMUFRiLDpNn17j7Z19m8q/lMqAN0vqTzsReL18MzC8LBevDvDDneFNNgcGr2V/aLvnrW6kovuTlxlJP5akZ6+J82MPzUWEZqFjvgFJz+WbrEmg7AAAAABJRU5ErkJggg=="/>
+  <text x="4" y="33" font-family="monospace" font-size="8" fill="#333333">ACHPNT01 Symbol</text>
+</svg>

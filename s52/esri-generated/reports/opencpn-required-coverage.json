@@ -1,0 +1,13 @@
+{
+  "lookupCount": 3057,
+  "symbolCount": 1093,
+  "lineStyleCount": 57,
+  "patternCount": 30,
+  "colorTableCount": 5,
+  "requiredObjectCountHeuristic": 0,
+  "esriDirectObjectCount": 57,
+  "directObjectMatches": 0,
+  "directObjectMissing": 0,
+  "requiredObjects": [],
+  "esriObjects": ["ACHARE", "BCNCAR", "BCNISD", "BCNLAT", "BCNSAW", "BCNSPP", "BOYCAR", "BOYINB", "BOYISD", "BOYLAT", "BOYSAW", "BOYSPP", "BRIDGE", "BUAARE", "BUISGL", "CBLOHD", "CBLSUB", "COALNE", "CRANES", "DAYMAR", "DEPARE", "DRGARE", "FAIRWY", "FOGSIG", "HRBFAC", "LIGHTS", "LITFLT", "LITVES", "LNDARE", "LNDELV", "LNDMRK", "MARCUL", "MORFAC", "NAVLNE", "OBSTRN", "OFSPLF", "OSPARE", "PILBOP", "PILPNT", "PIPSOL", "RADRFL", "RADSTA", "RDOCAL", "RDOSTA", "RECTRC", "RESARE", "ROADWY", "RTPBCN", "SBDARE", "SLCONS", "SLOTOP", "SOUNDG", "SWPARE", "TOPMAR", "UWTROC", "VEGATN", "WRECKS"]
+}

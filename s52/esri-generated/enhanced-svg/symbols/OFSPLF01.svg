@@ -1,0 +1,10 @@
+<!-- OpenCPN enhanced slot: OFSPLF01; ESRI source: L10_Offshore_platform.svg; match: CUSTOM_SYMBOL_MAP; reason: CustomSymbolMap object rule for OFSPLF -->
+<svg data-opencpn-name="OFSPLF01" data-esri-source="L10_Offshore_platform.svg" data-match-kind="CUSTOM_SYMBOL_MAP" data-enhancement-palette="opencpn-inspired-day" data-enhanced-svg="true" data-opencpn-colors="CCHBLK" data-opencpn-bitmap="rastersymbols-day.png:917,175,13x13@6,6" width="1.9999mm" height="1.9999mm" version="1.1" viewBox="-1 -1 1.9999 1.9999" xmlns="http://www.w3.org/2000/svg">
+ <path d="m-0.92503-0.92503h1.85v1.85h-1.85z" style="fill:none;stroke-miterlimit:3.864;stroke-width:.2;stroke:#111111"/>
+ <path d="m-0.35001-5.1141e-5c0-0.19297 0.15663-0.34996 0.34996-0.34996 0.19332 0 0.34996 0.15699 0.34996 0.34996 0 0.19332-0.15663 0.34996-0.34996 0.34996-0.19332 0-0.34996-0.15663-0.34996-0.34996" style="fill:#47b3e6"/>
+<g id="opencpn-enhancement" fill="none" pointer-events="none">
+  <path d="M-0.738 -0.738 L0.738 0.738" stroke="#e64777" stroke-width="0.72" stroke-linecap="round" stroke-opacity="0.82"/>
+  <rect x="-0.6" y="-0.6" width="1.2" height="1.2" rx="0.11" ry="0.11" stroke="#324a8f" stroke-width="0.4" stroke-opacity="0.55"/>
+  <circle cx="0.634" cy="-0.669" r="0.17" fill="#111111" stroke="#111111" stroke-width="0.4"/>
+</g>
+</svg>

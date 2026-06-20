@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420.0" height="110.0" viewBox="0 0 420.0 110.0" overflow="visible" shape-rendering="geometricPrecision" role="img" aria-label="ESSARE01">
+  <rect width="100%" height="100%" fill="white"/>
+  <line x1="12" y1="48" x2="408" y2="48" stroke="#D0D0D0" stroke-width="1" stroke-dasharray="4 4"/>
+  <g class="line-style-tile" transform="translate(16.0 24.0) scale(0.17575757575757575) translate(-2092.0 -1457.0)">
+    <path d="M 2105.0 1470.0 L 2409.0 1470.0" fill="none" stroke="#C545C3" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 2261.0 1470.0 L 2261.0 1620.0" fill="none" stroke="#C545C3" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g class="line-style-tile" transform="translate(86.0 24.0) scale(0.17575757575757575) translate(-2092.0 -1457.0)">
+    <path d="M 2105.0 1470.0 L 2409.0 1470.0" fill="none" stroke="#C545C3" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 2261.0 1470.0 L 2261.0 1620.0" fill="none" stroke="#C545C3" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g class="line-style-tile" transform="translate(156.0 24.0) scale(0.17575757575757575) translate(-2092.0 -1457.0)">
+    <path d="M 2105.0 1470.0 L 2409.0 1470.0" fill="none" stroke="#C545C3" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 2261.0 1470.0 L 2261.0 1620.0" fill="none" stroke="#C545C3" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g class="line-style-tile" transform="translate(226.0 24.0) scale(0.17575757575757575) translate(-2092.0 -1457.0)">
+    <path d="M 2105.0 1470.0 L 2409.0 1470.0" fill="none" stroke="#C545C3" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 2261.0 1470.0 L 2261.0 1620.0" fill="none" stroke="#C545C3" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g class="line-style-tile" transform="translate(296.0 24.0) scale(0.17575757575757575) translate(-2092.0 -1457.0)">
+    <path d="M 2105.0 1470.0 L 2409.0 1470.0" fill="none" stroke="#C545C3" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 2261.0 1470.0 L 2261.0 1620.0" fill="none" stroke="#C545C3" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="12" y="94" font-family="monospace" font-size="12" fill="#333333">ESSARE01 repeated line-style sample</text>
+</svg>

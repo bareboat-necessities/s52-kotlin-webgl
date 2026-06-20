@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="50" viewBox="0 0 32 50" role="img" aria-label="TOWERS64">
+  <title>TOWERS64 Symbol</title>
+  <desc>OpenCPN bitmap cell x=155, y=946, width=14, height=26</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="9" y="12" width="14" height="26" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAaCAYAAACHD21cAAABF0lEQVR4XrWUMQrCQBBFcwRPYMZERQlCQEijhVilsrKx08JSsBYLO4+hN0ht5RECXsADWHiEuD86YXc2QZC48CH8P2/N7kx0HG21XPfquW5WJmR6rbEQxqGfXdahIXhfwXnUyR77yBC8/4E/v6q8lP9eDnbeTHvWGeEhk/XFQnicBRYIr36wTTRBeF4MLBAeMtRIrgBxGRKEVz/oER0Q3rZDC4SX91PVSK4AJcSqH8RkjALPAljISqen6stgVX4hP4M4wy7uWwALWen06OOGScEvQDxJlWPHIO+slH6UewwSUeMNoA3N5gnmatxlKNE2TIwMtWjLp9CU1i/urxTnxVLmXenpEy0hPMOTddZSZwjFf08KT9a9APf6rb0dxnHkAAAAAElFTkSuQmCC"/>
+  <text x="4" y="46" font-family="monospace" font-size="8" fill="#333333">TOWERS64 Symbol</text>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1204.0" height="216.0" viewBox="0 0 1204.0 216.0" overflow="visible" shape-rendering="geometricPrecision" role="img" aria-label="SNDWAV01">
+  <title>SNDWAV01 Pattern</title>
+  <desc>colorRefs=CHGRD; unresolvedColors=</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <g transform="translate(-24.5 -303.5)">
+    <path d="M 37.0 495.0 L 121.0 495.0 L 163.0 473.0 L 228.0 328.0 L 263.0 328.0 L 320.0 473.0 L 347.0 495.0 L 523.0 495.0 L 554.0 468.0 L 600.0 331.0 L 626.0 331.0 L 677.0 468.0 L 710.0 495.0 L 856.0 495.0 L 906.0 495.0 L 937.0 476.0 L 998.0 316.0 L 1036.0 316.0 L 1093.0 473.0 L 1132.0 495.0 L 1216.0 495.0" fill="none" stroke="#7D898C" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="4" y="212.0" font-family="monospace" font-size="8" fill="#333333">SNDWAV01 Pattern</text>
+</svg>

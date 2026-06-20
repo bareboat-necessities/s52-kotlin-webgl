@@ -1,0 +1,10 @@
+<!-- OpenCPN enhanced slot: BCNLAT21; ESRI source: Q90_Stake_pole.svg; match: CUSTOM_SYMBOL_MAP; reason: CustomSymbolMap object rule for BCNLAT -->
+<svg data-opencpn-name="BCNLAT21" data-esri-source="Q90_Stake_pole.svg" data-match-kind="CUSTOM_SYMBOL_MAP" data-enhancement-palette="opencpn-inspired-day" data-enhanced-svg="true" data-opencpn-colors="aOUTLWbCHRED" data-opencpn-bitmap="rastersymbols-day.png:696,10,5x15@1,7" width=".99977mm" height="2.7996mm" version="1.1" viewBox="-.5 -2.75 .99977 2.7996" xmlns="http://www.w3.org/2000/svg">
+	<path d="m-0.5 0.049644h0.99977v-0.099836h-0.99977z" style="fill:#f2c400"/>
+	<path d="m-0.075256 0.049644h0.15064v-2.7996h-0.15064z" style="fill:#f2c400"/>
+<g id="opencpn-enhancement" fill="none" pointer-events="none">
+  <path d="M-0.383 -2.633 L0.382 -0.068" stroke="#e6475c" stroke-width="0.72" stroke-linecap="round" stroke-opacity="0.82"/>
+  <rect x="-0.1" y="-2.35" width="0.2" height="2" rx="0.055" ry="0.055" stroke="#324a8f" stroke-width="0.4" stroke-opacity="0.55"/>
+  <circle cx="0.287" cy="-2.555" r="0.085" fill="#111111" stroke="#111111" stroke-width="0.4"/>
+</g>
+</svg>

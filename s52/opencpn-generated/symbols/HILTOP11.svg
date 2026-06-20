@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="46" height="49" viewBox="0 0 46 49" role="img" aria-label="HILTOP11">
+  <title>HILTOP11 Symbol</title>
+  <desc>OpenCPN bitmap cell x=1420, y=121, width=30, height=25</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <image x="8" y="12" width="30" height="25" preserveAspectRatio="none" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAZCAYAAAAmNZ4aAAAC9UlEQVR4XrWVW4hOURTH95jOOd9t3HMZ19zGiCg88IBInijl0jwhT2qSInkgGnmQFw+aSKZQ8qKZeBi5RimXqfGAF5dCTA2iYaLQ+K359vbts3zXwb9We+/1X+u/9t5n77ONGQCiKFqDrdL+/w6KtgZBcFP7/xWqtMMhkUico3gfNkNzCqJRUCcfkoheCsNwtiYE+M9KYdo9mvNBzFHssPYXBQkXsE+I12vOFWbl9zRnUQ1/xE5uoyaLIplMLraJL3VxVxj7Rn+mz4HATlpy2xVXHki+bQXeY3Oc3yssq25y/nQ6PQbujsctc1xFIHGzE5GVc5LniZ9+i+e/LD76ddhD58da42qVIUD4qVfkGb4qPsMixiexlYyHSCD9bV7R78TOikspsKrlBK2nXcKK5uIaigXGXgNEdlqxd8RtiCUroLGCuB7a85qzEN0EFkrwQW+mYt0UeEXbyUSu0K/H9jOeqlXygd0Yl0qlxspnIm8feW3oXGPcwbiL8Q/R6w9mMA1rxr6oSXwWEaVdEuTUkturtMQ6mcAmQjKxBGY7ntnsJuCjBNI/EwsoH4PIf+wKotMu50IH/YGampqRsh3y3TVXLsjdgsZptnkhw2rNFwWJDSQu0P5SYJWrybth7ImvCO4Oy0FjmyZovhDIm0TOa5t7l90boWMKguSlJH71D4XJXq8QS6twk8lkRkXZx2AYxfZ6eX2s/KrJXqPiILiO5LcukUl8oN0hHP2mKHvym+2dl/hGrNvGN4pPDij2xptAm7i9MnHI1SHokQ3ukdnz/x3teAo/8MROiE/uqPPRv55TMwl8u0RHOLROeVwMIQG3bFBLqF4dik6OctvfG9pfovjd6mi7TPbP9xvycBBzCP4ntt3n+gE5BeJiWODxl6vlViZCPkfOWsfRX+dzDvaPVqv9JUGxrVb8CcPhmmebj1n+uOb+CmHuDZYXKR8CJnefuBem0h9GMSDaYa9GQcDPp/BztnWi5gYMCh9gtdO1Pw8GmzJW/AviSrUimcxaDgAAAABJRU5ErkJggg=="/>
+  <text x="4" y="45" font-family="monospace" font-size="8" fill="#333333">HILTOP11 Symbol</text>
+</svg>
